@@ -1,0 +1,50 @@
+= kapture-localization:  toolbox
+:sectnums:
+:sectnumlevels: 1
+:toc: macro
+:toclevels: 2
+
+toc::[]
+
+WARNING: DEPRECATED, please move to https://github.com/naver/kapture-localization
+
+== Overview
+
+kapture-localization is a toolbox in which you will find implementations for various localization related algorithms. All the dataset are expected to be given in the https://github.com/naver/kapture[kapture] data format. 
+
+== Software
+
+The kapture-localization toolbox is provided with a Python library, as well as several executable scripts.
+
+=== Install
+
+TODO (setup.py will be added later; for now install the required packages and run the script from this repository)
+
+=== Using docker
+
+See link:doc/docker.adoc[DOCKER]
+
+== Tutorial
+
+See the link:pipeline/README.adoc[kapture-localization tutorial] for a short introduction to:
+
+ - mapping pipeline
+ - localization pipeline
+ - image retrieval benchmark (global sfm, local sfm, pose approximation)
+
+ 
+== Contributing
+
+There are many ways to contribute to the kapture-localization project:
+
+* provide feedback and suggestions of improvements
+* submit bug reports in the project bug tracker
+* implement a feature or bug-fix for an outstanding issue
+* provide scripts to create data in kapture format (e.g. local/global feature extraction)
+* propose a new feature and implement it
+
+// TODO individual page for kapture-localization ?
+If you wish to contribute, please refer to the  link:https://github.com/naver/kapture/blob/master/CONTRIBUTING.adoc[CONTRIBUTING] page.
+
+== License
+Software license is detailed in the link:LICENSE[LICENSE] file.
