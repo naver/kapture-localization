@@ -6,8 +6,6 @@
 
 toc::[]
 
-WARNING: DEPRECATED, please move to https://github.com/naver/kapture-localization
-
 == Overview
 
 kapture-localization is a toolbox in which you will find implementations for various localization related algorithms. All the dataset are expected to be given in the https://github.com/naver/kapture[kapture] data format. 
