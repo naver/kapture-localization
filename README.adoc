@@ -24,7 +24,7 @@ It works on Ubuntu, Windows and MacOS.
 The directories are organised as follow:
 
 ----
-├── kapture-localization/  # package (library)
+├── kapture_localization/  # package (library)
 ├── pipeline/              # main programs scheduling all steps needed in localization pipelines
 ├── samples/               # some sample data
 ├── tests/                 # unit tests
@@ -34,7 +34,7 @@ The directories are organised as follow:
 
 The __kapture-localization__ toolbox provides both :
 
- - Python *package* (`kapture-localization/`),
+ - Python *package* (`kapture_localization/`),
  - Python *executable scripts* (`pipeline/` & `tools/`).
 
 There is basically 3 pipelines, for:
