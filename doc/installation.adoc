@@ -36,12 +36,12 @@ Requirements:
 
 === linux (Ubuntu 18.04 LTS)
 
-In a terminal (e.g. __bash__), run:
-
 kapture-localization requires a recent version of colmap (>=3.6).
 Unfortunately, `apt-get` in Ubuntu 18.04 will get you colmap 3.4.
 A solution is **to install colmap from source**. You will find how to
 do it in the link:../Dockerfile[Dockerfile].
+
+Then, in a terminal (e.g. __bash__), run:
 
 [source,bash]
 ----
@@ -55,12 +55,12 @@ python3 -m pip install kapture-localization
 === Windows and MacOS
 
 
-Download and install the latest 3.6 release from https://www.python.org/downloads/ for your machine.
+Download and install the latest python 3.6 release from https://www.python.org/downloads/ for your machine.
 
 NOTE: **For windows user**: when running the installer, tick `Add Python 3.6 to PATH`,
 then `customize`, make sure __pip__, __Python test suite__ and __py launcher__ are installed.
 
-Get the latest (>=3.6) __colmap__ binaries from https://github.com/colmap/colmap/releases.
+Get the latest __colmap__ binaries (>=3.6) from https://github.com/colmap/colmap/releases.
 
 Finally, in a terminal (e.g. __powershell__), run:
 [source,bash]
@@ -68,9 +68,9 @@ Finally, in a terminal (e.g. __powershell__), run:
 pip3 install kapture-localization
 ----
 
-NOTE: **For windows user**: __kapture-localization__ uses symlinks to optimize transfer operations. But symbolic links are not fully
-supported on __windows__ platform, and may lead to permission errors. If you encounter that kind of errors,
-please consider using __copy__ or __skip__ as transfer mode.
+NOTE: **For windows user**: __kapture-localization__ uses symlinks to optimize file transfer operations.
+But symbolic links are not fully supported on __windows__ platform, and may lead to permission errors.
+If you encounter that kind of errors,  please consider using __copy__ or __skip__ as transfer mode.
 
 == from source: for developers
 
@@ -101,8 +101,8 @@ python3 setup.py build install
 Download and install :
 
  - __git__ from https://git-scm.com/download/[git-scm.com].
- - __pandoc__ from https://github.com/jgm/pandoc/releases/tag/2.9.2.1[github.com/jgm/pandoc],
- - __asciidoctor__ from https://asciidoctor.org/[asciidoctor.org].
+ - [optional]  __pandoc__ from https://github.com/jgm/pandoc/releases/tag/2.9.2.1[github.com/jgm/pandoc],
+ - [optional] __asciidoctor__ from https://asciidoctor.org/[asciidoctor.org].
 
 Then, in a command prompt (cmd or powershell) run:
 
