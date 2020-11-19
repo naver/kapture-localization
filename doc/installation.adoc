@@ -68,9 +68,20 @@ Finally, in a terminal (e.g. __powershell__), run:
 pip3 install kapture-localization
 ----
 
-NOTE: **For windows user**: __kapture-localization__ uses symlinks to optimize file transfer operations.
+=== For windows users
+
+.Symlinks
+__kapture-localization__ uses symlinks to optimize file transfer operations.
 But symbolic links are not fully supported on __windows__ platform, and may lead to permission errors.
 If you encounter that kind of errors,  please consider using __copy__ or __skip__ as transfer mode.
+
+.Python file extension
+You should have the file extension `.py` associated to the python 3.6 executable:
+
+`Windows > Choose default apps by file type > .py > python`
+
+
+
 
 == from source: for developers
 

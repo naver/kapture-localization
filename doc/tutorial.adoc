@@ -1,0 +1,80 @@
+= kapture-localization / tutorial
+:sectnums:
+:sectnumlevels: 1
+:toc:
+:toclevels: 2
+
+In this tutorial, you will learn how to localize query images within a map.
+You will first see how to build the map using structure-from-motion using known poses.
+Then, you will localize query images and evaluate the precision of the obtained localization against the ground truth.
+
+We use the `virtual_gallery_tutorial` dataset as an example.
+You can find it in the `samples/` folder.
+You can easily reproduce the procedure for any dataset that follows the <<recommended dataset structure>>.
+
+== recommended dataset structure
+
+The pipeline scripts uses shared keypoints / descriptors / global_features / matches for multiple kapture folder.
+To achieve that, they have to be stored outside any kapture folder and the pipeline scripts will be in charge of
+rebuilding the correct inputs using symlinks.
+
+[source,txt]
+----
+my_dataset
+├─ mapping
+│  └─ sensors
+│     ├─ sensors.txt          # list of all sensors with their specifications (e.g. camera intrinsics)
+│     ├─ trajectories.txt     # extrinsics (timestamp, sensor, pose)
+│     ├─ records_camera.txt   # all records of type 'camera' (timestamp, sensor and path to image)
+│     └─ records_data/        # image data path
+├─ query
+│  └─ sensors
+│     ├─ sensors.txt          # list of all sensors with their specifications (e.g. camera intrinsics)
+│     ├─ trajectories.txt     # extrinsics (timestamp, sensor, pose)
+│     ├─ records_camera.txt   # all records of type 'camera' (timestamp, sensor and path to image)
+│     └─ records_data/        # image data path
+├─ map_plus_query # kapture_merge.py with mapping/query inputs
+│  └─ sensors
+│     ├─ sensors.txt          # list of all sensors with their specifications (e.g. camera intrinsics)
+│     ├─ trajectories.txt     # extrinsics (timestamp, sensor, pose)
+│     ├─ records_camera.txt   # all records of type 'camera' (timestamp, sensor and path to image)
+│     └─ records_data/        # image data path
+├─ local_features
+│  ├─ r2d2_WASF-N8_20k
+│  │  ├─ keypoints/
+│  │  ├─ descriptors/
+│  │  ├─ NN_no_gv # match method
+│  │  │  └─ matches/ # non verified matches
+│  │  └─ NN_colmap_gv/
+│  │     └─ matches/  # verified matches
+│  └─ d2_tf
+│     ├─ keypoints/
+│     ├─ descriptors/
+│     ├─ NN_no_gv # match method
+│     │  └─ matches/ # non verified matches
+│     └─ NN_colmap_gv/
+│        └─ matches/  # verified matches
+└─ global_features
+   └─ AP-GeM-LM18
+      └─ global_features
+----
+
+WARNING: Windows users, you should have the file extension `.py` associated to the python 3.6 executable special rights
+to allow symlink. see link:installation.adoc[installation instructions] for more details.
+
+
+== preparing data
+
+You have to extract __local features__ and __global features__ **before** you run the pipeline scripts in this folder.
+
+.local features
+As an example, you can extract __R2D2 local features__ using
+https://github.com/naver/r2d2/blob/master/extract_kapture.py[extract_kapture.py] provided
+in the https://github.com/naver/r2d2#feature-extraction-with-kapture-datasets[R2D2 git repository].
+
+.global features
+For __AP-GeM__, use
+the https://github.com/naver/deep-image-retrieval/blob/master/dirtorch/extract_kapture.py[extract_kapture.py] provided
+in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
+
+You should put the mapping and query features in the same folder, see the <<recommended dataset structure>> above.
