@@ -80,7 +80,10 @@ You should have the file extension `.py` associated to the python 3.6 executable
 
 `Windows > Choose default apps by file type > .py > python`
 
-
+.Colmap path
+You must use `colmap.bat`. If the __colmap__ path is not available from your `%PATH%`
+environment variable, you must provide it to kapture tools through the parameter `-colmap`,
+e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
 
 == from source: for developers
