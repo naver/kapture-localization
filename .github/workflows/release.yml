@@ -18,19 +18,23 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.6'
+
     - name: Install pip build tools
       run: |
         sudo apt-get install -y pandoc asciidoctor
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
     - name: build pip package
       run: |
         python setup.py sdist bdist_wheel
+
     - name: push pip package
       uses: pypa/gh-action-pypi-publish@master
       with:
-        password: ${{ secrets.PYPI_PASSWORD }}
+        repository_url: https://test.pypi.org/legacy/
+        password: ${{ secrets.PYPI_TEST_TOKEN }}
 
     - name: docker build and push
       uses: elgohr/Publish-Docker-Github-Action@master
