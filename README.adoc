@@ -15,7 +15,7 @@ The localization algorithms aims to do:
 
  . **mapping**,
  . **localization** and
- . **benchmarking** (only image retrieval).
+ . **benchmarking** (image retrieval for visual localization).
 
 It works on Ubuntu, Windows and MacOS.
 
