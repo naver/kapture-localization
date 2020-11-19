@@ -3,21 +3,25 @@
 Here you'll find example of usage for the different pipeline scripts.
 For a more detailed explanation, please refer to link:../doc/tutorial.adoc[doc/tutorial].
 
-WARNING: Windows users, you should have the file extension `.py` associated to the python 3.6 executable: `Windows > Choose default apps by file type > .py <-> python`.
+Before you try out the following commands, make sure :
 
-WARNING: Windows users, because the pipeline scripts heavily rely on symlinks, which require special rights on windows, you will have to run them as administrator. See details at see https://docs.python.org/3.6/library/os.html#os.symlink.
+ - You have local features and global features saved in the recommended dataset structure
+before you run the pipeline scripts in this folder.
+Refer to the section **prepare data** of link:../doc/tutorial.adoc[doc/tutorial] page.
 
-You have to extract local features and global features before you run the pipeline scripts in this folder. You can extract __R2D2__ features using the
-https://github.com/naver/r2d2/blob/master/extract_kapture.py[tool] provided
-in the https://github.com/naver/r2d2#feature-extraction-with-kapture-datasets[R2D2 git repository]. For __AP-GeM__, use 
-the https://github.com/naver/deep-image-retrieval/blob/master/dirtorch/extract_kapture.py[script] provided in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
-
-You should put the mapping and query features in the same folder, see the recomended file structure above.
+ - Windows users should take care of extra installation steps.
+Refer to link:../doc/installation.adoc[doc/installation]
 
 == kapture_pipeline_mapping.py
-this script computes image pairs from global features, the corresponding matches, runs geometric verification and build a colmap map.
-typical call:
 
+This script computes
+
+- the image pairs from global features,
+- the corresponding matches,
+- the geometric verification and finally
+- the colmap map.
+
+typical call:
 [source,bash]
 ----
 kapture_pipeline_mapping.py
@@ -33,9 +37,15 @@ kapture_pipeline_mapping.py
 
 == kapture_pipeline_localize.py
 
-this script computes image pairs from global features, the corresponding matches, runs geometric verification and localize images on an existing colmap map.
+This script computes
 
-the parameters passed to colmap image_registrator are described in https://europe.naverlabs.com/research/publications/robust-image-retrieval-based-visual-localization-using-kapture/
+ - the image pairs from global features,
+ - the corresponding matches,
+ - the geometric verification and finally
+ - localization of images against an existing colmap map.
+
+The parameters passed to `colmap image_registrator` are described in
+link:https://europe.naverlabs.com/research/publications/robust-image-retrieval-based-visual-localization-using-kapture/[].
 
 [source,text]
 ----
@@ -65,7 +75,7 @@ config=3 : ['--Mapper.ba_refine_focal_length', '1',
             '--Mapper.filter_max_reproj_error', '12']
 ----
 
-typical call:
+Typical call:
 
 [source,bash]
 ----
@@ -86,11 +96,16 @@ kapture_pipeline_localize.py
 ----
 
 
-## kapture_pipeline_image_retrieval_benchmark.py
-reproduce results from "Benchmarking Image Retrieval for Visual Localization"
-it adds two more steps compared to localize.py : pose approximation (EWB, BDI, CSI) and local sfm
+== kapture_pipeline_image_retrieval_benchmark.py
 
-you can run it the same way:
+Produces results from "Benchmarking Image Retrieval for Visual Localization".
+It adds two more steps compared to localize.py :
+
+ - pose approximation (EWB, BDI, CSI) and
+ - local sfm.
+
+You can run it the same way:
+
 [source,bash]
 ----
 kapture_pipeline_image_retrieval_benchmark.py
