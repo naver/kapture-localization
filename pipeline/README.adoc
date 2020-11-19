@@ -43,7 +43,7 @@ my_dataset
       └─ global_features
 ----
 
-WARNING: Windows users, you should have the file extension `.py` associated to the python executable: `Windows > Choose default apps by file type > .py <-> python`.
+WARNING: Windows users, you should have the file extension `.py` associated to the python 3.6 executable: `Windows > Choose default apps by file type > .py <-> python`.
 
 WARNING: Windows users, because the pipeline scripts heavily rely on symlinks, which require special rights on windows, you will have to run them as administrator. See details at see https://docs.python.org/3.6/library/os.html#os.symlink.
 
