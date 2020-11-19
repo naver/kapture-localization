@@ -226,3 +226,65 @@ And similarly to step 3), `import model` from
 .query localized in __colmap__.
 [[fig_localized]]
 image::../doc/colmap_localized.jpg[localized]
+
+== Standard COLMAP pipeline: SIFT local features and Vocabulary Tree matching
+
+Make sure, you start the tutorial cleaned from unwanted files (eg. previous experiments).
+see <<install kapture-localization>>.
+
+
+Then, download a vocabulary tree file from https://demuc.de/colmap/.
+In this tutorial, we will use `vocab_tree_flickr100K_words32K.bin`.
+
+[source,bash]
+----
+# Windows 10 includes curl.exe
+curl -C - --output ./vocab_tree_flickr100K_words32K.bin --url https://demuc.de/colmap/vocab_tree_flickr100K_words32K.bin
+----
+
+It will run in sequence:
+
+ . `kapture_colmap_build_sift_map.py` extracts sift features, run vocab tree matching, and point_triangulator
+ . `kapture_colmap_localize_sift.py` extracts sift features, run vocab tree matching, and image_registrator
+ . `kapture_import_colmap.py` imports the colmap results into kapture
+ . `kapture_evaluate.py` If query ground truth is available, evaluates
+ . `kapture_export_LTVL2020.py` exports the localized images to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark.
+
+In this script, the --config option will decide the parameters passed to colmap image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
+
+[source,bash]
+----
+# if the colmap executable is not available from your PATH,
+# set the parameter -colmap. example -colmap C:/Workspace/dev/colmap/colmap.bat
+# If you are working with RobotCar or RobotCar_v2, add --prepend_cam
+kapture_pipeline_colmap_vocab_tree.py -v info \
+        -i ./mapping \
+        --query ./query \
+        -o ./tutorial/sift_colmap_vocab_tree/ \
+        -voc ./vocab_tree_flickr100K_words32K.bin \
+        --config 2
+----
+
+In `./tutorial/sift_colmap_vocab_tree/eval/stats.txt`, you will find something similar to:
+[source,bash]
+----
+Model: sift_colmap_vocab_tree_config_2
+
+Found 4 / 4 image positions (100.00 %).
+Found 4 / 4 image rotations (100.00 %).
+Localized images: mean=(0.0027m, 0.0406 deg) / median=(0.0023m, 0.0407 deg)
+All: median=(0.0023m, 0.0407 deg)
+Min: 0.0020m; 0.0314 deg
+Max: 0.0040m; 0.0495 deg
+
+(0.25m, 2.0 deg): 100.00%
+(0.5m, 5.0 deg): 100.00%
+(5.0m, 10.0 deg): 100.00%
+----
+
+In `./tutorial/sift_colmap_vocab_tree/LTVL2020_style_result.txt`, you would have results compatible with
+https://www.visuallocalization.net/ if your dataset is part of this benchmark (not the case with virtual gallery).
+
+
