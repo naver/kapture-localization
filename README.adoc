@@ -59,7 +59,7 @@ See link:doc/installation.adoc[] for more details.
 
 == Tutorial
 
-See the link:pipeline/README.adoc[kapture-localization tutorial] for a short introduction to:
+See the link:doc/tutorial.adoc[doc/tutorial] for a short introduction to:
 
  - mapping pipeline
  - localization pipeline

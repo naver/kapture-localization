@@ -71,7 +71,7 @@ environment variable, you must provide it to kapture tools through the parameter
 e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
 
-== 0. preparing data
+== preparing data
 
 First, you need to extract your local and global features for each image.
 
@@ -80,7 +80,6 @@ You have to extract __local features__ and __global features__ **before** you ru
 For this tutorial, we provide precomputed __R2D2__ (500 keypoints per image) and __AP-GeM__ features  for
 `samples/virtual_gallery_tutorial`. If you want to process your own dataset, you will have to convert yours to the
 correct format.
-
 
 .local features
 As an example, you can extract __R2D2 local features__ using
@@ -94,6 +93,7 @@ in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kap
 
 You should put the mapping and query features in the same folder, see the <<recommended dataset structure>> above.
 
+.previous experiments
 Also, make sure, you start the tutorial cleaned from unwanted files (eg. previous experiments).
 
 [source,bash]
@@ -102,7 +102,9 @@ cd samples/virtual_gallery_tutorial # or your own dataset
 python ./reset_tutorial_folder.py
 ----
 
-== 1. mapping
+== kapture pipeline
+
+=== 1. mapping
 
 [source,bash]
 ----
@@ -154,7 +156,7 @@ NOTE: If you are using docker, you can simply use __colmap__ GUI from host, even
 image::../doc/colmap_mapping.jpg[reconstruction]
 
 
-== 2. localization
+=== 2. localization
 
 [source,bash]
 ----
@@ -228,11 +230,13 @@ And similarly to step 3), `import model` from
 [[fig_localized]]
 image::../doc/colmap_localized.jpg[localized]
 
-== Standard COLMAP pipeline: SIFT local features and Vocabulary Tree matching
+== Standard COLMAP pipeline
+
+In contrast to <<kapture pipeline>>, this section walks through a simpler pipeline based SIFT local features
+and Vocabulary Tree matching.
 
 Make sure, you start the tutorial cleaned from unwanted files (eg. previous experiments).
-see <<install kapture-localization>>.
-
+see <<preparing data>>.
 
 Then, download a vocabulary tree file from https://demuc.de/colmap/.
 In this tutorial, we will use `vocab_tree_flickr100K_words32K.bin`.
