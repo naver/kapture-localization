@@ -63,7 +63,7 @@ See the link:doc/tutorial.adoc[doc/tutorial] for a short introduction to:
 
  - mapping pipeline
  - localization pipeline
- - image retrieval benchmark (global sfm, local sfm, pose approximation)
+//- image retrieval benchmark (global sfm, local sfm, pose approximation)
 
  
 == Contributing
@@ -77,7 +77,8 @@ There are many ways to contribute to the __kapture-localization__ project:
 * propose a new feature and implement it.
 
 // TODO individual page for kapture-localization ?
-If you wish to contribute, please refer to the  link:https://github.com/naver/kapture/blob/master/CONTRIBUTING.adoc[CONTRIBUTING] page.
+If you wish to contribute, please refer to the
+link:https://github.com/naver/kapture/blob/master/CONTRIBUTING.adoc[CONTRIBUTING] page.
 
 == License
 Software license is detailed in the link:LICENSE[LICENSE] file.
