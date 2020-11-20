@@ -71,6 +71,13 @@ environment variable, you must provide it to kapture tools through the parameter
 e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
 
+.running docker
+[source,bash]
+----
+docker run --runtime=nvidia -it --rm  kapture/kapture-localization
+cd kapture-localization
+----
+
 == preparing data
 
 First, you need to extract your local and global features for each image.
@@ -99,7 +106,7 @@ Also, make sure, you start the tutorial cleaned from unwanted files (eg. previou
 [source,bash]
 ----
 cd samples/virtual_gallery_tutorial # or your own dataset
-python ./reset_tutorial_folder.py
+./reset_tutorial_folder.py
 ----
 
 == kapture pipeline
