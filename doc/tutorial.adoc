@@ -132,7 +132,7 @@ kapture_pipeline_mapping.py -v info \
     -gfeat ./global_features/AP-GeM-LM18/global_features \
     -matches ./local_features/r2d2_500/NN_no_gv/matches \
     -matches-gv ./local_features/r2d2_500/NN_colmap_gv/matches \
-    --colmap-map ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5  `# lfeat type / map pairs` \
+    --colmap-map ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5  `# lfeat type / map pairs` \
     --topk 5
 ----
 
@@ -143,23 +143,23 @@ It will run in sequence:
  . `kapture_run_colmap_gv.py`: Run geometric verification on the 2D-2D matches,
  . `kapture_colmap_build_map.py` triangulate the 2D-2D matches to get 3D points and 2D-3D observations.
 
-You will find the list of image pairs and the reconstruction inside `./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5`
+You will find the list of image pairs and the reconstruction inside `./colmap-sfm/r2d2_500/AP-GeM-LM18_top5`
 
 To visualise the map, you can use __colmap__ gui, as follows:
 
 [source,bash]
 ----
 colmap gui \
-    --database_path ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/colmap.db \
+    --database_path ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5/colmap.db \
     --image_path ./mapping/sensors/records_data \
-    --import_path ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction/ # only available in colmap 3.6
+    --import_path ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction/ # only available in colmap 3.6
 ----
 
 NOTE: For Windows user, replace "colmap" with the full path to "colmap.bat",
 as described in <<install kapture-localization>>.
 
 NOTE: If you use an older version, you will have to import the model manually, on menu `file` > `import model` and browse to
-`tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction`. Click `yes` and `save` to the following dialogs.
+`colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction`. Click `yes` and `save` to the following dialogs.
 
 As show in Fig. <<fig_reconstruct>>, the 3-D interface of __COLMAP__
 shows the 3-D points and the cameras in the scene.
@@ -187,8 +187,8 @@ kapture_pipeline_localize.py -v info \
       -gfeat ./global_features/AP-GeM-LM18/global_features \
       -matches ./local_features/r2d2_500/NN_no_gv/matches \
       -matches-gv ./local_features/r2d2_500/NN_colmap_gv/matches \
-      --colmap-map ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5 \
-      -o ./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/ \
+      --colmap-map ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5 \
+      -o ./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/ \
       --topk 5 \
       --config 2
 ----
@@ -208,7 +208,7 @@ It will run in sequence:
 In this script, the --config option will decide the parameters passed to colmap image_registrator.
 The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
 
-In `./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/eval/stats.txt`,
+In `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/eval/stats.txt`,
 you will find something similar to:
 
 [source,ini]
@@ -227,7 +227,7 @@ Max: 0.0246m; 0.4454 deg
 (5.0m, 10.0 deg): 100.00%
 ----
 
-In `./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/LTVL2020_style_result.txt`,
+In `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/LTVL2020_style_result.txt`,
 you would have results compatible with https://www.visuallocalization.net/
 if your dataset is part of this benchmark (not the case with virtual gallery).
 
@@ -235,9 +235,9 @@ To visualise the queries in the map, you can use __COLMAP__ gui, as follows:
 [source,bash]
 ----
 colmap gui \
-    --database_path ./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/colmap.db \
+    --database_path ./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/colmap.db \
     --image_path query/sensors/records_data \
-    --import_path ./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/reconstruction/ # only available in colmap 3.6
+    --import_path ./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/reconstruction/ # only available in colmap 3.6
 ----
 
 .query localized in __colmap__.
@@ -269,7 +269,7 @@ curl -C - --output ./vocab_tree_flickr100K_words32K.bin --url https://demuc.de/c
 kapture_pipeline_colmap_vocab_tree.py -v info \
         -i ./mapping \
         --query ./query \
-        -o ./tutorial/sift_colmap_vocab_tree/ \
+        -o ./sift_colmap_vocab_tree/ \
         -voc ./vocab_tree_flickr100K_words32K.bin \
         --config 2
 ----
@@ -286,7 +286,7 @@ It will run in sequence:
 In this script, the --config option will decide the parameters passed to colmap image_registrator.
 The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
 
-In `./tutorial/sift_colmap_vocab_tree/eval/stats.txt`, you will find something similar to:
+In `./sift_colmap_vocab_tree/eval/stats.txt`, you will find something similar to:
 [source,bash]
 ----
 Model: sift_colmap_vocab_tree_config_2
@@ -303,7 +303,7 @@ Max: 0.0040m; 0.0495 deg
 (5.0m, 10.0 deg): 100.00%
 ----
 
-In `./tutorial/sift_colmap_vocab_tree/LTVL2020_style_result.txt`, you would have results compatible with
+In `./sift_colmap_vocab_tree/LTVL2020_style_result.txt`, you would have results compatible with
 https://www.visuallocalization.net/ if your dataset is part of this benchmark (not the case with virtual gallery).
 
 
