@@ -12,6 +12,8 @@ We use the `virtual_gallery_tutorial` dataset as an example.
 You can find it in the `samples/` folder.
 You can easily reproduce the procedure for any dataset that follows the <<recommended dataset structure>>.
 
+If you want to use the pipelines to your own data, have a look to link:../pipeline/README.adoc[pipeline/README].
+
 == recommended dataset structure
 
 The pipeline scripts uses shared keypoints / descriptors / global_features / matches for multiple kapture folder.
