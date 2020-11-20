@@ -105,7 +105,7 @@ Also, make sure, you start the tutorial cleaned from unwanted files (eg. previou
 
 [source,bash]
 ----
-cd samples/virtual_gallery_tutorial # or your own dataset
+cd samples/virtual_gallery_tutorial
 ./reset_tutorial_folder.py
 ----
 
@@ -115,6 +115,7 @@ cd samples/virtual_gallery_tutorial # or your own dataset
 
 [source,bash]
 ----
+cd samples/virtual_gallery_tutorial # or your own dataset
 # if the colmap executable is not available from your PATH,
 # set the parameter -colmap. example -colmap C:/Workspace/dev/colmap/colmap.bat
 kapture_pipeline_mapping.py -v info \
@@ -124,7 +125,7 @@ kapture_pipeline_mapping.py -v info \
     -gfeat ./global_features/AP-GeM-LM18/global_features \
     -matches ./local_features/r2d2_500/NN_no_gv/matches \
     -matches-gv ./local_features/r2d2_500/NN_colmap_gv/matches \
-    --colmap-map ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5 # lfeat_type / map_pairs \
+    --colmap-map ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5  `# lfeat type / map pairs` \
     --topk 5
 ----
 
