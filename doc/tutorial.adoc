@@ -80,23 +80,28 @@ cd kapture-localization
 
 == preparing data
 
-First, you need to extract your local and global features for each image.
+Before going through the <<kapture pipeline>>, you have to extract __local features__ and __global features__
+for each image.
 
-You have to extract __local features__ and __global features__ **before** you run the pipeline scripts in this folder.
+.precomputed features
+For sake of simplicity, we provide precomputed local and global features for this tutorial  (virtual_gallery_tutorial).
+The local features are __R2D2__ feature (500 keypoints per image).
+They are stored in `./local_features/r2d2_500/{descriptors,keypoints}`.
+The global features are __AP-GeM__ features.
+They are stored in `global_features/AP-GeM-LM18/global_features/`.
+If you want more details about those features or extract your owns, refer to the section below.
 
-For this tutorial, we provide precomputed __R2D2__ (500 keypoints per image) and __AP-GeM__ features  for
-`samples/virtual_gallery_tutorial`. If you want to process your own dataset, you will have to convert yours to the
-correct format.
-
-.local features
-As an example, you can extract __R2D2 local features__ using
+.extract your __local features__
+You can extract __R2D2 local features__ using
 https://github.com/naver/r2d2/blob/master/extract_kapture.py[extract_kapture.py] provided
 in the https://github.com/naver/r2d2#feature-extraction-with-kapture-datasets[R2D2 git repository].
+If you want to use another type of keypoints detector/descriptor, you just have to comply to the __kapture__ format.
 
-.global features
-For __AP-GeM__, use
+.extract your __global features__
+To extract __AP-GeM__ global features, use
 the https://github.com/naver/deep-image-retrieval/blob/master/dirtorch/extract_kapture.py[extract_kapture.py] provided
 in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
+If you want to use another type of global features, you just have to comply to the __kapture__ format.
 
 You should put the mapping and query features in the same folder, see the <<recommended dataset structure>> above.
 
@@ -144,13 +149,14 @@ To visualise the map, you can use __colmap__ gui, as follows:
 ----
 colmap gui \
     --database_path ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/colmap.db \
-    --image_path ./mapping/sensors/records_data
+    --image_path ./mapping/sensors/records_data \
+    --import_path ./tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction/ # only available in colmap 3.6
 ----
 
 NOTE: For Windows user, replace "colmap" with the full path to "colmap.bat",
 as described in <<install kapture-localization>>.
 
-Once the __COLMAP__ window appears, click on menu `file` > `import model` and browse to
+NOTE: If you use an older version, you will have to import the model manually, on menu `file` > `import model` and browse to
 `tutorial/colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction`. Click `yes` and `save` to the following dialogs.
 
 As show in Fig. <<fig_reconstruct>>, the 3-D interface of __COLMAP__
@@ -227,12 +233,10 @@ To visualise the queries in the map, you can use __COLMAP__ gui, as follows:
 [source,bash]
 ----
 colmap gui \
-        --database_path tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/colmap.db \
-        --image_path query/sensors/records_data
+    --database_path ./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/colmap.db \
+    --image_path query/sensors/records_data \
+    --import_path ./tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/reconstruction/ # only available in colmap 3.6
 ----
-
-And similarly to step 3), `import model` from
-`tutorial/colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/reconstruction`.
 
 .query localized in __colmap__.
 [[fig_localized]]
