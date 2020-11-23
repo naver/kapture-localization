@@ -8,7 +8,7 @@ In this tutorial, you will learn how to localize query images within a map.
 You will first see how to build the map using structure-from-motion using known poses.
 Then, you will localize query images and evaluate the precision of the obtained localization against the ground truth.
 
-We use the `virtual_gallery_tutorial` dataset as an example.
+We use the `virtual_gallery_tutorial` dataset as an example. It is a subset of the https://europe.naverlabs.com/research/3d-vision/virtual-gallery-dataset/[virtual gallery dataset].
 You can find it in the `samples/` folder.
 You can easily reproduce the procedure for any dataset that follows the <<recommended dataset structure>>.
 
