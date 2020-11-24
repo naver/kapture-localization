@@ -151,7 +151,7 @@ def localize_pipeline(kapture_map_path: str,
 
     # kapture_compute_matches.py
     if 'compute_matches' not in skip_list:
-        local_compute_matches_path = path.join(pipeline_import_paths.HERE_PATH, '../tool/kapture_compute_matches.py')
+        local_compute_matches_path = path.join(pipeline_import_paths.HERE_PATH, '../tools/kapture_compute_matches.py')
         compute_matches_args = ['-v', str(logger.level),
                                 '-i', proxy_kapture_map_plus_query_path,
                                 '--pairsfile-path', pairfile_path]
