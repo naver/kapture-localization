@@ -71,7 +71,8 @@ pip3 install kapture-localization
 .Symlinks
 __kapture-localization__ uses symlinks to optimize file transfer operations.
 However, symbolic links are not fully supported on __windows__ platforms and may lead to permission errors.
-If you encounter that kind of errors, please consider using __copy__ or __skip__ as transfer mode in the kapture scripts.
+For most kapture scripts, you can use __copy__ or __skip__ as transfer mode in order to avoid this issue.
+For the pipeline scripts, you cannot avoid the use of symlinks and will have to run them as administrator.
 
 .Python file extension
 You should have the file extension `.py` associated to the python 3.6 executable:
