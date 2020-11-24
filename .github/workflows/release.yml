@@ -43,6 +43,14 @@ jobs:
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: kapture/kapture-localization
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
         tag_names: true
+
+    - name: docker tag latest
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: kapture/kapture-localization
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        tags: "latest"

@@ -42,7 +42,7 @@ long_description = read_doc(readme_filepath)
 setuptools.setup(
     # description
     name='kapture-localization',
-    version="0.0.b",
+    version="0.0.1",
     author="naverlabs",
     author_email="kapture@naverlabs.com",
     description="kapture-localization: localization pipelines based on kapture.",

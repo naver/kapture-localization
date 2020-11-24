@@ -15,6 +15,7 @@ from typing import List
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
+import kapture_localization.colmap.colmap_command as colmap_lib
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -24,7 +25,6 @@ from kapture.utils.paths import safe_remove_file, safe_remove_any_path
 from kapture.core.Trajectories import rigs_remove_inplace
 from kapture.io.records import get_image_fullpath
 
-import kapture.converter.colmap.colmap_command as colmap_lib
 from kapture.converter.colmap.database import COLMAPDatabase
 import kapture.converter.colmap.database_extra as database_extra
 
