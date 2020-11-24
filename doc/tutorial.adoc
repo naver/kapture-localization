@@ -307,3 +307,61 @@ In `./sift_colmap_vocab_tree/LTVL2020_style_result.txt`, you would have results 
 https://www.visuallocalization.net/ if your dataset is part of this benchmark (not the case with virtual gallery).
 
 
+== Image retrieval benchmark
+
+We will soon release colmap maps alongside r2d2 local features for the Aachen Day Night, Robotcar Seasons and baidu mall datasets.
+We will complete this section with more detailed intruction at that time.
+
+In order to run the image retrieval benchmark, you need to have a colmap map, as well as local and global features for the map and query data in the same file structure as described above.
+
+Once everything in ready, it is called like kapture_pipeline_localize.py. In addition to the global sfm, it also outputs results for local sfm and pose approximation.
+
+Example:
+# If the colmap executable is not available from your PATH, set the parameter -colmap
+#   example: -colmap C:/Workspace/dev/colmap/colmap.bat
+# If you are working with RobotCar or RobotCar_v2, add --prepend_cam
+kapture_pipeline_image_retrieval_benchmark.py -v info \
+      -i ./mapping \
+      --query ./query \
+      -kpt ./local_features/r2d2_500/keypoints \
+      -desc ./local_features/r2d2_500/descriptors \
+      -gfeat ./global_features/AP-GeM-LM18/global_features \
+      -matches ./local_features/r2d2_500/NN_no_gv/matches \
+      -matches-gv ./local_features/r2d2_500/NN_colmap_gv/matches \
+      --colmap-map ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5 \
+      -o ./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/ \
+      --topk 5 \
+      --config 2
+----
+
+It will run in sequence:
+
+ . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets,
+ . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute matches),
+ . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs,
+ . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches,
+ . `kapture_colmap_localize.py` runs the camera pose estimation part of the code (global sfm),
+ . `kapture_import_colmap.py` imports the colmap results into kapture,
+ . `kapture_export_LTVL2020.py` exports the global sfm results to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_colmap_localize_localsfm.py` runs the camera pose estimation part of the code (local sfm),
+ . `kapture_export_LTVL2020.py` exports the local sfm results to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_pose_approximation.py` runs the pose approximation 3 times,
+ . `kapture_export_LTVL2020.py` exports the pose approximation results (called 3 times) to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_evaluate.py` If query ground truth is available, evaluates the localization for all methods.
+
+In this script, the --config option will decide the parameters passed to colmap image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
+
+It will output something similar to
+```
+                     (0.25, 2.0)    (0.5, 5.0)    (5.0, 10.0)
+-------------------  -------------  ------------  -------------
+global_sfm_config_2  100.00%        100.00%       100.00%
+local_sfm            100.00%        100.00%       100.00%
+EWB                  0.00%          25.00%        25.00%
+BDI                  0.00%          25.00%        25.00%
+CSI                  0.00%          25.00%        50.00%
+```
