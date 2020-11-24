@@ -4,21 +4,21 @@
 :toc:
 :toclevels: 2
 
-You can either install using docker, pip or from the source code manually.
+You can install this toolbox using docker, pip or manually from the source code.
 
 == Docker: the fast way
 
-We provide a docker image, you can run it:
+We provide a docker image that can be run like this:
 
 [source,bash]
 ----
-docker run --runtime=nvidia # benefit the GPU acceleration \
-    -it --rm # Automatically remove the container when it exits \
+docker run --runtime=nvidia # benefit from the GPU acceleration \
+    -it --rm # automatically remove the container when it exits \
     --volume <my_data>:<my_data> # give access to your data on your machine \
     kapture/kapture-localization
 ----
 
-You can also build your own docker image as follow  :
+You can also build your own docker image as follow:
 
 [source,bash]
 ----
@@ -32,21 +32,20 @@ docker build --tag kapture/kapture-localization .
 Requirements:
 
  - python >= 3.6 + python3-pip
- - colmap >= 3.6
+ - COLMAP >= 3.6
 
 === linux (Ubuntu 18.04 LTS)
 
-kapture-localization requires a recent version of colmap (>=3.6).
-Unfortunately, `apt-get` in Ubuntu 18.04 will get you colmap 3.4.
-A solution is **to install colmap from source**. You will find how to
-do it in the link:../Dockerfile[Dockerfile].
+kapture-localization requires a recent version of COLMAP (>=3.6).
+Unfortunately, `apt-get` in Ubuntu 18.04 will install COLMAP 3.4.
+A solution is **to install COLMAP from source**. You will find instructions of how to do that in the link:../Dockerfile[Dockerfile].
 
 Then, in a terminal (e.g. __bash__), run:
 
 [source,bash]
 ----
 # install requirements
-# make sure you have colmap 3.6 (see above instructions)
+# make sure you have COLMAP 3.6 (see above instructions)
 sudo apt-get install -y python3.6 python3-pip
 # install kapture-localization
 python3 -m pip install kapture-localization
@@ -54,13 +53,12 @@ python3 -m pip install kapture-localization
 
 === Windows and MacOS
 
-
 Download and install the latest python 3.6 release from https://www.python.org/downloads/ for your machine.
 
 NOTE: **For windows user**: when running the installer, tick `Add Python 3.6 to PATH`,
 then `customize`, make sure __pip__, __Python test suite__ and __py launcher__ are installed.
 
-Get the latest __colmap__ binaries (>=3.6) from https://github.com/colmap/colmap/releases.
+Get the latest __COLMAP__ binaries (>=3.6) from https://github.com/colmap/colmap/releases.
 
 Finally, in a terminal (e.g. __powershell__), run:
 [source,bash]
@@ -68,32 +66,32 @@ Finally, in a terminal (e.g. __powershell__), run:
 pip3 install kapture-localization
 ----
 
-=== For windows users
+=== For Windows users
 
 .Symlinks
 __kapture-localization__ uses symlinks to optimize file transfer operations.
-But symbolic links are not fully supported on __windows__ platform, and may lead to permission errors.
-If you encounter that kind of errors,  please consider using __copy__ or __skip__ as transfer mode.
+However, symbolic links are not fully supported on __windows__ platforms and may lead to permission errors.
+If you encounter that kind of errors, please consider using __copy__ or __skip__ as transfer mode in the kapture scripts.
 
 .Python file extension
 You should have the file extension `.py` associated to the python 3.6 executable:
 
 `Windows > Choose default apps by file type > .py > python`
 
-.Colmap path
-You must use `colmap.bat`. If the __colmap__ path is not available from your `%PATH%`
+.COLMAP path
+You must use `colmap.bat`. If the __COLMAP__ path is not available from your `%PATH%`
 environment variable, you must provide it to kapture tools through the parameter `-colmap`,
 e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
 
-== from source: for developers
+== From source: for developers
 
 NOTE: __kapture-localization__ can also work as a stand-alone, without being installed.
 
-In addition to package (<<pip: the simple way>>) requirements, you need to install __git__,
+In addition to the package (<<pip: the simple way>>) requirements, you need to install __git__,
 and optionally (for documentation), __pandoc__ and __asciidoctor__.
 
-=== linux (Ubuntu 18.04 LTS)
+=== Linux (Ubuntu 18.04 LTS)
 
 In a terminal, do:
 

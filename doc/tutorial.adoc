@@ -4,21 +4,26 @@
 :toc:
 :toclevels: 2
 
-In this tutorial, you will learn how to localize query images within a map.
-You will first see how to build the map using structure-from-motion using known poses.
-Then, you will localize query images and evaluate the precision of the obtained localization against the ground truth.
+= Structure-based mapping and localization
 
-We use the `virtual_gallery_tutorial` dataset as an example. It is a subset of the https://europe.naverlabs.com/research/3d-vision/virtual-gallery-dataset/[virtual gallery dataset].
-You can find it in the `samples/` folder.
-You can easily reproduce the procedure for any dataset that follows the <<recommended dataset structure>>.
+In this tutorial, we will us two pipelines (custom pipeline and COLMAP pipeline) to explain how to localize query images within a map.
+We will first explain how to build the map using structure-from-motion leveraging known camera poses.
+Then, we will show how to localize query images and how to evaluate the precision of the obtained localization against the ground truth.
 
-If you want to use the pipelines to your own data, have a look to link:../pipeline/README.adoc[pipeline/README].
+We will use the `virtual_gallery_tutorial` dataset as an example. It is a subset of the https://europe.naverlabs.com/research/3d-vision/virtual-gallery-dataset/[virtual gallery dataset].
+The sample dataset can be found in the `samples/` folder.
+The tutorial can be used for any dataset that follows the <<recommended dataset structure>>.
 
-== recommended dataset structure
+Further information about the pipelines can be found in link:../pipeline/README.adoc[pipeline/README].
 
-The pipeline scripts uses shared keypoints / descriptors / global_features / matches for multiple kapture folder.
-To achieve that, they have to be stored outside any kapture folder and the pipeline scripts will be in charge of
-rebuilding the correct inputs using symlinks.
+== Recommended dataset structure
+
+The pipeline scripts use the same locations of keypoints, descriptors, global features, and matches for multiple kapture folders.
+Note, a kapture folder contains sensor data and, if available, reconstruction data. More details about the structure of a kapture folder and the data it contains can be found in the link:https://github.com/naver/kapture/blob/master/kapture_format.adoc[kapture repository].
+
+In order to share reconstruction data across different kapture folders, this data has to be stored outside of any kapture folder and the pipeline scripts will use these locations to assemble the correct kapture folders using symlinks.
+
+The following example contains 3 kapture folders (mapping, query, map_plus_query) and 2 locations for shared reconstruction data (local_features, global_features). Note, since keypoint matches depend on the local feature type, they are stored in the respective subfolder. For example, r2d2_WASF-N8_20k/NN_no_gv means matches without geometric verification of 20k R2D2 features extracted using the model named r2d2_WASF-N8. Of course the naming of the matching method and the local features is arbitrary.
 
 [source,txt]
 ----
@@ -32,7 +37,7 @@ my_dataset
 ├─ query
 │  └─ sensors
 │     ├─ sensors.txt          # list of all sensors with their specifications (e.g. camera intrinsics)
-│     ├─ trajectories.txt     # extrinsics (timestamp, sensor, pose)
+│     ├─ trajectories.txt     # if available: extrinsics (timestamp, sensor, pose)
 │     ├─ records_camera.txt   # all records of type 'camera' (timestamp, sensor and path to image)
 │     └─ records_data/        # image data path
 ├─ map_plus_query # kapture_merge.py with mapping/query inputs
@@ -42,73 +47,70 @@ my_dataset
 │     ├─ records_camera.txt   # all records of type 'camera' (timestamp, sensor and path to image)
 │     └─ records_data/        # image data path
 ├─ local_features
-│  ├─ r2d2_WASF-N8_20k
+│  ├─ r2d2_WASF-N8_20k # 20k R2D2 with model r2d2_WASF-N8
 │  │  ├─ keypoints/
 │  │  ├─ descriptors/
-│  │  ├─ NN_no_gv # match method
-│  │  │  └─ matches/ # non verified matches
-│  │  └─ NN_colmap_gv/
-│  │     └─ matches/  # verified matches
+│  │  ├─ NN_no_gv # match method, here: cross validation without geometric verification
+│  │  │  └─ matches/
+│  │  └─ NN_colmap_gv/ # match method, here: cross validation with COLMAP geometric verification
+│  │     └─ matches/
 │  └─ d2_tf
 │     ├─ keypoints/
 │     ├─ descriptors/
-│     ├─ NN_no_gv # match method
-│     │  └─ matches/ # non verified matches
-│     └─ NN_colmap_gv/
-│        └─ matches/  # verified matches
+│     ├─ NN_no_gv # match method (see above)
+│     │  └─ matches/
+│     └─ NN_colmap_gv/ # match method (see above)
+│        └─ matches/
 └─ global_features
-   └─ AP-GeM-LM18
+   └─ AP-GeM-LM18 # APGeM features with model AP-GeM-LM18
       └─ global_features
 ----
 
-WARNING: Windows users, you should have the file extension `.py` associated to the python 3.6 executable special rights
-to allow symlink. see link:installation.adoc[installation instructions] for more details.
+WARNING: Windows users need to have the file extension `.py` associated to the python3.6 executable special rights
+to allow symlink. See link:installation.adoc[installation instructions] for more details.
 
-== install kapture-localization
+== Install kapture-localization
 
-see link:installation.adoc[]
+See link:installation.adoc[] for more details.
 
-For __Windows__ users, you must use `colmap.bat`. If the __colmap__ path is not available from your `%PATH%`
-environment variable, you must provide it to kapture tools through the parameter `-colmap`,
+For __Windows__ users: Please use `colmap.bat`. If the __colmap__ path is not available from your `%PATH%`
+environment variable, you have to provide it to kapture tools through the parameter `-colmap`,
 e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
 
-.running docker
+.using docker
 [source,bash]
 ----
 docker run --runtime=nvidia -it --rm  kapture/kapture-localization
 cd kapture-localization
 ----
 
-== preparing data
+== Prepare data
 
-Before going through the <<kapture pipeline>>, you have to extract __local features__ and __global features__
-for each image.
+Before going through the <<kapture pipeline>>, __local features__ and __global features__ have to be extracted for each image.
 
 .precomputed features
-For sake of simplicity, we provide precomputed local and global features for this tutorial  (virtual_gallery_tutorial).
-The local features are __R2D2__ feature (500 keypoints per image).
-They are stored in `./local_features/r2d2_500/{descriptors,keypoints}`.
-The global features are __AP-GeM__ features.
-They are stored in `global_features/AP-GeM-LM18/global_features/`.
-If you want more details about those features or extract your owns, refer to the section below.
+For easy use of this tutorial, we provide precomputed local and global features (virtual_gallery_tutorial):
 
-.extract your __local features__
-You can extract __R2D2 local features__ using
+- local features: __R2D2__ (500 kps per image), stored in `./local_features/r2d2_500/{descriptors,keypoints}`.
+- global features: __AP-GeM__, stored in `./global_features/AP-GeM-LM18/global_features/`.
+
+.extract own __local features__
+Custom local features in the __kapture__ format can be used as well. For example, __R2D2__ features can be extracted using
 https://github.com/naver/r2d2/blob/master/extract_kapture.py[extract_kapture.py] provided
 in the https://github.com/naver/r2d2#feature-extraction-with-kapture-datasets[R2D2 git repository].
-If you want to use another type of keypoints detector/descriptor, you just have to comply to the __kapture__ format.
+See https://github.com/naver/kapture#local-features[here] for more local feature types that are directly supported in kapture.
 
-.extract your __global features__
-To extract __AP-GeM__ global features, use
-the https://github.com/naver/deep-image-retrieval/blob/master/dirtorch/extract_kapture.py[extract_kapture.py] provided
+.extract own __global features__
+Custom global features in the __kapture__ format can be used as well.
+For example, __AP-GeM__ global features can be extracted using https://github.com/naver/deep-image-retrieval/blob/master/dirtorch/extract_kapture.py[extract_kapture.py] provided
 in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
-If you want to use another type of global features, you just have to comply to the __kapture__ format.
+See https://github.com/naver/kapture#global-features[here] for more global feature types that are directly supported in kapture.
 
-You should put the mapping and query features in the same folder, see the <<recommended dataset structure>> above.
+Features for mapping and query images should be in the same folder (see the <<recommended dataset structure>> above).
 
 .previous experiments
-Also, make sure, you start the tutorial cleaned from unwanted files (eg. previous experiments).
+To be sure starting from scratch, unwanted files (e.g. previous experiments) should be deleted before running this tutorial.
 
 [source,bash]
 ----
@@ -116,15 +118,17 @@ cd samples/virtual_gallery_tutorial
 ./reset_tutorial_folder.py
 ----
 
-== kapture pipeline
+Next, we will introduce two mapping and localization pipelines. The first one is a custom-built pipeline that can be used with any local or global feature type as well as custom keypoint matches, the second one is fully based on COLMAP and shows how COLMAP can be used with data provided in kapture format.
 
-=== 1. mapping
+== Kapture pipeline
+
+=== 1. Mapping
 
 [source,bash]
 ----
-cd samples/virtual_gallery_tutorial # or your own dataset
-# if the colmap executable is not available from your PATH,
-# set the parameter -colmap. example -colmap C:/Workspace/dev/colmap/colmap.bat
+cd samples/virtual_gallery_tutorial # or a custom dataset
+# if the COLMAP executable is not available from PATH,
+# parameter -colmap needs to be set. example -colmap C:/Workspace/dev/colmap/colmap.bat
 kapture_pipeline_mapping.py -v info \
     -i ./mapping \
     -kpt ./local_features/r2d2_500/keypoints \
@@ -136,16 +140,16 @@ kapture_pipeline_mapping.py -v info \
     --topk 5
 ----
 
-It will run in sequence:
+`kapture_pipeline_mapping.py` will run the following sequence:
 
- . `kapture_compute_image_pairs.py`: associate similar images within the mapping set,
- . `kapture_compute_matches.py`: compute 2D-2D matches using local features and the list of pairs,
- . `kapture_run_colmap_gv.py`: Run geometric verification on the 2D-2D matches,
- . `kapture_colmap_build_map.py` triangulate the 2D-2D matches to get 3D points and 2D-3D observations.
+ . `kapture_compute_image_pairs.py`: associate similar images within the mapping set
+ . `kapture_compute_matches.py`: compute 2D-2D matches using local features and the list of pairs
+ . `kapture_run_colmap_gv.py`: run COLMAP geometric verification on the 2D-2D matches
+ . `kapture_colmap_build_map.py` triangulate the 2D-2D matches to get 3D points and 2D-3D observations
 
-You will find the list of image pairs and the reconstruction inside `./colmap-sfm/r2d2_500/AP-GeM-LM18_top5`
+The resulting list of image pairs and the 3D reconstruction (map) can be found in `./colmap-sfm/r2d2_500/AP-GeM-LM18_top5`.
 
-To visualise the map, you can use __colmap__ gui, as follows:
+The map you can visualized using the __COLMAP__ gui as follows:
 
 [source,bash]
 ----
@@ -158,27 +162,27 @@ colmap gui \
 NOTE: For Windows user, replace "colmap" with the full path to "colmap.bat",
 as described in <<install kapture-localization>>.
 
-NOTE: If you use an older version, you will have to import the model manually, on menu `file` > `import model` and browse to
-`colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction`. Click `yes` and `save` to the following dialogs.
+NOTE: For older versions of COLMAP (< 3.6) the model needs to be imported manually: menu `file` > `import model` > browse to
+`colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction` >  click `yes` and `save` in the following two dialogs.
 
-As show in Fig. <<fig_reconstruct>>, the 3-D interface of __COLMAP__
-shows the 3-D points and the cameras in the scene.
-If you double-click on a camera, you'll see the image, and the 3-D points seen from it will be highlighted.
+As show in Fig. <<fig_reconstruct>>, the 3D interface of __COLMAP__
+shows the 3D points and the cameras in the scene.
+A double-click on a camera will show the image and the observed 3D points will be highlighted.
 
-NOTE: If you are using docker, you can simply use __colmap__ GUI from host, even if the version is < 3.6.
+NOTE: If you are using docker, you can simply use __COLMAP__ GUI from host, even if the version is < 3.6.
 
-.map reconstruction in __colmap__.
+.Map reconstruction in __COLMAP__.
 [[fig_reconstruct]]
 image::../doc/colmap_mapping.jpg[reconstruction]
 
 
-=== 2. localization
+=== 2. Localization
 
 [source,bash]
 ----
-# If the colmap executable is not available from your PATH, set the parameter -colmap
+# If the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
-# If you are working with RobotCar or RobotCar_v2, add --prepend_cam
+# For RobotCar or RobotCar_v2 --prepend_cam needs to be added.
 kapture_pipeline_localize.py -v info \
       -i ./mapping \
       --query ./query \
@@ -193,23 +197,22 @@ kapture_pipeline_localize.py -v info \
       --config 2
 ----
 
-It will run in sequence:
+`kapture_pipeline_localize.py` will run the following sequence:
 
- . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets,
- . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute matches),
- . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs,
- . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches,
- . `kapture_colmap_localize.py` runs the camera pose estimation part of the code,
- . `kapture_import_colmap.py` imports the colmap results into kapture,
- . `kapture_evaluate.py` If query ground truth is available, evaluates the localization.
+ . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets
+ . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute shared matches)
+ . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs
+ . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches
+ . `kapture_colmap_localize.py` runs the camera pose estimation
+ . `kapture_import_colmap.py` imports the COLMAP results into kapture
+ . `kapture_evaluate.py` if query ground truth is available, this evaluates the localization results
  . `kapture_export_LTVL2020.py` exports the localized images to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
 
-In this script, the --config option will decide the parameters passed to colmap image_registrator.
-The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
+In this script, the --config option will decide the parameters passed to the COLMAP image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py].
 
-In `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/eval/stats.txt`,
-you will find something similar to:
+The resulting `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/eval/stats.txt` will look similar to:
 
 [source,ini]
 ----
@@ -227,12 +230,11 @@ Max: 0.0246m; 0.4454 deg
 (5.0m, 10.0 deg): 100.00%
 ----
 
-In `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/LTVL2020_style_result.txt`,
-you would have results compatible with https://www.visuallocalization.net/
-if your dataset is part of this benchmark (not the case with virtual gallery).
+If the dataset used is part of the https://www.visuallocalization.net/[online benchmark] (not the case for virtual gallery), `./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/LTVL2020_style_result.txt` contains the results in compatible format.
 
-To visualise the queries in the map, you can use __COLMAP__ gui, as follows:
+To visualise the queries in the map, __COLMAP__ gui can be used as follows:
 [source,bash]
+
 ----
 colmap gui \
     --database_path ./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/colmap.db \
@@ -240,19 +242,18 @@ colmap gui \
     --import_path ./colmap-localization/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/colmap_localized/reconstruction/ # only available in colmap 3.6
 ----
 
-.query localized in __colmap__.
+.Query localized in __COLMAP__.
 [[fig_localized]]
 image::../doc/colmap_localized.jpg[localized]
 
 == Standard COLMAP pipeline
 
-In contrast to <<kapture pipeline>>, this section walks through a simpler pipeline based SIFT local features
+In contrast to <<kapture pipeline>>, this section walks through a simpler pipeline fully based on COLMAP using SIFT local features
 and Vocabulary Tree matching.
 
-Make sure, you start the tutorial cleaned from unwanted files (eg. previous experiments).
-see <<preparing data>>.
+This tutorial also needs to be started from scratch. To clean unwanted files (e.g. previous experiments) see <<preparing data>>.
 
-Then, download a vocabulary tree file from https://demuc.de/colmap/.
+As keypoint matching is done with a vocabulary tree, an index file can be downloaded from https://demuc.de/colmap/.
 In this tutorial, we will use `vocab_tree_flickr100K_words32K.bin`.
 
 [source,bash]
@@ -263,9 +264,9 @@ curl -C - --output ./vocab_tree_flickr100K_words32K.bin --url https://demuc.de/c
 
 [source,bash]
 ----
-# if the colmap executable is not available from your PATH,
-# set the parameter -colmap. example -colmap C:/Workspace/dev/colmap/colmap.bat
-# If you are working with RobotCar or RobotCar_v2, add --prepend_cam
+# if the COLMAP executable is not available from PATH,
+# the parameter -colmap needs to be set. example -colmap C:/Workspace/dev/colmap/colmap.bat
+# For RobotCar or RobotCar_v2 --prepend_cam needs to be added
 kapture_pipeline_colmap_vocab_tree.py -v info \
         -i ./mapping \
         --query ./query \
@@ -274,19 +275,20 @@ kapture_pipeline_colmap_vocab_tree.py -v info \
         --config 2
 ----
 
-It will run in sequence:
+`kapture_pipeline_colmap_vocab_tree.py` will run the following sequence:
 
- . `kapture_colmap_build_sift_map.py` extracts sift features, run vocab tree matching, and point_triangulator
- . `kapture_colmap_localize_sift.py` extracts sift features, run vocab tree matching, and image_registrator
- . `kapture_import_colmap.py` imports the colmap results into kapture
- . `kapture_evaluate.py` If query ground truth is available, evaluates
+ . `kapture_colmap_build_sift_map.py` extracts SIFT features, runs vocab tree matching and point_triangulator
+ . `kapture_colmap_localize_sift.py` extracts SIFT features, runs vocab tree matching and image_registrator
+ . `kapture_import_colmap.py` imports the COLMAP results into kapture
+ . `kapture_evaluate.py` if query ground truth is available, this evaluates the localization results
  . `kapture_export_LTVL2020.py` exports the localized images to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark.
 
-In this script, the --config option will decide the parameters passed to colmap image_registrator.
-The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
+In this script, the --config option will set the parameters passed to the COLMAP image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py].
 
-In `./sift_colmap_vocab_tree/eval/stats.txt`, you will find something similar to:
+The resulting `./sift_colmap_vocab_tree/eval/stats.txt` will look similar to:
+
 [source,bash]
 ----
 Model: sift_colmap_vocab_tree_config_2
@@ -303,24 +305,48 @@ Max: 0.0040m; 0.0495 deg
 (5.0m, 10.0 deg): 100.00%
 ----
 
-In `./sift_colmap_vocab_tree/LTVL2020_style_result.txt`, you would have results compatible with
-https://www.visuallocalization.net/ if your dataset is part of this benchmark (not the case with virtual gallery).
+If the dataset used is part of the https://www.visuallocalization.net/[online benchmark] (not the case for virtual gallery), `./sift_colmap_vocab_tree/LTVL2020_style_result.txt` contains the results in compatible format.
 
+= Image retrieval benchmark
 
-== Image retrieval benchmark
+In this section, we will present our benchmark of image retrieval methods for visual localization.
+More details and analysis are presented in our 3DV https://europe.naverlabs.com/research/publications/benchmarking-image-retrieval-for-visual-localization/[paper].
 
-We will soon release colmap maps alongside r2d2 local features for the Aachen Day Night, Robotcar Seasons and baidu mall datasets.
-We will complete this section with more detailed intruction at that time.
+As shown in Fig. <<fig_roles_ir>> image retrieval can play different roles in visual localization:
 
-In order to run the image retrieval benchmark, you need to have a colmap map, as well as local and global features for the map and query data in the same file structure as described above.
+- Task 1: Pose approximation
+- Task 2a: Accurate pose estimation without global map
+- Task 2b: Accurate pose estimation with global map
 
-Once everything in ready, it is called like kapture_pipeline_localize.py. In addition to the global sfm, it also outputs results for local sfm and pose approximation.
+.Roles of image retrieval in visual localization.
+[[fig_roles_ir]]
+image::../doc/tasks_ir.png[roles of image retrieval]
 
-Example:
+== Introdution
+
+This benchmark is used to evaluate how well a global image representation is suited for visual localization.
+To do this, we provide the following script that runs predefined visual localization pipelines representing all three tasks mentioned above for any set of global image representations provided in kapture format.
+Since the image features are the only part that changes, this benchmark can be used to compare global image features for the task of visual localization.
+
+In the 3DV paper, we evaluated 4 image representations (APGeM, DELG, NetVLAD, DenseVLAD) on 3 datasets (Aachen Day-Night v1.1, RobotCar Seasons, Baidu-Mall). All datasets are available through our https://github.com/naver/kapture#datasets[dataset downloader] (for Baidu-Mall, the images need to be downloaded separately).
+
+NOTE: In order to facilitate the use of our benchmark and to reduce processing load, we will soon provide COLMAP maps alongside R2D2 local features and several global features for all three benchmark datasets.
+We will furthermore provide commands for executing the benchmark with the provided data.
+
+== Benchmark
+
+In order to run the image retrieval benchmark, a COLMAP map as well as local (same type as used in the COLMAP map) and global features for both mapping and query data are needed.
+This data needs to be stored in the same file structure as described above.
+This is important because in this way all data will be reused as much as possible.
+This means that, for example, the matches for each image pair will only be computed once even if multiple types of global features are evaluated.
+
+Once everything in ready, the following example shows how the benchmark should be called.
+
+Example using the small virtual gallery dataset from above:
 ----
-# If the colmap executable is not available from your PATH, set the parameter -colmap
+# if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
-# If you are working with RobotCar or RobotCar_v2, add --prepend_cam
+# for RobotCar or RobotCar_v2 --prepend_cam needs to be added
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i ./mapping \
       --query ./query \
@@ -335,28 +361,28 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       --config 2
 ----
 
-It will run in sequence:
+This script will execute the following commands:
 
- . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets,
- . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute matches),
- . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs,
- . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches,
- . `kapture_colmap_localize.py` runs the camera pose estimation part of the code (global sfm),
- . `kapture_import_colmap.py` imports the colmap results into kapture,
+ . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets
+ . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute matches)
+ . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs
+ . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches
+ . `kapture_colmap_localize.py` runs the camera pose estimation (Task 2b: global sfm)
+ . `kapture_import_colmap.py` imports the COLMAP results into kapture
  . `kapture_export_LTVL2020.py` exports the global sfm results to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
- . `kapture_colmap_localize_localsfm.py` runs the camera pose estimation part of the code (local sfm),
+ . `kapture_colmap_localize_localsfm.py` runs the camera pose estimation (Task 2a: local sfm)
  . `kapture_export_LTVL2020.py` exports the local sfm results to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
- . `kapture_pose_approximation.py` runs the pose approximation 3 times,
- . `kapture_export_LTVL2020.py` exports the pose approximation results (called 3 times) to a format compatible with the
+ . `kapture_pose_approximation.py` run 3 variants of camera pose approximation (Task 1)
+ . `kapture_export_LTVL2020.py` exports the three pose approximation results (called 3 times) to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
- . `kapture_evaluate.py` If query ground truth is available, evaluates the localization for all methods.
+ . `kapture_evaluate.py` if query ground truth is available, this evaluates the localization results
 
-In this script, the --config option will decide the parameters passed to colmap image_registrator.
-The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
+In this script, the --config option will select the parameters passed to the COLMAP image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py].
 
-It will output something similar to
+It will output something similar to:
 ----
                      (0.25, 2.0)    (0.5, 5.0)    (5.0, 10.0)
 -------------------  -------------  ------------  -------------
@@ -367,4 +393,4 @@ BDI                  0.00%          25.00%        25.00%
 CSI                  0.00%          25.00%        50.00%
 ----
 
-In `./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/` you would find the pairs file, the LTVL style results and kapture style `eval` results.
+`./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results.

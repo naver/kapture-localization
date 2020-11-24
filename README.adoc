@@ -9,46 +9,45 @@ toc::[]
 == Overview
 
 kapture-localization is a **toolbox** in which you will find implementations for various localization related algorithms.
-It strongly relies on the https://github.com/naver/kapture[kapture] package for data representation and manipulation.
+It strongly relies on the https://github.com/naver/kapture[kapture] format for data representation and manipulation.
 
-The localization algorithms aims to do:
+The localization algorithms include:
 
  . **mapping**,
- . **localization** and
+ . **localization**, and
  . **benchmarking** (image retrieval for visual localization).
 
-It works on Ubuntu, Windows and MacOS.
+It works on Ubuntu, Windows, and MacOS.
 
-== structure
+== Structure
 
 The directories are organised as follow:
 
 ----
 ├── kapture_localization/  # package (library)
-├── pipeline/              # main programs scheduling all steps needed in localization pipelines
+├── pipeline/              # main programs executing all steps of the localization pipelines
 ├── samples/               # some sample data
 ├── tests/                 # unit tests
 └── tools/                 # sub programs involved in the pipeline
 ----
 
 
-The __kapture-localization__ toolbox provides both :
+The __kapture-localization__ toolbox is available as:
 
  - Python *package* (`kapture_localization/`),
  - Python *executable scripts* (`pipeline/` & `tools/`).
 
-There is basically 3 pipelines, for:
+There are 3 pipelines available:
 
  . mapping,
- . localization and
+ . localization, and
  . image retrieval benchmark (global sfm, local sfm, pose approximation).
 
 
 == Installation
 
-You can either install using docker, pip or from the source code manually.
-Basically, you will need python (>=3.6) and Colmap (>=3.6) to be installed, and then you
-can
+It can be installed using docker, pip or from manually from source code.
+After installing python (>=3.6) and COLMAP (>=3.6), this toolbox can be installed with:
 
 [source,bash]
 ----
@@ -59,18 +58,13 @@ See link:doc/installation.adoc[] for more details.
 
 == Tutorial
 
-See the link:doc/tutorial.adoc[doc/tutorial] for a short introduction to:
+See link:doc/tutorial.adoc[doc/tutorial] for a short introduction and examples of the provided processing pipelines.
 
- - mapping pipeline
- - localization pipeline
-- image retrieval benchmark (global sfm, local sfm, pose approximation)
-
- 
 == Contributing
 
 There are many ways to contribute to the __kapture-localization__ project:
 
-* provide feedback and suggestions of improvements,
+* provide feedback and suggestion,
 * submit bug reports in the project bug tracker,
 * implement a feature or bug-fix for an outstanding issue,
 * provide scripts to create data in kapture format (e.g. local/global feature extraction),
@@ -82,3 +76,28 @@ link:https://github.com/naver/kapture/blob/master/CONTRIBUTING.adoc[CONTRIBUTING
 
 == License
 Software license is detailed in the link:LICENSE[LICENSE] file.
+
+== References
+If you use this work for your research, please cite the respective paper(s):
+
+.Structure-based localization or kapture format
+----
+@misc{kapture2020,
+      title={Robust Image Retrieval-based Visual Localization using Kapture},
+      author={Martin Humenberger and Yohann Cabon and Nicolas Guerin and Julien Morat and Jérôme Revaud and Philippe Rerole and Noé Pion and Cesar de Souza and Vincent Leroy and Gabriela Csurka},
+      year={2020},
+      eprint={2007.13867},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+----
+
+.Image retrieval benchmark
+----
+@inproceedings{benchmarking_ir3DV2020,
+      title={Benchmarking Image Retrieval for Visual Localization},
+      author={Noé Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
+      year={2020},
+      booktitle={International Conference on 3D Vision}
+}
+----
