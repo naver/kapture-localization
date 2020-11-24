@@ -322,7 +322,7 @@ As shown in Fig. <<fig_roles_ir>> image retrieval can play different roles in vi
 [[fig_roles_ir]]
 image::../doc/tasks_ir.png[roles of image retrieval]
 
-== Introdution
+== Introduction
 
 This benchmark is used to evaluate how well a global image representation is suited for visual localization.
 To do this, we provide the following script that runs predefined visual localization pipelines representing all three tasks mentioned above for any set of global image representations provided in kapture format.
