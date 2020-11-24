@@ -365,3 +365,5 @@ EWB                  0.00%          25.00%        25.00%
 BDI                  0.00%          25.00%        25.00%
 CSI                  0.00%          25.00%        50.00%
 ```
+
+In `./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/` you would find the pairs file, the LTVL style results and kapture style `eval` results.
