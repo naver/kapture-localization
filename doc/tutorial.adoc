@@ -330,6 +330,16 @@ Since the image features are the only part that changes, this benchmark can be u
 
 In the 3DV paper, we evaluated 4 image representations (APGeM, DELG, NetVLAD, DenseVLAD) on 3 datasets (Aachen Day-Night v1.1, RobotCar Seasons, Baidu-Mall). All datasets are available through our https://github.com/naver/kapture#datasets[dataset downloader] (for Baidu-Mall, the images need to be downloaded separately).
 
+If you use this benchmark in research papers, please cite this paper:
+----
+@inproceedings{benchmarking_ir3DV2020,
+      title={Benchmarking Image Retrieval for Visual Localization},
+      author={Noé Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
+      year={2020},
+      booktitle={International Conference on 3D Vision}
+}
+----
+
 NOTE: In order to facilitate the use of our benchmark and to reduce processing load, we will soon provide COLMAP maps alongside R2D2 local features and several global features for all three benchmark datasets.
 We will furthermore provide commands for executing the benchmark with the provided data.
 

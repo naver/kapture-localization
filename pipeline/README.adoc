@@ -1,27 +1,25 @@
 = kapture-localization / pipeline
 
-Here you'll find example of usage for the different pipeline scripts.
+Here we provide usage examples of different pipeline scripts.
 For a more detailed explanation, please refer to link:../doc/tutorial.adoc[doc/tutorial].
 
-Before you try out the following commands, make sure :
+Before executing the following commands, please make sure:
 
- - You have local features and global features saved in the recommended dataset structure
-before you run the pipeline scripts in this folder.
+- You have local and global features saved in the recommended dataset structure.
 Refer to the section **prepare data** of link:../doc/tutorial.adoc[doc/tutorial] page.
 
- - Windows users should take care of extra installation steps.
-Refer to link:../doc/installation.adoc[doc/installation]
+- Windows users should take care of extra installation steps.
+Refer to link:../doc/installation.adoc[doc/installation].
 
 == kapture_pipeline_mapping.py
 
-This script computes
+This script computes:
 
 - the image pairs from global features,
-- the corresponding matches,
-- the geometric verification and finally
-- the colmap map.
+- the corresponding keypoint matches,
+- the geometric verification of the matches, and finally
+- the COLMAP map (which is later used for localization).
 
-typical call:
 [source,bash]
 ----
 kapture_pipeline_mapping.py
@@ -37,12 +35,12 @@ kapture_pipeline_mapping.py
 
 == kapture_pipeline_localize.py
 
-This script computes
+This script computes:
 
- - the image pairs from global features,
- - the corresponding matches,
- - the geometric verification and finally
- - localization of images against an existing colmap map.
+ - the image pairs (query-map) from global features,
+ - the corresponding keypoint matches,
+ - the geometric verification of the matches, and finally
+ - localization of images against an existing COLMAP map.
 
 The parameters passed to `colmap image_registrator` are described in
 link:https://europe.naverlabs.com/research/publications/robust-image-retrieval-based-visual-localization-using-kapture/[].
@@ -75,8 +73,6 @@ config=3 : ['--Mapper.ba_refine_focal_length', '1',
             '--Mapper.filter_max_reproj_error', '12']
 ----
 
-Typical call:
-
 [source,bash]
 ----
 kapture_pipeline_localize.py
@@ -92,19 +88,21 @@ kapture_pipeline_localize.py
     -o my_dataset/colmap-localization/r2d2_WASF-N8_20k/AP-GeM-LM18_top20/AP-GeM-LM18_top20/ # lfeat_type / map_pairs / query_pairs / \
     --topk 20 \
     --config 2
-# add --prepend_cam when the dataset is RobotCar_Seasons or RobotCar Seasons v2
+# add --prepend_cam when using RobotCar_Seasons or RobotCar Seasons v2
 ----
 
 
 == kapture_pipeline_image_retrieval_benchmark.py
 
-Produces results from "Benchmarking Image Retrieval for Visual Localization".
-It adds two more steps compared to localize.py :
+This can be used to evaluate image retrieval for visual localization.
+Please refer to link:../doc/tutorial.adoc[doc/tutorial] for more details.
 
- - pose approximation (EWB, BDI, CSI) and
- - local sfm.
+This script executes two more steps compared to localize.py :
 
-You can run it the same way:
+ - pose approximation (EWB, BDI, CSI), and
+ - local SFM.
+
+More details about these two methods can be found in our 3DV https://europe.naverlabs.com/research/publications/benchmarking-image-retrieval-for-visual-localization/[paper].
 
 [source,bash]
 ----
@@ -122,5 +120,5 @@ kapture_pipeline_image_retrieval_benchmark.py
     --topk 20 \
     --config 2
 
-# add --prepend_cam when the dataset is RobotCar_Seasons or RobotCar Seasons v2
+# add --prepend_cam for RobotCar_Seasons or RobotCar Seasons v2
 ----

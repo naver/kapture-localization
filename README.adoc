@@ -1,4 +1,4 @@
-= kapture-localization:  toolbox
+= kapture-localization: toolbox
 :sectnums:
 :sectnumlevels: 1
 :toc: macro
