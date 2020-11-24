@@ -317,6 +317,7 @@ In order to run the image retrieval benchmark, you need to have a colmap map, as
 Once everything in ready, it is called like kapture_pipeline_localize.py. In addition to the global sfm, it also outputs results for local sfm and pose approximation.
 
 Example:
+----
 # If the colmap executable is not available from your PATH, set the parameter -colmap
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
 # If you are working with RobotCar or RobotCar_v2, add --prepend_cam
@@ -356,7 +357,7 @@ In this script, the --config option will decide the parameters passed to colmap 
 The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py]
 
 It will output something similar to
-```
+----
                      (0.25, 2.0)    (0.5, 5.0)    (5.0, 10.0)
 -------------------  -------------  ------------  -------------
 global_sfm_config_2  100.00%        100.00%       100.00%
@@ -364,6 +365,6 @@ local_sfm            100.00%        100.00%       100.00%
 EWB                  0.00%          25.00%        25.00%
 BDI                  0.00%          25.00%        25.00%
 CSI                  0.00%          25.00%        50.00%
-```
+----
 
 In `./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/` you would find the pairs file, the LTVL style results and kapture style `eval` results.
