@@ -8,8 +8,7 @@ on:
     types: [created]
 
 jobs:
-  deploy:
-
+  deploy_pip:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,13 +32,17 @@ jobs:
     - name: push pip package
       uses: pypa/gh-action-pypi-publish@master
       with:
-        repository_url: https://test.pypi.org/legacy/
-        password: ${{ secrets.PYPI_TEST_TOKEN }}
+        password: ${{ secrets.PYPI_TOKEN }}
 
+  deploy_docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
     - name: docker build and push
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: kapture/kapture
+        name: kapture/kapture-localization
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
+        tag_names: true
