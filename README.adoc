@@ -63,7 +63,7 @@ See the link:doc/tutorial.adoc[doc/tutorial] for a short introduction to:
 
  - mapping pipeline
  - localization pipeline
-//- image retrieval benchmark (global sfm, local sfm, pose approximation)
+- image retrieval benchmark (global sfm, local sfm, pose approximation)
 
  
 == Contributing
