@@ -13,7 +13,7 @@ Refer to link:../doc/installation.adoc[doc/installation].
 
 - if the COLMAP executable is not available from PATH, the parameter `-colmap` needs to be set.
 
-- if your operating system cannot infer the python binary from the shebang or the file extensions (default behviour), you can explicitely give the python binary path with the `-python` parameter or let python find it from sys.executable with `--auto-python-binary`.
+- if your operating system cannot infer the python binary from the shebang or the file extension (default behaviour), you can explicitely give the python binary path with the `-python` parameter or let python find it from sys.executable with `--auto-python-binary`.
 
 
 == kapture_pipeline_mapping.py
