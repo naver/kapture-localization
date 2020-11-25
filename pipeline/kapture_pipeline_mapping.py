@@ -9,7 +9,8 @@ import argparse
 import logging
 import os
 import os.path as path
-from typing import List
+import sys
+from typing import List, Optional
 
 import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
@@ -31,6 +32,7 @@ def mapping_pipeline(kapture_path: str,
                      matches_gv_path: str,
                      colmap_map_path: str,
                      colmap_binary: str,
+                     python_binary: Optional[str],
                      topk: int,
                      skip_list: List[str],
                      force_overwrite_existing: bool) -> None:
@@ -53,6 +55,8 @@ def mapping_pipeline(kapture_path: str,
     :type colmap_map_path: str
     :param colmap_binary: path to the colmap executable
     :type colmap_binary: str
+    :param python_binary: path to the python executable
+    :type python_binary: Optional[str]
     :param topk: the max number of top retained images when computing image pairs from global features
     :type topk: int
     :param skip_list: list of steps to ignore
@@ -89,7 +93,7 @@ def mapping_pipeline(kapture_path: str,
                                     '--query', proxy_kapture_path,
                                     '--topk', str(topk),
                                     '-o', pairfile_path]
-        run_python_command(local_image_pairs_path, compute_image_pairs_args)
+        run_python_command(local_image_pairs_path, compute_image_pairs_args, python_binary)
 
     # kapture_compute_matches.py
     if 'compute_matches' not in skip_list:
@@ -97,7 +101,7 @@ def mapping_pipeline(kapture_path: str,
         compute_matches_args = ['-v', str(logger.level),
                                 '-i', proxy_kapture_path,
                                 '--pairsfile-path', pairfile_path]
-        run_python_command(local_compute_matches_path, compute_matches_args)
+        run_python_command(local_compute_matches_path, compute_matches_args, python_binary)
 
     # build proxy gv kapture in output folder
     proxy_kapture_gv_path = path.join(colmap_map_path, 'kapture_inputs/proxy_mapping_gv')
@@ -119,7 +123,7 @@ def mapping_pipeline(kapture_path: str,
                               '-colmap', colmap_binary]
         if force_overwrite_existing:
             run_colmap_gv_args.append('-f')
-        run_python_command(local_run_colmap_gv_path, run_colmap_gv_args)
+        run_python_command(local_run_colmap_gv_path, run_colmap_gv_args, python_binary)
 
     # kapture_colmap_build_map.py
     if 'colmap_build_map' not in skip_list:
@@ -134,7 +138,7 @@ def mapping_pipeline(kapture_path: str,
         build_map_args += ['--Mapper.ba_refine_focal_length', '0',
                            '--Mapper.ba_refine_principal_point', '0',
                            '--Mapper.ba_refine_extra_params', '0']
-        run_python_command(local_build_map_path, build_map_args)
+        run_python_command(local_build_map_path, build_map_args, python_binary)
 
 
 def mapping_pipeline_command_line():
@@ -171,6 +175,14 @@ def mapping_pipeline_command_line():
                         help='full path to colmap binary '
                              '(default is "colmap", i.e. assume the binary'
                              ' is in the user PATH).')
+    parser_python_bin = parser.add_mutually_exclusive_group()
+    parser_python_bin.add_argument('-python', '--python_binary', required=False,
+                                   default=None,
+                                   help='full path to python binary '
+                                   '(default is "None", i.e. assume the os'
+                                   ' can infer the python binary from the files itself, shebang or extension).')
+    parser_python_bin.add_argument('--auto-python-binary', action='store_true', default=False,
+                                   help='use sys.executable as python binary.')
     parser.add_argument('--topk',
                         default=20,
                         type=int,
@@ -194,6 +206,10 @@ def mapping_pipeline_command_line():
         '--{:20} {:100}'.format(k, str(v)) for k, v in args_dict.items()))
 
     if can_use_symlinks():
+        python_binary = args.python_binary
+        if args.auto_python_binary:
+            python_binary = sys.executable
+            logger.debug(f'python_binary set to {python_binary}')
         mapping_pipeline(args.kapture_map,
                          args.keypoints_path,
                          args.descriptors_path,
@@ -202,6 +218,7 @@ def mapping_pipeline_command_line():
                          args.matches_gv_path,
                          args.colmap_map,
                          args.colmap_binary,
+                         python_binary,
                          args.topk,
                          args.skip,
                          args.force)

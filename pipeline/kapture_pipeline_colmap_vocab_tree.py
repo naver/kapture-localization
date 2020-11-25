@@ -9,11 +9,11 @@ import argparse
 import logging
 import os
 import os.path as path
+import sys
 from typing import List, Optional
 
 import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
-from kapture_localization.utils.symlink import can_use_symlinks
 from kapture_localization.utils.subprocess import run_python_command
 from kapture_localization.colmap.colmap_command import CONFIGS
 
@@ -28,6 +28,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                colmap_map_path: Optional[str],
                                localization_output_path: str,
                                colmap_binary: str,
+                               python_binary: Optional[str],
                                vocab_tree_path: str,
                                config: int,
                                prepend_cam: bool,
@@ -47,6 +48,8 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
     :type localization_output_path: str
     :param colmap_binary: path to the colmap executable
     :type colmap_binary: str
+    :param python_binary: path to the python executable
+    :type python_binary: Optional[str]
     :param vocab_tree_path: full path to Vocabulary Tree file used for matching
     :type vocab_tree_path: str
     :param config: index of the config parameters to use for image registrator
@@ -82,7 +85,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         build_sift_map_args += ['--Mapper.ba_refine_focal_length', '0',
                                 '--Mapper.ba_refine_principal_point', '0',
                                 '--Mapper.ba_refine_extra_params', '0']
-        run_python_command(local_build_sift_map_path, build_sift_map_args)
+        run_python_command(local_build_sift_map_path, build_sift_map_args, python_binary)
 
     if kapture_query_path is None:
         return
@@ -107,7 +110,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         if force_overwrite_existing:
             localize_sift_args.append('-f')
         localize_sift_args += CONFIGS[config]
-        run_python_command(local_localize_sift_path, localize_sift_args)
+        run_python_command(local_localize_sift_path, localize_sift_args, python_binary)
 
     # kapture_import_colmap.py
     if 'import_colmap' not in skip_list:
@@ -120,7 +123,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                               '--skip_reconstruction']
         if force_overwrite_existing:
             import_colmap_args.append('-f')
-        run_python_command(local_import_colmap_path, import_colmap_args)
+        run_python_command(local_import_colmap_path, import_colmap_args, python_binary)
 
     # kapture_evaluate.py
     if 'evaluate' not in skip_list and path.isfile(path.join(kapture_query_path, 'sensors/trajectories.txt')):
@@ -133,7 +136,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         evaluate_args += ['--bins'] + bins_as_str
         if force_overwrite_existing:
             evaluate_args.append('-f')
-        run_python_command(local_evaluate_path, evaluate_args)
+        run_python_command(local_evaluate_path, evaluate_args, python_binary)
 
     # kapture_export_LTVL2020.py
     if 'export_LTVL2020' not in skip_list:
@@ -146,7 +149,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
             export_LTVL2020_args.append('-p')
         if force_overwrite_existing:
             export_LTVL2020_args.append('-f')
-        run_python_command(local_export_LTVL2020_path, export_LTVL2020_args)
+        run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
 
 def colmap_vocab_tree_pipeline_command_line():
@@ -175,6 +178,14 @@ def colmap_vocab_tree_pipeline_command_line():
                         help='full path to colmap binary '
                              '(default is "colmap", i.e. assume the binary'
                              ' is in the user PATH).')
+    parser_python_bin = parser.add_mutually_exclusive_group()
+    parser_python_bin.add_argument('-python', '--python_binary', required=False,
+                                   default=None,
+                                   help='full path to python binary '
+                                   '(default is "None", i.e. assume the os'
+                                   ' can infer the python binary from the files itself, shebang or extension).')
+    parser_python_bin.add_argument('--auto-python-binary', action='store_true', default=False,
+                                   help='use sys.executable as python binary.')
     parser.add_argument('-voc', '--vocab_tree_path', required=True,
                         help='full path to Vocabulary Tree file'
                              ' used for matching.')
@@ -204,24 +215,22 @@ def colmap_vocab_tree_pipeline_command_line():
     args_dict = vars(args)
     logger.debug('localize.py \\\n' + '  \\\n'.join(
         '--{:20} {:100}'.format(k, str(v)) for k, v in args_dict.items()))
-    if can_use_symlinks():
-        colmap_vocab_tree_pipeline(args.kapture_map,
-                                   args.query,
-                                   args.colmap_map,
-                                   args.output,
-                                   args.colmap_binary,
-                                   args.vocab_tree_path,
-                                   args.config,
-                                   args.prepend_cam,
-                                   args.bins,
-                                   args.skip,
-                                   args.force)
-    else:
-        raise EnvironmentError('Please restart this command as admin, it is required for os.symlink'
-                               'see https://docs.python.org/3.6/library/os.html#os.symlink')
-        # need to find a way to redirect output, else it closes on error...
-        # logger.critical('Request UAC for symlink rights...')
-        # ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    python_binary = args.python_binary
+    if args.auto_python_binary:
+        python_binary = sys.executable
+        logger.debug(f'python_binary set to {python_binary}')
+    colmap_vocab_tree_pipeline(args.kapture_map,
+                               args.query,
+                               args.colmap_map,
+                               args.output,
+                               args.colmap_binary,
+                               python_binary,
+                               args.vocab_tree_path,
+                               args.config,
+                               args.prepend_cam,
+                               args.bins,
+                               args.skip,
+                               args.force)
 
 
 if __name__ == '__main__':

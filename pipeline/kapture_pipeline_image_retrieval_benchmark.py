@@ -9,6 +9,7 @@ import argparse
 import logging
 import os
 import os.path as path
+import sys
 from typing import List, Optional
 
 import pipeline_import_paths  # noqa: F401
@@ -35,6 +36,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                               colmap_map_path: str,
                               localization_output_path: str,
                               colmap_binary: str,
+                              python_binary: Optional[str],
                               topk: int,
                               config: int,
                               prepend_cam: bool,
@@ -66,6 +68,8 @@ def image_retrieval_benchmark(kapture_map_path: str,
     :type localization_output_path: str
     :param colmap_binary: path to the colmap executable
     :type colmap_binary: str
+    :param python_binary: path to the python executable
+    :type python_binary: Optional[str]
     :param topk: the max number of top retained images when computing image pairs from global features
     :type topk: int
     :param config: index of the config parameters to use for image registrator
@@ -141,7 +145,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                                     '--query', proxy_kapture_query_path,
                                     '--topk', str(topk),
                                     '-o', pairfile_path]
-        run_python_command(local_image_pairs_path, compute_image_pairs_args)
+        run_python_command(local_image_pairs_path, compute_image_pairs_args, python_binary)
 
     # kapture_merge.py
     if merge_path is None:
@@ -153,7 +157,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                       '--image_transfer', 'link_absolute']
         if force_overwrite_existing:
             merge_args.append('-f')
-        run_python_command(local_merge_path, merge_args)
+        run_python_command(local_merge_path, merge_args, python_binary)
 
     # build proxy kapture map+query in output folder
     proxy_kapture_map_plus_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query')
@@ -171,7 +175,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         compute_matches_args = ['-v', str(logger.level),
                                 '-i', proxy_kapture_map_plus_query_path,
                                 '--pairsfile-path', pairfile_path]
-        run_python_command(local_compute_matches_path, compute_matches_args)
+        run_python_command(local_compute_matches_path, compute_matches_args, python_binary)
 
     # build proxy gv kapture in output folder
     proxy_kapture_map_plus_query_gv_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query_gv')
@@ -193,7 +197,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                               '-colmap', colmap_binary]
         if force_overwrite_existing:
             run_colmap_gv_args.append('-f')
-        run_python_command(local_run_colmap_gv_path, run_colmap_gv_args)
+        run_python_command(local_run_colmap_gv_path, run_colmap_gv_args, python_binary)
 
     # -------- GLOBAL MAP LOCALIZATION --------
     if 'global_sfm' not in skip_list:
@@ -209,7 +213,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         if force_overwrite_existing:
             localize_args.append('-f')
         localize_args += CONFIGS[config]
-        run_python_command(local_localize_path, localize_args)
+        run_python_command(local_localize_path, localize_args, python_binary)
 
         # kapture_import_colmap.py
         local_import_colmap_path = path.join(pipeline_import_paths.HERE_PATH,
@@ -221,7 +225,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                               '--skip_reconstruction']
         if force_overwrite_existing:
             import_colmap_args.append('-f')
-        run_python_command(local_import_colmap_path, import_colmap_args)
+        run_python_command(local_import_colmap_path, import_colmap_args, python_binary)
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
@@ -234,7 +238,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                 export_LTVL2020_args.append('-p')
             if force_overwrite_existing:
                 export_LTVL2020_args.append('-f')
-            run_python_command(local_export_LTVL2020_path, export_LTVL2020_args)
+            run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
     # -------- LOCAL SFM LOCALIZATION --------
     if 'local_sfm' not in skip_list:
@@ -250,7 +254,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                                          '--pairsfile-path', pairfile_path]
         if force_overwrite_existing:
             colmap_localize_localsfm_args.append('-f')
-        run_python_command(local_colmap_localize_localsfm_path, colmap_localize_localsfm_args)
+        run_python_command(local_colmap_localize_localsfm_path, colmap_localize_localsfm_args, python_binary)
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
@@ -263,7 +267,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                 export_LTVL2020_args.append('-p')
             if force_overwrite_existing:
                 export_LTVL2020_args.append('-f')
-            run_python_command(local_export_LTVL2020_path, export_LTVL2020_args)
+            run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
     # -------- POSE APPROXIMATION LOCALIZATION --------
     if 'pose_approximation' not in skip_list:
@@ -280,17 +284,17 @@ def image_retrieval_benchmark(kapture_map_path: str,
         # EWB
         EWB_pose_approximation_args = pose_approximation_args + ['-o', pose_approx_EWB_path,
                                                                  'equal_weighted_barycenter']
-        run_python_command(local_pose_approximation_path, EWB_pose_approximation_args)
+        run_python_command(local_pose_approximation_path, EWB_pose_approximation_args, python_binary)
 
         # BDI
         BDI_pose_approximation_args = pose_approximation_args + ['-o', pose_approx_BDI_path,
                                                                  'barycentric_descriptor_interpolation']
-        run_python_command(local_pose_approximation_path, BDI_pose_approximation_args)
+        run_python_command(local_pose_approximation_path, BDI_pose_approximation_args, python_binary)
 
         # CSI
         CSI_pose_approximation_args = pose_approximation_args + ['-o', pose_approx_CSI_path,
                                                                  'cosine_similarity']
-        run_python_command(local_pose_approximation_path, CSI_pose_approximation_args)
+        run_python_command(local_pose_approximation_path, CSI_pose_approximation_args, python_binary)
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
@@ -305,17 +309,17 @@ def image_retrieval_benchmark(kapture_map_path: str,
             EWB_export_LTVL2020_args = ['-v', str(logger.level),
                                         '-i', pose_approx_EWB_path,
                                         '-o', pose_approx_EWB_LTVL2020_output_path] + args_append_array
-            run_python_command(local_export_LTVL2020_path, EWB_export_LTVL2020_args)
+            run_python_command(local_export_LTVL2020_path, EWB_export_LTVL2020_args, python_binary)
 
             BDI_export_LTVL2020_args = ['-v', str(logger.level),
                                         '-i', pose_approx_BDI_path,
                                         '-o', pose_approx_BDI_LTVL2020_output_path] + args_append_array
-            run_python_command(local_export_LTVL2020_path, BDI_export_LTVL2020_args)
+            run_python_command(local_export_LTVL2020_path, BDI_export_LTVL2020_args, python_binary)
 
             CSI_export_LTVL2020_args = ['-v', str(logger.level),
                                         '-i', pose_approx_CSI_path,
                                         '-o', pose_approx_CSI_LTVL2020_output_path] + args_append_array
-            run_python_command(local_export_LTVL2020_path, CSI_export_LTVL2020_args)
+            run_python_command(local_export_LTVL2020_path, CSI_export_LTVL2020_args, python_binary)
 
     # -------- EVALUATE ALL AT ONCE --------
     # kapture_evaluate.py
@@ -341,7 +345,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                                                                            '-o', eval_path]
         if force_overwrite_existing:
             evaluate_args.append('-f')
-        run_python_command(local_evaluate_path, evaluate_args)
+        run_python_command(local_evaluate_path, evaluate_args, python_binary)
 
 
 def image_retrieval_benchmark_command_line():
@@ -383,6 +387,14 @@ def image_retrieval_benchmark_command_line():
                         help='full path to colmap binary '
                              '(default is "colmap", i.e. assume the binary'
                              ' is in the user PATH).')
+    parser_python_bin = parser.add_mutually_exclusive_group()
+    parser_python_bin.add_argument('-python', '--python_binary', required=False,
+                                   default=None,
+                                   help='full path to python binary '
+                                   '(default is "None", i.e. assume the os'
+                                   ' can infer the python binary from the files itself, shebang or extension).')
+    parser_python_bin.add_argument('--auto-python-binary', action='store_true', default=False,
+                                   help='use sys.executable as python binary.')
     parser.add_argument('--topk',
                         default=20,
                         type=int,
@@ -414,6 +426,10 @@ def image_retrieval_benchmark_command_line():
     logger.debug('image_retrieval_benchmark.py \\\n' + '  \\\n'.join(
         '--{:20} {:100}'.format(k, str(v)) for k, v in args_dict.items()))
     if can_use_symlinks():
+        python_binary = args.python_binary
+        if args.auto_python_binary:
+            python_binary = sys.executable
+            logger.debug(f'python_binary set to {python_binary}')
         image_retrieval_benchmark(args.kapture_map,
                                   args.query,
                                   args.merge_path,
@@ -425,6 +441,7 @@ def image_retrieval_benchmark_command_line():
                                   args.colmap_map,
                                   args.output,
                                   args.colmap_binary,
+                                  python_binary,
                                   args.topk,
                                   args.config,
                                   args.prepend_cam,
