@@ -2,11 +2,13 @@
 FROM nvidia/cudagl:10.0-devel-ubuntu18.04
 MAINTAINER naverlabs "kapture@naverlabs.com"
 
-# Set correct environment variables.
-ENV LC_ALL C
-ENV DEBIAN_FRONTEND noninteractive
-ARG MAKE_OPTIONS="-j8"
-ARG SOURCE_PREFIX="/opt/src"
+# setup environment
+ENV     LANG C.UTF-8
+ENV     LC_ALL C.UTF-8
+ENV     DEBIAN_FRONTEND noninteractive
+# arguments
+ARG     MAKE_OPTIONS="-j8"
+ARG     SOURCE_PREFIX="/opt/src"
 
 RUN mkdir -p ${SOURCE_PREFIX}
 
