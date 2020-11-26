@@ -29,7 +29,7 @@ def find_in_PATH(filename: str):
     raise FileNotFoundError(f'could not find {filename}')
 
 
-def run_python_command(local_path: str, args: List[str], python_binary: Optional[str]):
+def run_python_command(local_path: str, args: List[str], python_binary: Optional[str] = None):
     """
     run a python subprocess
 
