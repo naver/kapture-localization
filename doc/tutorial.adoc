@@ -349,8 +349,9 @@ In order to run the image retrieval benchmark, a COLMAP map as well as local (sa
 This data needs to be stored in the same file structure as described above.
 This is important because in this way all data will be reused as much as possible.
 This means that, for example, the matches for each image pair will only be computed once even if multiple types of global features are evaluated.
+Note that the features needed to execute the command below are provided as part of this repository and the COLMAP map can be built using the mapping pipeline explained <<1. Mapping, here>>.
 
-Once everything in ready, the following example shows how the benchmark should be called.
+Once everything is ready, the following example shows how the benchmark should be called.
 
 Example using the small virtual gallery dataset from above:
 ----
@@ -403,4 +404,7 @@ BDI                  0.00%          25.00%        25.00%
 CSI                  0.00%          25.00%        50.00%
 ----
 
-`./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results.
+`./image_retrieval_benchmark/r2d2_500/AP-GeM-LM18_top5/AP-GeM-LM18_top5/` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results.
+
+We encourage to organize the experiment data by local feature type, COLMAP map used, and global feature type.
+In our example, the results path is composed like this because we use `r2d2_500` (top 500 r2d2 features), the map is named `AP-GeM-LM18_top5`, and we localize using top 5 retrieved images using AP-GeM-LM18 global features (`AP-GeM-LM18_top5`).

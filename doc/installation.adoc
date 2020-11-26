@@ -38,7 +38,7 @@ Requirements:
 
 kapture-localization requires a recent version of COLMAP (>=3.6).
 Unfortunately, `apt-get` in Ubuntu 18.04 will install COLMAP 3.4.
-A solution is **to install COLMAP from source**. You will find instructions of how to do that in the link:../Dockerfile[Dockerfile].
+A solution is **to install COLMAP from source**. You will find instructions of how to do that in the link:../Dockerfile[Dockerfile] and on the https://colmap.github.io/install.html[COLMAP website].
 
 Then, in a terminal (e.g. __bash__), run:
 
