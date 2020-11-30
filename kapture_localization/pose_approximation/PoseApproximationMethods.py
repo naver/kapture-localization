@@ -20,6 +20,6 @@ METHOD_DESCRIPTIONS = {
                                                                     "approximation of the query descriptor via the "
                                                                     "database descriptors with norm2(d_q-sum(w_i*d_i)) "
                                                                     "subject to sum(w_i)=1."),
-    PoseApproximationMethods.cosine_similarity: ("CSI: w_i=(1/z_i)*(transpose(d_q)*d_i)^α, "
-                                                 "z_i=sum(transpose(d_q)*d_j)^α")
+    PoseApproximationMethods.cosine_similarity: ("CSI: w_i=(1/z_i)*(transpose(d_q)*d_i)^alpha, "
+                                                 "z_i=sum(transpose(d_q)*d_j)^alpha")
 }

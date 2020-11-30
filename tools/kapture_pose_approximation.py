@@ -109,7 +109,7 @@ def get_pose_approximation_method_argparser(method: PoseApproximationMethods):
     parser_method.set_defaults(method=method)
     # per method parameters
     if method == PoseApproximationMethods.cosine_similarity:
-        parser_method.add_argument('--alpha', default=8.0, type=float, help='α parameter of CSI')
+        parser_method.add_argument('--alpha', default=8.0, type=float, help='alpha parameter of CSI')
     return parser_method
 
 
