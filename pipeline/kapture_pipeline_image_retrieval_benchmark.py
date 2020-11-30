@@ -409,7 +409,7 @@ def image_retrieval_benchmark_command_line():
                                                  'geometric_verification',
                                                  'global_sfm',
                                                  'local_sfm',
-                                                 'pose_approximation'
+                                                 'pose_approximation',
                                                  'evaluate',
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
