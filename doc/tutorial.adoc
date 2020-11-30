@@ -46,7 +46,7 @@ Fig. <<fig_mapping>> illustrates the algorithmic steps of the mapping part:
 4. Local descriptor matching and geometric verification of the image pairs
 5. Point triangulation with COLMAP (point triangulator)
 
-.Map generation with SFM.
+.Map generation with SFM. Images from https://github.com/openMVG/ImageDataset_SceauxCastle/tree/master/images[SceauxCastle Dataset].
 [[fig_mapping]]
 image::../doc/mapping.png[mapping]
 
@@ -57,7 +57,7 @@ Fig. <<fig_localization>> illustrates the algorithmic steps of the localization 
 3. Local descriptor matching and geometric verification
 4. Camera pose estimation with COLMAP (image registrator)
 
-.Localization of query images in an SFM map.
+.Localization of query images in an SFM map. Images from https://github.com/openMVG/ImageDataset_SceauxCastle/tree/master/images[SceauxCastle Dataset].
 [[fig_localization]]
 image::../doc/localization.png[localization]
 
