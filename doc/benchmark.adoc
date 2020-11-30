@@ -1,0 +1,351 @@
+= kapture-localization / Image Retrieval Benchmark from 3DV2020 paper
+:sectnums:
+:sectnumlevels: 0
+:toc:
+:toclevels: 2
+
+= Introduction
+
+In this tutorial, we present how to run a majority of the experiments presented in our 3DV2020 https://europe.naverlabs.com/research/publications/benchmarking-image-retrieval-for-visual-localization/[paper] from scratch.
+Here, we assume that kapture-localization is already installed.
+Please refer to the link:./installation.adoc[installation tutorial] for more details.
+The fastest way would be using the public docker container.
+
+If this benchmark is used in research, please cite this paper:
+----
+@inproceedings{benchmarking_ir3DV2020,
+      title={Benchmarking Image Retrieval for Visual Localization},
+      author={Noé Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
+      year={2020},
+      booktitle={International Conference on 3D Vision}
+}
+----
+
+= Datasets
+
+In order to download the 3 datasets used in the paper, we recommend using the kapture dataset downloader.
+Note that the dataset downloader does not only provide the raw datasets, it also provides some precomputed data such as the COLMAP map and the global features used in the paper.
+In this tutorial, we will store all datasets in a folder called `kapture_datasets`.
+This folder will not only contain the raw datasets in kapture format, but also all processed data (features, matches, etc.) and benchmark results.
+
+=== Aachen Day-Night v1.1
+```
+mkdir kapture_datasets
+cd kapture_datasets
+kapture_download_dataset.py update
+kapture_download_dataset.py list # this will list all available datasets
+
+# this will download all available data for Aachen Day-Night v1.1
+kapture_download_dataset.py install "Aachen*"
+cd Aachen-Day-Night-v1.1
+# this will merge query_day and query_night into query_all
+kapture_merge.py -v info \
+                 -i query_day query_night \
+                 -o query_all \
+                 --image_transfer link_relative
+# this will merge mapping and query in one kapture folder
+kapture_merge.py -v info \
+                 -i mapping query_all \
+                 -o map_plus_query \
+                 --image_transfer link_relative
+```
+
+If all Aachen Day-Night v1.1 data was downloaded, the kapture_datasets folder should look like this (not all subfolders are shown here):
+
+```
+kapture_datasets
+└─ Aachen-Day-Night-v1.1
+    ├─ global_features
+    │  ├─ AP-GeM-LM18
+    │  ├─ DELG
+    │  ├─ densevlad_multi
+    │  └─ netvlad_vd16pitts
+    │     └─ global_features
+    ├─ colmap-sfm
+    ├─ map_plus_query
+    ├─ query_all
+    ├─ readme_kapture.txt
+    ├─ LICENSE.txt
+    ├─ README_Aachen-Day-Night.md
+    ├─ README_Aachen-Day-Night_v1_1.md
+    ├─ query_day
+    ├─ query_night
+    └─ mapping
+```
+
+=== Baidu-Mall
+
+The images of this dataset are not provided in the dataset downloader, thus, they need to be first downloaded (and extracted) from the original https://sites.google.com/site/xunsunhomepage/[source] and stored in the kapture_datasets folder.
+
+Convert the original image folder structure to the one used in the kapture version of the dataset:
+```
+cd kapture_datasets/IDL_dataset_cvpr17_3852
+for cam in cdm lp mi qf sx wh wj wl xyf; do \
+  mkdir -p query_images_undistort/${cam}; \
+  mv query_images_undistort/${cam}*.jpg query_images_undistort/${cam}/; \
+done
+
+mkdir -p training_images_undistort/00
+mkdir -p training_images_undistort/01
+mv training_images_undistort/nikon5300a*.jpg training_images_undistort/00/
+mv training_images_undistort/nikon5300b*.jpg training_images_undistort/01/
+```
+
+Download the Baidu-Mall kapture dataset (no images, just sensor data) using the downloader:
+
+```
+kapture_download_dataset.py install "baidu*"
+```
+
+Move the images to the kapture folder:
+```
+cd kapture_datasets
+mkdir -p baidu-mall/mapping_wo_images/sensors/records_data
+mv IDL_dataset_cvpr17_3852/training_images_undistort/* baidu-mall/mapping_wo_images/sensors/records_data/
+mv baidu-mall/mapping_wo_images baidu-mall/mapping
+
+mkdir -p baidu-mall/query_wo_images/sensors/records_data
+mv IDL_dataset_cvpr17_3852/query_images_undistort/* baidu-mall/query_wo_images/sensors/records_data/
+mv baidu-mall/query_wo_images baidu-mall/query
+
+cd kapture_datasets/baidu-mall
+# this will merge mapping and query in one kapture folder
+kapture_merge.py -v info \
+                 -i mapping query \
+                 -o map_plus_query \
+                 --image_transfer link_relative
+```
+
+The kapture_datasets folder should look like this now (not all subfolders are shown here):
+
+```
+kapture_datasets
+├─ Aachen-Day-Night-v1.1
+└─ baidu-mall
+    ├─ global_features
+    │  ├─ AP-GeM-LM18
+    │  ├─ DELG
+    │  ├─ densevlad_multi
+    │  └─ netvlad_vd16pitts
+    │     └─ global_features
+    ├─ colmap-sfm
+    ├─ map_plus_query
+    ├─ query
+    ├─ readme_kapture.txt
+    ├─ readme.txt
+    └─ mapping
+```
+
+=== RobotCar Seasons
+
+We used the first version of the RobotCar Seasons (v1) dataset for the 3DV2020 paper.
+Our downloader, however, provides RobotCar Seasons v2, incl. images, separated in its individual locations (same as the original dataset).
+V1 is provided as all-locations-in-one kapture, but without images.
+Thus, we have to first download all available RobotCar data using the downloader and then convert/merge the data.
+
+```
+cd kapture_datasets
+# this will download all available data for RobotCar Seasons v1 and v2
+kapture_download_dataset.py install "RobotCar_Seasons*"
+
+cd RobotCar_Seasons-v2
+# this will merge all v2 kapture folders
+mapping=`find . -maxdepth 2 -type d -name mapping  -printf '%P '`
+query=`find . -maxdepth 2 -type d -name query  -printf '%P '`
+kapture_merge.py -v info \
+                 -i $mapping $query \
+                 -o all \
+                 --image_transfer link_relative
+cd ../RobotCar_Seasons-v1
+mv mapping_wo_images mapping
+cd mapping/sensors
+ln -s ../../../RobotCar_Seasons-v2/all/sensors/records_data records_data
+cd ../..
+mv query_wo_images query
+cd query/sensors
+ln -s ../../../RobotCar_Seasons-v2/all/sensors/records_data records_data
+cd ../..
+
+# this will merge mapping and query in one kapture folder
+kapture_merge.py -v info \
+                 -i mapping query \
+                 -o map_plus_query \
+                 --image_transfer link_relative
+```
+
+Finally, the kapture_datasets folder should look like this (not all subfolders are shown here):
+
+```
+kapture_datasets
+├─ Aachen-Day-Night-v1.1
+├─ baidu-mall
+├─ RobotCar_Seasons-v2
+└─ RobotCar_Seasons-v1
+    ├─ global_features
+    │  ├─ AP-GeM-LM18
+    │  ├─ DELG
+    │  ├─ densevlad_multi
+    │  └─ netvlad_vd16pitts
+    │     └─ global_features
+    ├─ colmap-sfm
+    ├─ map_plus_query
+    ├─ query
+    ├─ readme_kapture.txt
+    ├─ LICENSE.txt
+    ├─ README_RobotCar-Seasons.md
+    └─ mapping
+```
+
+= Image Features
+
+=== Global features
+
+As can be seen above, in order to reproduce the 3DV2020 paper results we provide the global features in our dataset downloader and up to this point, they should already be downloaded.
+
+=== Local features
+
+Any local features in https://github.com/naver/kapture/blob/master/kapture_format.adoc[kapture format] can be used.
+For this tutorial, we suggest to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]).
+
+
+```
+cd kapture_datasets
+git clone https://github.com/naver/r2d2.git
+# extract 20k R2D2 features for:
+# Aachen Day-Night v1.1
+python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
+                               --kapture-root Aachen-Day-Night-v1.1/map_plus_query \
+                               --top-k 20000 \
+                               --max-size 9999 # max image size
+
+# Baidu Mall
+python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
+                               --kapture-root baidu-mall/map_plus_query \
+                               --top-k 20000 \
+                               --max-size 9999
+
+# RobotCar Seasons
+python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
+                               --kapture-root RobotCar_Seasons-v1/map_plus_query \
+                               --top-k 20000 \
+                               --max-size 9999
+```
+
+The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse.
+
+```
+mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
+
+mkdir -p baidu-mall/local_features/r2d2_WASF_N8_20k
+mv baidu-mall/map_plus_query/reconstruction/keypoints baidu-mall/local_features/r2d2_WASF_N8_20k/
+mv baidu-mall/map_plus_query/reconstruction/descriptors baidu-mall/local_features/r2d2_WASF_N8_20k/
+
+mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
+```
+
+In the paper, we also used two other local feature types:
+
+- SIFT: A simple way of using SIFT (as an alternative to R2D2) would be to extract the features using COLMAP and then to import the COLMAP database to kapture using this https://github.com/naver/kapture/blob/master/tools/kapture_import_colmap.py[script].
+
+- D2-Net: Instructions to extract https://arxiv.org/abs/1905.03561[D2-Net] features in kapture format can be found https://github.com/naver/kapture#local-features[here].
+
+If multiple local feature types are used (e.g. for comparison), we strongly recommend to follow our suggested folder structure. For example:
+
+```
+Aachen-Day-Night-v1.1
+└─ local_features
+   ├─ SIFT
+   ├─ D2-Net
+   └─ r2d2_WASF_N8_20k
+      ├─ keypoints
+      ├─ descriptors
+      ├─ NN_no_gv           # raw matches after cross-validation
+      └─ NN_colmap_gv       # matches after geometric verification using COLMAP
+```
+
+Each local feature subfolder contains keypoints, descriptors, and matches (see next section).
+Note that this data can be stored in kapture folders as well (as defined in the https://github.com/naver/kapture/blob/master/kapture_format.adoc[specification]).
+However, for easy reuse we recommend to store them somewhere else (as done in this example).
+The kapture pipelines will generate links to these folders.
+
+= Benchmark
+
+```
+cd kapture_datasets
+# if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
+#   example: -colmap C:/Workspace/dev/colmap/colmap.bat
+
+# run full benchmark (all 3 tasks) on
+# Aachen Day-Night v1.1
+kapture_pipeline_image_retrieval_benchmark.py -v info \
+      -i Aachen-Day-Night-v1.1/mapping \
+      --query Aachen-Day-Night-v1.1/query_all \
+      -kpt Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints \
+      -desc Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors \
+      -gfeat Aachen-Day-Night-v1.1/global_features/AP-GeM-LM18/global_features \
+      -matches Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+      -matches-gv Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
+      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20 \
+      --topk 20 \
+      --config 2
+
+# Baidu Mall
+kapture_pipeline_image_retrieval_benchmark.py -v info \
+      -i baidu-mall/mapping \
+      --query baidu-mall/query_all \
+      -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
+      -desc baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors \
+      -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
+      -matches baidu-mall/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+      -matches-gv baidu-mall/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
+      -o baidu-mall/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20 \
+      --topk 20 \
+      --config 2
+
+# RobotCar Seasons
+kapture_pipeline_image_retrieval_benchmark.py -v info \
+      -i RobotCar_Seasons-v1/mapping \
+      --query RobotCar_Seasons-v1/query_all \
+      -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
+      -desc RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors \
+      -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
+      -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+      -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/frustum_topk50_far50/colmap \
+      -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_topk50_far50/AP-GeM-LM18_top20 \
+      --topk 20 \
+      --config 2 \
+      --prepend_cam # important for RobotCar (needed for visuallocalization.net)
+```
+
+The benchmark script will execute the following commands:
+
+ . `kapture_compute_image_pairs.py` associates similar images between the mapping and query sets
+ . `kapture_merge.py` merges the mapping and query sensors into the same folder (necessary to compute matches)
+ . `kapture_compute_matches.py` computes 2D-2D matches using local features and the list of pairs
+ . `kapture_run_colmap_gv.py` runs geometric verification on the 2D-2D matches
+ . `kapture_colmap_localize.py` runs the camera pose estimation (Task 2b: global sfm)
+ . `kapture_import_colmap.py` imports the COLMAP results into kapture
+ . `kapture_export_LTVL2020.py` exports the global sfm results to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_colmap_localize_localsfm.py` runs the camera pose estimation (Task 2a: local sfm)
+ . `kapture_export_LTVL2020.py` exports the local sfm results to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_pose_approximation.py` run 3 variants of camera pose approximation (Task 1)
+ . `kapture_export_LTVL2020.py` exports the three pose approximation results (called 3 times) to a format compatible with the
+                                https://www.visuallocalization.net/ benchmark
+ . `kapture_evaluate.py` if query ground truth is available, this evaluates the localization results
+
+In this script, the --config option will select the parameters passed to the COLMAP image_registrator.
+The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py].
+
+The benchmark script also has a parameter `--skip` which can be used to skip parts of the benchmark.
+For example, if you want to evaluate your global features only on global SFM, you could use `--skip local_sfm pose_approximation`.
+
+The folder `image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results for each dataset.

@@ -385,8 +385,8 @@ If you use this benchmark in research papers, please cite this paper:
 }
 ----
 
-NOTE: In order to facilitate the use of our benchmark and to reduce processing load, we will soon provide COLMAP maps alongside R2D2 local features and several global features for all three benchmark datasets.
-We will furthermore provide commands for executing the benchmark with the provided data.
+NOTE: In this section, we use the small virtual gallery dataset as example.
+A detailed description of how to reproduce the experiments of the paper can be found link:./benchmark.adoc[here].
 
 == Benchmark
 
@@ -455,5 +455,4 @@ We encourage to organize the experiment data by local feature type, COLMAP map u
 In our example, the results path is composed like this because we use `r2d2_500` (top 500 r2d2 features), the map is named `AP-GeM-LM18_top5`, and we localize using top 5 retrieved images using AP-GeM-LM18 global features (`AP-GeM-LM18_top5`).
 
 The benchmark script also has a parameter `--skip` which can be used to skip parts of the benchmark.
-For example, if you want to evaluate your global features only on global SFM, you could pass
-`--skip local_sfm pose_approximation` to the script.
+For example, if you want to evaluate your global features only on global SFM, you could use `--skip local_sfm pose_approximation`.
