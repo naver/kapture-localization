@@ -6,15 +6,60 @@
 
 = Structure-based mapping and localization
 
-In this tutorial, we will us two pipelines (custom pipeline and COLMAP pipeline) to explain how to localize query images within a map.
-We will first explain how to build the map using structure-from-motion leveraging known camera poses.
-Then, we will show how to localize query images and how to evaluate the precision of the obtained localization against the ground truth.
+In this tutorial, we us two pipelines (custom pipeline and COLMAP pipeline) to explain how to localize query images within a map.
+Before explaining how to use the code, we provide more details about the algorithmic workflow and the methods used.
+
+For both pipelines (custom and COLMAP), we explain how to build a map using structure-from-motion leveraging known camera poses, we show how to localize query images within this map, and we show how to evaluate the precision of the obtained localization against the ground truth.
 
 We will use the `virtual_gallery_tutorial` dataset as an example. It is a subset of the https://europe.naverlabs.com/research/3d-vision/virtual-gallery-dataset/[virtual gallery dataset].
 The sample dataset can be found in the `samples/` folder.
 The tutorial can be used for any dataset that follows the <<recommended dataset structure>>.
-
 Further information about the pipelines can be found in link:../pipeline/README.adoc[pipeline/README].
+
+If you use this work for your research, please cite the respective paper:
+
+----
+@misc{kapture2020,
+      title={Robust Image Retrieval-based Visual Localization using Kapture},
+      author={Martin Humenberger and Yohann Cabon and Nicolas Guerin and Julien Morat and Jérôme Revaud and Philippe Rerole and Noé Pion and Cesar de Souza and Vincent Leroy and Gabriela Csurka},
+      year={2020},
+      eprint={2007.13867},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+----
+
+== Algorithmic workflow
+
+In this section, we present the algorithmic workflow of our pipelines.
+In the custom pipeline, we follow a structure-based approach using image retrieval (any compatible global image representation can be used) to select the image pairs to match (using any compatible local feature type).
+In this pipeline, we use COLMAP for point triangulation and image registration.
+More details about the method can be found in our https://arxiv.org/pdf/2007.13867[paper].
+In the COLMAP pipeline, we follow the COLMAP workflow which uses a vocabulary tree matcher and SIFT features.
+For more details about the COLMAP workflow, please refer to the https://colmap.github.io/faq.html?highlight=localization#register-localize-new-images-into-an-existing-reconstruction[documentation] and this https://github.com/tsattler/visuallocalizationbenchmark[repository].
+
+Fig. <<fig_mapping>> illustrates the algorithmic steps of the mapping part:
+
+1. Extraction of local descriptors and keypoints (e.g. R2D2, D2-Net, SIFT) of training images
+2. Extraction of global features (e.g. AP-GeM, NetVLAD, DenseVLAD) of training images
+3. Computation of training image pairs using global features
+4. Local descriptor matching and geometric verification of the image pairs
+5. Point triangulation with COLMAP (point triangulator)
+
+.Map generation with SFM.
+[[fig_mapping]]
+image::../doc/mapping.png[mapping]
+
+Fig. <<fig_localization>> illustrates the algorithmic steps of the localization part:
+
+1. Extraction of local and global features (same local and global feature types as used for mapping) of query images
+2. Retrieval of similar images from the training images (training-query image pairs)
+3. Local descriptor matching and geometric verification
+4. Camera pose estimation with COLMAP (image registrator)
+
+.Localization of query images in an SFM map.
+[[fig_localization]]
+image::../doc/localization.png[localization]
 
 == Recommended dataset structure
 
@@ -107,7 +152,7 @@ For example, __AP-GeM__ global features can be extracted using https://github.co
 in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
 See https://github.com/naver/kapture#global-features[here] for more global feature types that are directly supported in kapture.
 
-Features for mapping and query images should be in the same folder (see the <<recommended dataset structure>> above).
+Features for mapping and query images need to be in the same folder (see the <<recommended dataset structure>> above).
 
 .previous experiments
 To be sure starting from scratch, unwanted files (e.g. previous experiments) should be deleted before running this tutorial.
@@ -120,7 +165,7 @@ cd samples/virtual_gallery_tutorial
 
 Next, we will introduce two mapping and localization pipelines. The first one is a custom-built pipeline that can be used with any local or global feature type as well as custom keypoint matches, the second one is fully based on COLMAP and shows how COLMAP can be used with data provided in kapture format.
 
-== Kapture pipeline
+== Kapture pipeline (custom)
 
 === 1. Mapping
 
@@ -136,7 +181,7 @@ kapture_pipeline_mapping.py -v info \
     -gfeat ./global_features/AP-GeM-LM18/global_features \
     -matches ./local_features/r2d2_500/NN_no_gv/matches \
     -matches-gv ./local_features/r2d2_500/NN_colmap_gv/matches \
-    --colmap-map ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5  `# lfeat type / map pairs` \
+    --colmap-map ./colmap-sfm/r2d2_500/AP-GeM-LM18_top5  # lfeat type / map pairs \
     --topk 5
 ----
 
@@ -246,7 +291,7 @@ colmap gui \
 [[fig_localized]]
 image::../doc/colmap_localized.jpg[localized]
 
-== Standard COLMAP pipeline
+== Kapture pipeline (COLMAP)
 
 In contrast to <<kapture pipeline>>, this section walks through a simpler pipeline fully based on COLMAP using SIFT local features
 and Vocabulary Tree matching.
@@ -408,3 +453,7 @@ CSI                  0.00%          25.00%        50.00%
 
 We encourage to organize the experiment data by local feature type, COLMAP map used, and global feature type.
 In our example, the results path is composed like this because we use `r2d2_500` (top 500 r2d2 features), the map is named `AP-GeM-LM18_top5`, and we localize using top 5 retrieved images using AP-GeM-LM18 global features (`AP-GeM-LM18_top5`).
+
+The benchmark script also has a parameter `--skip` which can be used to skip parts of the benchmark.
+For example, if you want to evaluate your global features only on global SFM, you could pass
+`--skip local_sfm pose_approximation` to the script.

@@ -68,7 +68,7 @@ def compute_image_pairs(mapping_path: str,
                                                 kdata_mapping.global_features.dtype,
                                                 kdata_mapping.global_features.dsize)
 
-    logger.info(f'computing pairs from with {kdata_mapping.global_features.type_name}...')
+    logger.info(f'computing pairs with {kdata_mapping.global_features.type_name}...')
 
     mapping_global_features_to_filepaths = global_features_to_filepaths(kdata_mapping.global_features,
                                                                         mapping_path)
