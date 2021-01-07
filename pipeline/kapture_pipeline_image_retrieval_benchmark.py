@@ -348,10 +348,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         run_python_command(local_evaluate_path, evaluate_args, python_binary)
 
 
-def image_retrieval_benchmark_command_line():
-    """
-    Parse the command line arguments to run the image retrieval benchmark on kapture data.
-    """
+def image_retrieval_benchmark_get_parser():
     parser = argparse.ArgumentParser(description='run the image retrieval benchmark on kapture data')
     parser_verbosity = parser.add_mutually_exclusive_group()
     parser_verbosity.add_argument('-v', '--verbose', nargs='?', default=logging.WARNING, const=logging.INFO,
@@ -414,6 +411,14 @@ def image_retrieval_benchmark_command_line():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    return parser
+
+
+def image_retrieval_benchmark_command_line():
+    """
+    Parse the command line arguments to run the image retrieval benchmark on kapture data.
+    """
+    parser = image_retrieval_benchmark_get_parser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
