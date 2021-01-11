@@ -107,7 +107,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
     pose_approx_CSI_path = path.join(pose_approx_path, f'CSI')
 
     pose_approx_EWB_LTVL2020_output_path = path.join(localization_output_path, 'EWB_LTVL2020_style_result.txt')
-    pose_approx_BDI_LTVL2020_output_path = path.join(localization_output_path, 'BSI_LTVL2020_style_result.txt')
+    pose_approx_BDI_LTVL2020_output_path = path.join(localization_output_path, 'BDI_LTVL2020_style_result.txt')
     pose_approx_CSI_LTVL2020_output_path = path.join(localization_output_path, 'CSI_LTVL2020_style_result.txt')
 
     if not path.isdir(matches_path):
