@@ -153,6 +153,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         merge_args = ['-v', str(logger.level),
                       '-i', proxy_kapture_map_path, proxy_kapture_query_path,
                       '-o', map_plus_query_path,
+                      '--keep-sensor-ids',
                       '-s', 'keypoints', 'descriptors', 'global_features', 'matches',
                       '--image_transfer', 'link_absolute']
         if force_overwrite_existing:
