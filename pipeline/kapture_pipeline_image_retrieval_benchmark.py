@@ -92,6 +92,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
     global_sfm_colmap_localize_path = path.join(global_sfm_path, f'colmap_localized')
     os.makedirs(global_sfm_colmap_localize_path, exist_ok=True)
     global_sfm_kapture_localize_import_path = path.join(global_sfm_path, f'kapture_localized')
+    global_sfm_kapture_localize_recover_path = path.join(global_sfm_path, f'kapture_localized_recover')
     global_sfm_LTVL2020_output_path = path.join(localization_output_path, 'global_sfm_LTVL2020_style_result.txt')
 
     # local sfm results
@@ -227,12 +228,23 @@ def image_retrieval_benchmark(kapture_map_path: str,
             import_colmap_args.append('-f')
         run_python_command(local_import_colmap_path, import_colmap_args, python_binary)
 
+        local_recover_path = path.join(pipeline_import_paths.HERE_PATH,
+                                       '../tools/kapture_recover_timestamps_and_ids.py')
+        recover_args = ['-v', str(logger.level),
+                        '-i', global_sfm_kapture_localize_import_path,
+                        '--ref', proxy_kapture_query_path,
+                        '-o', global_sfm_kapture_localize_recover_path,
+                        '--image_transfer', 'skip']
+        if force_overwrite_existing:
+            recover_args.append('-f')
+        run_python_command(local_recover_path, recover_args, python_binary)
+
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
             local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
                                                    '../../kapture/tools/kapture_export_LTVL2020.py')
             export_LTVL2020_args = ['-v', str(logger.level),
-                                    '-i', global_sfm_kapture_localize_import_path,
+                                    '-i', global_sfm_kapture_localize_recover_path,
                                     '-o', global_sfm_LTVL2020_output_path]
             if prepend_cam:
                 export_LTVL2020_args.append('-p')

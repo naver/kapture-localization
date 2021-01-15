@@ -90,6 +90,7 @@ def localize_pipeline(kapture_map_path: str,
     colmap_localize_path = path.join(localization_output_path, f'colmap_localized')
     os.makedirs(colmap_localize_path, exist_ok=True)
     kapture_localize_import_path = path.join(localization_output_path, f'kapture_localized')
+    kapture_localize_recover_path = path.join(localization_output_path, f'kapture_localized_recover')
     eval_path = path.join(localization_output_path, f'eval')
     LTVL2020_output_path = path.join(localization_output_path, 'LTVL2020_style_result.txt')
 
@@ -210,11 +211,22 @@ def localize_pipeline(kapture_map_path: str,
             import_colmap_args.append('-f')
         run_python_command(local_import_colmap_path, import_colmap_args, python_binary)
 
+        local_recover_path = path.join(pipeline_import_paths.HERE_PATH,
+                                       '../tools/kapture_recover_timestamps_and_ids.py')
+        recover_args = ['-v', str(logger.level),
+                        '-i', kapture_localize_import_path,
+                        '--ref', kapture_query_path,
+                        '-o', kapture_localize_recover_path,
+                        '--image_transfer', 'skip']
+        if force_overwrite_existing:
+            recover_args.append('-f')
+        run_python_command(local_recover_path, recover_args, python_binary)
+
     # kapture_evaluate.py
     if 'evaluate' not in skip_list and path.isfile(path.join(kapture_query_path, 'sensors/trajectories.txt')):
         local_evaluate_path = path.join(pipeline_import_paths.HERE_PATH, '../tools/kapture_evaluate.py')
         evaluate_args = ['-v', str(logger.level),
-                         '-i', kapture_localize_import_path,
+                         '-i', kapture_localize_recover_path,
                          '--labels', f'colmap_config_{config}',
                          '-gt', kapture_query_path,
                          '-o', eval_path]
@@ -228,7 +240,7 @@ def localize_pipeline(kapture_map_path: str,
         local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
                                                '../../kapture/tools/kapture_export_LTVL2020.py')
         export_LTVL2020_args = ['-v', str(logger.level),
-                                '-i', kapture_localize_import_path,
+                                '-i', kapture_localize_recover_path,
                                 '-o', LTVL2020_output_path]
         if prepend_cam:
             export_LTVL2020_args.append('-p')
