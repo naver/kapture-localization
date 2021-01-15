@@ -340,7 +340,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         input_list = []
         label_list = []
         if 'global_sfm' not in skip_list:
-            input_list.append(global_sfm_kapture_localize_import_path)
+            input_list.append(global_sfm_kapture_localize_recover_path)
             label_list.append(f'global_sfm_config_{config}')
         if 'local_sfm' not in skip_list:
             input_list.append(local_sfm_localize_path)

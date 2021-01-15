@@ -104,32 +104,15 @@ def recover_timestamps_and_ids(input_path: str,
             rig_id = sensor_to_rig[camera_id]
             out_rigs[ref_rig_id, ref_camera_id] = kdata[rig_id, camera_id]
 
-    # some files do not depend on ids
-    out_points3d = kdata_ref.points3d
-
-    if kdata.observations is not None:
-        logger.info('filter observations of removed images')
-        kept_images = set(image_name for _, _, image_name in kapture.flatten(out_records))
-        out_observations = kapture.Observations()
-        for point_id, obvervation_list in kdata.observations.items():
-            new_obs = [(name, keypoint_id)
-                       for (name, keypoint_id) in obvervation_list
-                       if name in kept_images]
-            if len(new_obs) > 0:
-                out_observations[point_id] = new_obs
-    else:
-        out_observations = None
-
     # prefer None over empty
     out_sensors = out_sensors or None
     out_records = out_records or None
     out_rigs = out_rigs or None
     out_trajectories = out_trajectories or None
-    out_observations = out_observations or None
 
     logger.info('saving results')
-    kdata_out = kapture.Kapture(sensors=out_sensors, rigs=out_rigs, trajectories=out_trajectories,
-                                records_camera=out_records, points3d=out_points3d, observations=out_observations)
+    kdata_out = kapture.Kapture(sensors=out_sensors, rigs=out_rigs,
+                                trajectories=out_trajectories, records_camera=out_records)
     csv.kapture_to_dir(output_path, kdata_out)
 
     logger.info('handle image files with a call to transfer_actions')
