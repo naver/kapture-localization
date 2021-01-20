@@ -7,6 +7,7 @@ from glob import glob
 from subprocess import check_call
 import os
 import tempfile
+import sys
 
 HERE = path.normpath(path.dirname(__file__))
 
@@ -24,8 +25,10 @@ def read_doc(filepath):
         with tempfile.TemporaryDirectory() as tmpdirname:
             xml_filepath = path.join(tmpdirname, 'README.xml')
             md_filepath = path.join(tmpdirname, 'README.md')
-            check_call(['asciidoctor', '-b', 'docbook', filepath, '-o', xml_filepath])
-            check_call(['pandoc', '-f', 'docbook', '-t', 'markdown_strict', xml_filepath, '-o', md_filepath])
+            use_shell = sys.platform.startswith("win")
+            check_call(['asciidoctor', '-b', 'docbook', filepath, '-o', xml_filepath], shell=use_shell)
+            check_call(['pandoc', '-f', 'docbook', '-t', 'markdown_strict', xml_filepath, '-o', md_filepath],
+                       shell=use_shell)
             content = read_file(md_filepath)
 
     except FileNotFoundError:
@@ -59,11 +62,11 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=[
         'kapture>=1.0.10',
-        'numpy==1.19.5',
+        'numpy>=1.16,<1.20',
         'numpy-quaternion',
         'numba',
         'cvxpy>=1.1.6',
-        'torch==1.4.0',
+        'torch>=1.4.0',
         'tabulate>=0.8.7',
     ],
     extras_require={
