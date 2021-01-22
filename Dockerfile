@@ -95,7 +95,7 @@ RUN      python3 -m pip install kapture
 # install kapture-localization
 ADD      . ${SOURCE_PREFIX}/kapture-localization
 WORKDIR  ${SOURCE_PREFIX}/kapture-localization
-RUN      python3 -m pip install "torch==1.4.0" "torchvision==0.5.0"
+RUN      python3 -m pip install "torch==1.4.0" "torchvision==0.5.0" "scikit_learn==0.20.2"
 RUN      python3 -m pip install -r requirements.txt --use-feature=2020-resolver
 RUN      python3 setup.py install
 
