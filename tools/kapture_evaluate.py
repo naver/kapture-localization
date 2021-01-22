@@ -24,6 +24,7 @@ import kapture
 import kapture.io.csv as csv
 import kapture.utils.logging
 from kapture.utils.paths import safe_remove_file
+from kapture.io.csv import table_from_file
 
 RESULTS_FILENAME = "scores"
 STATISTICS_FILENAME = "stats"
@@ -284,8 +285,7 @@ def evaluate_command_line() -> None:
 
         if args.image_list:
             with open(args.image_list, 'r') as fid:
-                lines = fid.readlines()
-                image_set = {line.rstrip() for line in lines}
+                image_set = {line[0] for line in table_from_file(fid)}
         else:
             image_set = set(image_name for _, _, image_name in kapture.flatten(gt_kapture.records_camera))
         if len(image_set) == 0:
