@@ -64,7 +64,7 @@ image::../doc/localization.png[localization]
 == Recommended dataset structure
 
 The pipeline scripts use the same locations of keypoints, descriptors, global features, and matches for multiple kapture folders.
-Note, a kapture folder contains sensor data and, if available, reconstruction data. More details about the structure of a kapture folder and the data it contains can be found in the link:https://github.com/naver/kapture/blob/master/kapture_format.adoc[kapture repository].
+Note, a kapture folder contains sensor data and, if available, reconstruction data. More details about the structure of a kapture folder and the data it contains can be found in the link:https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture repository].
 
 In order to share reconstruction data across different kapture folders, this data has to be stored outside of any kapture folder and the pipeline scripts will use these locations to assemble the correct kapture folders using symlinks.
 

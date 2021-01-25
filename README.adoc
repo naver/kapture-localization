@@ -72,7 +72,7 @@ There are many ways to contribute to the __kapture-localization__ project:
 
 // TODO individual page for kapture-localization ?
 If you wish to contribute, please refer to the
-link:https://github.com/naver/kapture/blob/master/CONTRIBUTING.adoc[CONTRIBUTING] page.
+link:https://github.com/naver/kapture/blob/main/CONTRIBUTING.adoc[CONTRIBUTING] page.
 
 == License
 Software license is detailed in the link:LICENSE[LICENSE] file.

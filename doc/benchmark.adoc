@@ -204,7 +204,7 @@ As can be seen above, in order to reproduce the 3DV2020 paper results we provide
 
 === Local features
 
-Any local features in https://github.com/naver/kapture/blob/master/kapture_format.adoc[kapture format] can be used.
+Any local features in https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture format] can be used.
 For this tutorial, we suggest to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]).
 
 
@@ -249,7 +249,7 @@ mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors RobotCar_Season
 
 In the paper, we also used two other local feature types:
 
-- SIFT: A simple way of using SIFT (as an alternative to R2D2) would be to extract the features using COLMAP and then to import the COLMAP database to kapture using this https://github.com/naver/kapture/blob/master/tools/kapture_import_colmap.py[script].
+- SIFT: A simple way of using SIFT (as an alternative to R2D2) would be to extract the features using COLMAP and then to import the COLMAP database to kapture using this https://github.com/naver/kapture/blob/main/tools/kapture_import_colmap.py[script].
 
 - D2-Net: Instructions to extract https://arxiv.org/abs/1905.03561[D2-Net] features in kapture format can be found https://github.com/naver/kapture#local-features[here].
 
@@ -268,7 +268,7 @@ Aachen-Day-Night-v1.1
 ```
 
 Each local feature subfolder contains keypoints, descriptors, and matches (see next section).
-Note that this data can be stored in kapture folders as well (as defined in the https://github.com/naver/kapture/blob/master/kapture_format.adoc[specification]).
+Note that this data can be stored in kapture folders as well (as defined in the https://github.com/naver/kapture/blob/main/kapture_format.adoc[specification]).
 However, for easy reuse we recommend to store them somewhere else (as done in this example).
 The kapture pipelines will generate links to these folders.
 
