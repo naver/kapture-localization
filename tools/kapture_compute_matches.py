@@ -7,6 +7,7 @@ from functools import lru_cache
 from typing import List, Tuple
 import torch
 from tqdm import tqdm
+import os
 from collections import OrderedDict
 
 import path_to_kapture_localization  # noqa: F401
@@ -86,6 +87,7 @@ def compute_matches_from_loaded_data(input_path: str,
     assert kdata.sensors is not None
     assert kdata.records_camera is not None
     assert kdata.descriptors is not None
+    os.umask(0o002)
 
     matcher = MatchPairNnTorch(use_cuda=torch.cuda.is_available())
     new_matches = kapture.Matches()
