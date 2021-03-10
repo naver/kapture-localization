@@ -281,12 +281,19 @@ def evaluate_command_line() -> None:
         logger.info('loading ground truth data')
         gt_kapture = csv.kapture_from_dir(args.ground_truth)
         assert gt_kapture.records_camera is not None
+        assert gt_kapture.trajectories is not None
 
         if args.image_list:
             with open(args.image_list, 'r') as fid:
                 image_set = {line[0] for line in table_from_file(fid)}
         else:
-            image_set = set(image_name for _, _, image_name in kapture.flatten(gt_kapture.records_camera))
+            if gt_kapture.rigs is not None:
+                gt_trajectories = kapture.rigs_remove(gt_kapture.trajectories, gt_kapture.rigs)
+            else:
+                gt_trajectories = gt_kapture.trajectories
+            image_set = set(image_name
+                            for ts, sensor_id, image_name in kapture.flatten(gt_kapture.records_camera)
+                            if (ts, sensor_id) in gt_trajectories)
         if len(image_set) == 0:
             logger.info('image_set is empty, for some reason, I could not find images to evaluate')
             exit(0)
