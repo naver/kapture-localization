@@ -38,6 +38,7 @@ jobs:
         python -m pip install --upgrade pip
         # Need do pre-install numpy<20 as v20.0 is not compatible with Python3.6 and pip does not work properly!
         pip install flake8 pytest "numpy<20.0"
+        pip install --no-binary ":all:" numpy-quaternion
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
