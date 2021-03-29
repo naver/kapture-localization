@@ -46,8 +46,10 @@ def write_results_to_file(output_folder: str,
     """
     for i in range(0, len(results)):
         label = labels[i]
+        translation_map = label.maketrans("\\/:*?<>|", "________")
+        label_name_safe = label.translate(translation_map)
         result = results[i]
-        full_path = path.join(output_folder, RESULTS_FILENAME + '_{}'.format(label) + '.txt')
+        full_path = path.join(output_folder, RESULTS_FILENAME + '_{}'.format(label_name_safe) + '.txt')
         safe_remove_file(full_path, force)
         results_as_lines = ['{} {} {}\n'.format(name, position_error, rotation_error)
                             for name, position_error, rotation_error in result]
