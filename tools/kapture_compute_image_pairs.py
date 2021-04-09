@@ -15,7 +15,7 @@ import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
 from kapture.io.csv import kapture_from_dir, table_to_file
-from kapture.io.csv import ImageFeatureConfig
+from kapture.io.csv import ImageFeatureConfig, get_all_tar_handlers
 from kapture.io.features import global_features_to_filepaths
 from kapture.utils.Collections import try_get_only_key_from_collection
 
@@ -41,7 +41,7 @@ def compute_image_pairs(mapping_path: str,
     :type topk: int
     """
     logger.info(f'compute_image_pairs. loading mapping: {mapping_path}')
-    with kapture.io.csv.get_all_tar_handlers(mapping_path) as mapping_tar_handlers:
+    with get_all_tar_handlers(mapping_path) as mapping_tar_handlers:
         kdata_mapping = kapture_from_dir(mapping_path, None, skip_list=[kapture.Keypoints,
                                                                         kapture.Descriptors,
                                                                         kapture.Matches,
@@ -76,7 +76,7 @@ def compute_image_pairs(mapping_path: str,
         query_stacked_features = mapping_stacked_features
     else:
         logger.info(f'compute_image_pairs. loading query: {query_path}')
-        with kapture.io.csv.get_all_tar_handlers(query_path) as query_tar_handlers:
+        with get_all_tar_handlers(query_path) as query_tar_handlers:
             kdata_query = kapture_from_dir(query_path, None, skip_list=[kapture.Keypoints,
                                                                         kapture.Descriptors,
                                                                         kapture.Matches,
