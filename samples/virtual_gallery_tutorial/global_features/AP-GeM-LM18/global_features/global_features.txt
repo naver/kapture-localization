@@ -1,3 +1,3 @@
-# kapture format: 1.0
-# name, dtype, dsize
-dirtorch, float32, 2048
+# kapture format: 1.1
+# name, dtype, dsize, metric_type
+dirtorch, float32, 2048, L2
