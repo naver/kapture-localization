@@ -10,7 +10,7 @@ from kapture_localization.utils.logging import getLogger
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 from kapture.io.csv import ImageFeatureConfig
 from kapture.io.features import image_global_features_from_file
-
+from kapture.io.tar import TarHandler
 
 class StackedGlobalFeatures:
     def __init__(self,
@@ -21,7 +21,7 @@ class StackedGlobalFeatures:
 
 
 def stack_global_features(global_features_config: ImageFeatureConfig,
-                          global_features_paths: List[Tuple[str, str]]
+                          global_features_paths: List[Tuple[str, Union[str, Tuple[str, TarHandler]]]]
                           ) -> Tuple[Union[np.array, List[str]], np.ndarray]:
     """
     loads global features and store them inside a numpy array of shape (number_of_images, dsize)

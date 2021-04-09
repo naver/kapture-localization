@@ -4,7 +4,7 @@
 import argparse
 import logging
 from functools import lru_cache
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 import torch
 from tqdm import tqdm
 import os
@@ -21,6 +21,8 @@ from kapture.io.csv import kapture_from_dir, table_from_file
 from kapture.io.features import get_descriptors_fullpath, get_matches_fullpath
 from kapture.io.features import image_descriptors_from_file
 from kapture.io.features import matches_check_dir, image_matches_to_file
+from kapture.io.tar import TarCollection
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 logger = logging.getLogger('compute_matches')
 
@@ -45,20 +47,25 @@ def get_pairs_from_file(pairsfile_path: str) -> List[Tuple[str, str]]:
 
 
 @lru_cache(maxsize=50)
-def load_descriptors(input_path: str, image_name: str, dtype, dsize):
+def load_descriptors(descriptors_type: str, input_path: str,
+                     tar_handler: Optional[TarCollection],
+                     image_name: str, dtype, dsize):
     """
     load a descriptor. this functions caches up to 50 descriptors
 
+    :param descriptors_type: the name of the descriptors type
     :param input_path: input path to kapture input root directory
+    :param tar_handler: collection of preloaded tar archives
     :param image_name: name of the image
     :param dtype: dtype of the numpy array
     :param dsize: size of the numpy array
     """
-    descriptors_path = get_descriptors_fullpath(input_path, image_name)
+    descriptors_path = get_descriptors_fullpath(descriptors_type, input_path, image_name, tar_handler)
     return image_descriptors_from_file(descriptors_path, dtype, dsize)
 
 
 def compute_matches(input_path: str,
+                    descriptors_type: Optional[str],
                     pairsfile_path: str,
                     overwrite_existing: bool = False):
     """
@@ -66,28 +73,42 @@ def compute_matches(input_path: str,
 
     :param input_path: input path to kapture input root directory
     :type input_path: str
+    :param descriptors_type: types of descriptors used to match
     :param pairsfile_path: path to pairs file (csv with 3 fields, name1, name2, score)
     :type pairsfile_path: str
     """
     logger.info(f'compute_matches. loading input: {input_path}')
-    kdata = kapture_from_dir(input_path, pairsfile_path, skip_list=[kapture.GlobalFeatures,
-                                                                    kapture.Observations,
-                                                                    kapture.Points3d])
-    image_pairs = get_pairs_from_file(pairsfile_path)
-    compute_matches_from_loaded_data(input_path,
-                                     kdata,
-                                     image_pairs,
-                                     overwrite_existing)
+    with kapture.io.csv.get_all_tar_handlers(input_path) as tar_handlers:
+        kdata = kapture_from_dir(input_path, pairsfile_path, skip_list=[kapture.GlobalFeatures,
+                                                                        kapture.Observations,
+                                                                        kapture.Points3d],
+                                 tar_handlers=tar_handlers)
+        image_pairs = get_pairs_from_file(pairsfile_path)
+        compute_matches_from_loaded_data(input_path,
+                                         tar_handlers,
+                                         kdata,
+                                         descriptors_type,
+                                         image_pairs,
+                                         overwrite_existing)
 
 
 def compute_matches_from_loaded_data(input_path: str,
+                                     tar_handlers: Optional[TarCollection],
                                      kdata: kapture.Kapture,
+                                     descriptors_type: Optional[str],
                                      image_pairs: list,
                                      overwrite_existing: bool = False):
     assert kdata.sensors is not None
     assert kdata.records_camera is not None
     assert kdata.descriptors is not None
     os.umask(0o002)
+
+    if descriptors_type is None:
+        descriptors_type = try_get_only_key_from_collection(kdata.descriptors)
+    assert descriptors_type is not None
+    assert descriptors_type in kdata.descriptors
+    keypoints_type = kdata.descriptors[descriptors_type].keypoints_type
+    # assert kdata.descriptors[descriptors_type].metric_type == "L2"
 
     matcher = MatchPairNnTorch(use_cuda=torch.cuda.is_available())
     new_matches = kapture.Matches()
@@ -102,26 +123,32 @@ def compute_matches_from_loaded_data(input_path: str,
             image_path1, image_path2 = image_path2, image_path1
 
         # skip existing matches
-        if (not overwrite_existing) and (kdata.matches is not None) and ((image_path1, image_path2) in kdata.matches):
+        if (not overwrite_existing) \
+                and (kdata.matches is not None) \
+                and keypoints_type in kdata.matches \
+                and ((image_path1, image_path2) in kdata.matches[keypoints_type]):
             new_matches.add(image_path1, image_path2)
             skip_count += 1
             continue
 
-        if image_path1 not in kdata.descriptors or image_path2 not in kdata.descriptors:
+        if image_path1 not in kdata.descriptors[descriptors_type] \
+                or image_path2 not in kdata.descriptors[descriptors_type]:
             logger.warning('unable to find descriptors for image pair : '
                            '\n\t{} \n\t{}'.format(image_path1, image_path2))
             continue
 
-        descriptor1 = load_descriptors(input_path, image_path1, kdata.descriptors.dtype, kdata.descriptors.dsize)
-        descriptor2 = load_descriptors(input_path, image_path2, kdata.descriptors.dtype, kdata.descriptors.dsize)
+        descriptor1 = load_descriptors(descriptors_type, input_path, tar_handlers,
+                                       image_path1, kdata.descriptors.dtype, kdata.descriptors.dsize)
+        descriptor2 = load_descriptors(descriptors_type, input_path, tar_handlers,
+                                       image_path2, kdata.descriptors.dtype, kdata.descriptors.dsize)
         matches = matcher.match_descriptors(descriptor1, descriptor2)
-        matches_path = get_matches_fullpath((image_path1, image_path2), input_path)
+        matches_path = get_matches_fullpath((image_path1, image_path2), keypoints_type, input_path, tar_handlers)
         image_matches_to_file(matches_path, matches)
         new_matches.add(image_path1, image_path2)
 
     if not overwrite_existing:
         logger.debug(f'{skip_count} pairs were skipped because the match file already existed')
-    if not matches_check_dir(new_matches, input_path):
+    if not matches_check_dir(new_matches, keypoints_type, input_path, tar_handlers):
         logger.critical('matching ended successfully but not all files were saved')
     logger.info('all done')
 
@@ -145,6 +172,7 @@ def compute_matches_command_line():
                               'which contains the image pairs to match'))
     parser.add_argument('-ow', '--overwrite', action='store_true', default=False,
                         help='overwrite matches if they already exist.')
+    parser.add_argument('-desc', '--descriptors-type', default=None, help='kapture descriptors type.')
     args = parser.parse_args()
     logger.setLevel(args.verbose)
     if args.verbose <= logging.DEBUG:
@@ -154,7 +182,10 @@ def compute_matches_command_line():
 
     logger.debug(''.join(['\n\t{:13} = {}'.format(k, v)
                           for k, v in vars(args).items()]))
-    compute_matches(args.input, args.pairsfile_path)
+    compute_matches(args.input,
+                    args.descriptors_type,
+                    args.pairsfile_path,
+                    args.overwrite)
 
 
 if __name__ == '__main__':
