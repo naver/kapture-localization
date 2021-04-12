@@ -4,6 +4,7 @@
 import os
 import argparse
 import logging
+from re import T
 from typing import List, Optional
 
 import path_to_kapture_localization  # noqa: F401
@@ -20,6 +21,8 @@ from kapture.converter.colmap.import_colmap_database import get_images_and_traje
 from kapture.converter.colmap.import_colmap_database import get_matches_from_database
 from kapture.core.Trajectories import rigs_remove_inplace
 import kapture.converter.colmap.database_extra as database_extra
+from kapture.io.tar import TarCollection
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 logger = logging.getLogger('run_colmap_gv')
 
@@ -28,24 +31,35 @@ def run_colmap_gv(kapture_none_matches_dirpath: str,
                   kapture_colmap_matches_dirpath: str,
                   colmap_binary: str,
                   pairsfile_path: Optional[str],
+                  keypoints_type: Optional[str],
                   skip_list: List[str],
                   force: bool):
-    kapture_none_matches = kapture_from_dir(kapture_none_matches_dirpath, pairsfile_path)
-    kapture_colmap_matches = kapture_from_dir(kapture_colmap_matches_dirpath, pairsfile_path)
-    run_colmap_gv_from_loaded_data(kapture_none_matches,
-                                   kapture_colmap_matches,
-                                   kapture_none_matches_dirpath,
-                                   kapture_colmap_matches_dirpath,
-                                   colmap_binary,
-                                   skip_list,
-                                   force)
+    with kapture.io.csv.get_all_tar_handlers(kapture_none_matches_dirpath) as tar_handlers_none:
+        kapture_none_matches = kapture_from_dir(kapture_none_matches_dirpath, pairsfile_path,
+                                                tar_handlers=tar_handlers_none)
+        with kapture.io.csv.get_all_tar_handlers(kapture_colmap_matches_dirpath) as tar_handlers_colmap:
+            kapture_colmap_matches = kapture_from_dir(kapture_colmap_matches_dirpath, pairsfile_path,
+                                                      tar_handlers=tar_handlers_colmap)
+            run_colmap_gv_from_loaded_data(kapture_none_matches,
+                                           kapture_colmap_matches,
+                                           kapture_none_matches_dirpath,
+                                           kapture_colmap_matches_dirpath,
+                                           tar_handlers_none,
+                                           tar_handlers_colmap,
+                                           colmap_binary,
+                                           keypoints_type,
+                                           skip_list,
+                                           force)
 
 
 def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
                                    kapture_colmap_matches: kapture.Kapture,
                                    kapture_none_matches_dirpath: str,
                                    kapture_colmap_matches_dirpath: str,
+                                   tar_handlers_none_matches: Optional[TarCollection],
+                                   tar_handlers_colmap_matches: Optional[TarCollection],
                                    colmap_binary: str,
+                                   keypoints_type: Optional[str],
                                    skip_list: List[str],
                                    force: bool):
     logger.info('run_colmap_gv...')
@@ -64,22 +78,36 @@ def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
     if 'delete_existing' not in skip_list:
         safe_remove_file(colmap_db_path, force)
 
+    if keypoints_type is None:
+        keypoints_type = try_get_only_key_from_collection(kapture_none_matches.matches)
+    assert keypoints_type is not None
+    assert keypoints_type in kapture_none_matches.keypoints
+    assert keypoints_type in kapture_none_matches.matches
+
     if 'matches_importer' not in skip_list:
         logger.debug('compute matches difference.')
-        if kapture_colmap_matches.matches is not None:
-            colmap_matches = kapture_colmap_matches.matches
+        if kapture_colmap_matches.matches is not None and keypoints_type in kapture_colmap_matches.matches:
+            colmap_matches = kapture_colmap_matches.matches[keypoints_type]
         else:
             colmap_matches = kapture.Matches()
-        matches_to_verify = kapture.Matches(kapture_none_matches.matches.difference(colmap_matches))
+        matches_to_verify = kapture.Matches(kapture_none_matches.matches[keypoints_type].difference(colmap_matches))
         kapture_data_to_export = kapture.Kapture(sensors=kapture_none_matches.sensors,
                                                  trajectories=kapture_none_matches.trajectories,
                                                  records_camera=kapture_none_matches.records_camera,
-                                                 keypoints=kapture_none_matches.keypoints,
-                                                 matches=matches_to_verify)
+                                                 keypoints={
+                                                     keypoints_type: kapture_none_matches.keypoints[keypoints_type]
+                                                 },
+                                                 matches={
+                                                     keypoints_type: matches_to_verify
+                                                 })
         # creates a new database with matches
         logger.debug('export matches difference to db.')
         colmap_db = COLMAPDatabase.connect(colmap_db_path)
-        database_extra.kapture_to_colmap(kapture_data_to_export, kapture_none_matches_dirpath, colmap_db,
+        database_extra.kapture_to_colmap(kapture_data_to_export, kapture_none_matches_dirpath,
+                                         tar_handlers_none_matches,
+                                         colmap_db,
+                                         keypoints_type,
+                                         None,
                                          export_two_view_geometry=False)
         # close db before running colmap processes in order to avoid locks
         colmap_db.close()
@@ -102,6 +130,8 @@ def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
         kapture_data.records_camera, _ = get_images_and_trajectories_from_database(colmap_db)
         kapture_data.matches = get_matches_from_database(colmap_db, kapture_data.records_camera,
                                                          kapture_colmap_matches_dirpath,
+                                                         tar_handlers_colmap_matches,
+                                                         keypoints_type,
                                                          no_geometric_filtering=False)
         colmap_db.close()
 
@@ -138,6 +168,7 @@ def run_colmap_gv_command_line():
                                                  'delete_db'],
                         nargs='+', default=[],
                         help='steps to skip')
+    parser.add_argument('-kpt', '--keypoints-type', default=None, help='kapture keypoints type.')
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -149,7 +180,10 @@ def run_colmap_gv_command_line():
 
     args_dict = vars(args)
     logger.debug('run_colmap_gv.py \\\n' + ''.join(['\n\t{:13} = {}'.format(k, v) for k, v in args_dict.items()]))
-    run_colmap_gv(args.input, args.output, args.colmap_binary, args.pairsfile_path, args.skip, args.force)
+    run_colmap_gv(args.input, args.output, args.colmap_binary,
+                  args.pairsfile_path,
+                  args.keypoints_type,
+                  args.skip, args.force)
 
 
 if __name__ == '__main__':

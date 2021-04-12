@@ -6,6 +6,7 @@ import argparse
 import logging
 import itertools
 from collections import OrderedDict
+from typing import Optional
 
 import path_to_kapture_localization
 import kapture_localization.utils.path_to_kapture
@@ -23,6 +24,8 @@ from kapture.io.features import get_matches_fullpath
 from kapture.io.records import TransferAction
 from kapture.converter.colmap.import_colmap import import_colmap
 from kapture.utils.paths import safe_remove_file, safe_remove_any_path
+from kapture.io.tar import TarCollection
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 logger = logging.getLogger()
 
@@ -32,7 +35,7 @@ def sub_kapture_from_img_list(kdata, kdata_path, img_list, pairs):
     sensors = kapture.Sensors()
     records = kapture.RecordsCamera()
     keypoints = kapture.Keypoints(kdata.keypoints._tname, kdata.keypoints._dtype, kdata.keypoints._dsize)
-    if kdata.descriptors != None:
+    if kdata.descriptors is not None:
         descriptors = kapture.Descriptors(kdata.descriptors._tname, kdata.descriptors._dtype, kdata.descriptors._dsize)
     else:
         descriptors = None
@@ -47,7 +50,7 @@ def sub_kapture_from_img_list(kdata, kdata_path, img_list, pairs):
         records[timestamp, sensor_id] = img
         trajectories[timestamp, sensor_id] = pose
         keypoints.add(img)
-        if kdata.descriptors != None:
+        if kdata.descriptors is not None:
             descriptors.add(img)
 
     for i in pairs:
@@ -67,7 +70,7 @@ def add_image_to_kapture(kdata_src, kdata_src_path, kdata_trg, img_name, pairs, 
     kdata_trg.sensors[sensor_id] = kdata_src.sensors[sensor_id]
     kdata_trg.records_camera[timestamp, sensor_id] = img_name
     kdata_trg.keypoints.add(img_name)
-    if kdata_trg.descriptors != None:
+    if kdata_trg.descriptors is not None:
         kdata_trg.descriptors.add(img_name)
 
     if add_pose:
@@ -155,6 +158,7 @@ def write_pairfile_img_vs_img_list(img, img_list, pairsfile_path):
 def local_sfm(map_plus_query_path: str,
               map_plus_query_gv_path: str,
               query_path: str,
+              descriptors_type: Optional[str],
               pairsfile_path: str,
               output_path_root: str,
               colmap_binary: str,
@@ -165,6 +169,47 @@ def local_sfm(map_plus_query_path: str,
     :param map_plus_query_path: path to the kapture data consisting of mapping and query data (sensors and reconstruction)
     :param map_plus_query_gv_path: path to the kapture data consisting of mapping and query data after geometric verification (sensors and reconstruction)
     :param query_path: path to the query kapture data (sensors)
+    :param descriptors_type: types of descriptors used to match
+    :param pairsfile_path: path to the pairsfile that contains the topk retrieved mapping images for each query image
+    :param output_path_root: root path where outputs should be stored
+    :param colmap_binary: path to the COLMAP binary
+    :param force: silently overwrite already existing results
+    """
+    kdata_query = kapture_from_dir(query_path)
+    with kapture.io.csv.get_all_tar_handlers(map_plus_query_path) as tar_handlers_map:
+        kdata_map = kapture_from_dir(map_plus_query_path, tar_handlers=tar_handlers_map)
+        with kapture.io.csv.get_all_tar_handlers(map_plus_query_path) as tar_handlers_map_gv:
+            kdata_map_gv = kapture_from_dir(map_plus_query_gv_path, tar_handlers=tar_handlers_map_gv)
+            local_sfm_from_loaded_data(kdata_map, kdata_map_gv, kdata_query,
+                                       map_plus_query_path, map_plus_query_gv_path,
+                                       tar_handlers_map,
+                                       tar_handlers_map_gv,
+                                       descriptors_type,
+                                       pairsfile_path,
+                                       output_path_root,
+                                       colmap_binary,
+                                       force)
+
+
+def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
+                               kdata_map_gv: kapture.Kapture,
+                               kdata_query: kapture.Kapture,
+                               map_plus_query_path: str,
+                               map_plus_query_gv_path: str,
+                               tar_handlers_map: Optional[TarCollection],
+                               tar_handlers_map_gv: Optional[TarCollection],
+                               descriptors_type: Optional[str],
+                               pairsfile_path: str,
+                               output_path_root: str,
+                               colmap_binary: str,
+                               force: bool):
+    """
+    Localize query images in a COLMAP model built from topk retrieved images.
+
+    :param map_plus_query_path: path to the kapture data consisting of mapping and query data (sensors and reconstruction)
+    :param map_plus_query_gv_path: path to the kapture data consisting of mapping and query data after geometric verification (sensors and reconstruction)
+    :param query_path: path to the query kapture data (sensors)
+    :param descriptors_type: types of descriptors used to match
     :param pairsfile_path: path to the pairsfile that contains the topk retrieved mapping images for each query image
     :param output_path_root: root path where outputs should be stored
     :param colmap_binary: path to the COLMAP binary
@@ -172,7 +217,6 @@ def local_sfm(map_plus_query_path: str,
     """
 
     # load query kapture (we use query kapture to reuse sensor_ids etc.)
-    kdata_query = kapture_from_dir(query_path)
     if kdata_query.trajectories:
         logger.warning("Query data contains trajectories: they will be ignored")
         kdata_query.trajectories.clear()
@@ -184,23 +228,21 @@ def local_sfm(map_plus_query_path: str,
     if os.path.exists(os.path.join(output_path, 'sensors/trajectories.txt')):
         kdata_output = kapture_from_dir(output_path)
         if kdata_query.records_camera == kdata_output.records_camera and len(
-            kdata_output.trajectories) != 0 and not force:
+                kdata_output.trajectories) != 0 and not force:
             kdata_query.trajectories = kdata_output.trajectories
 
     # load kapture maps
-    kdata_map = kapture_from_dir(map_plus_query_path)
-    if kdata_map.rigs != None:
+    if kdata_map.rigs is not None:
         rigs_remove_inplace(kdata_map.trajectories, kdata_map.rigs)
-    kdata_map_gv = kapture_from_dir(map_plus_query_gv_path)
-    if kdata_map_gv.rigs != None:
+    if kdata_map_gv.rigs is not None:
         rigs_remove_inplace(kdata_map_gv.trajectories, kdata_map_gv.rigs)
 
     # load pairsfile
     pairs = {}
     with open(pairsfile_path, 'r') as fid:
         table = table_from_file(fid)
-        for img_query, img_map, score in table:
-            if not img_query in pairs:
+        for img_query, img_map, _ in table:
+            if img_query not in pairs:
                 pairs[img_query] = []
             pairs[img_query].append(img_map)
 
@@ -208,6 +250,12 @@ def local_sfm(map_plus_query_path: str,
     kdata_reg_query_path = os.path.join(output_path_root, 'query_registered')
     sub_kapture_pairsfile_path = os.path.join(output_path_root, 'tmp_pairs_map.txt')
     query_img_kapture_pairsfile_path = os.path.join(output_path_root, 'tmp_pairs_query.txt')
+
+    if descriptors_type is None:
+        descriptors_type = try_get_only_key_from_collection(kdata_map.descriptors)
+    assert descriptors_type is not None
+    assert descriptors_type in kdata_map.descriptors
+    keypoints_type = kdata_map.descriptors[descriptors_type].keypoints_type
 
     # loop over query images
     for img_query, img_list_map in pairs.items():
@@ -228,7 +276,11 @@ def local_sfm(map_plus_query_path: str,
         kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, img_list_map, map_pairs)
 
         # match missing pairs for mapping
-        compute_matches_from_loaded_data(map_plus_query_path, kdata_sub, map_pairs)
+        compute_matches_from_loaded_data(map_plus_query_path,
+                                         tar_handlers_map,
+                                         kdata_sub,
+                                         descriptors_type,
+                                         map_pairs)
 
         # kdata_sub needs to be re-created to add the new matches
         kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, img_list_map, map_pairs)
@@ -239,7 +291,10 @@ def local_sfm(map_plus_query_path: str,
                                            kdata_sub_gv,
                                            map_plus_query_path,
                                            map_plus_query_gv_path,
+                                           tar_handlers_map,
+                                           tar_handlers_map_gv,
                                            colmap_binary,
+                                           keypoints_type,
                                            [],
                                            True)
             # kdata_sub_gv needs to be re-created to add the new matches
@@ -254,8 +309,10 @@ def local_sfm(map_plus_query_path: str,
             colmap_build_map_from_loaded_data(
                 kdata_sub_gv,
                 map_plus_query_gv_path,
+                tar_handlers_map_gv,
                 kdata_sub_colmap_path,
                 colmap_binary,
+                keypoints_type,
                 False,
                 [],
                 ['model_converter'],
@@ -276,7 +333,11 @@ def local_sfm(map_plus_query_path: str,
                                                     query_pairs)
 
         # match missing pairs for localization
-        compute_matches_from_loaded_data(map_plus_query_path, query_img_kapture, query_pairs)
+        compute_matches_from_loaded_data(map_plus_query_path,
+                                         tar_handlers_map,
+                                         query_img_kapture,
+                                         descriptors_type,
+                                         query_pairs)
 
         # query_img_kapture needs to be re-created to add the new matches
         query_img_kapture = add_image_to_kapture(kdata_map, map_plus_query_path, kdata_sub, img_query, query_pairs)
@@ -287,7 +348,10 @@ def local_sfm(map_plus_query_path: str,
                                            query_img_kapture_gv,
                                            map_plus_query_path,
                                            map_plus_query_gv_path,
+                                           tar_handlers_map,
+                                           tar_handlers_map_gv,
                                            colmap_binary,
+                                           keypoints_type,
                                            [],
                                            True)
             # query_img_kapture_gv needs to be re-created to add the new matches
@@ -303,10 +367,12 @@ def local_sfm(map_plus_query_path: str,
             colmap_localize_from_loaded_data(
                 query_img_kapture_gv,
                 map_plus_query_gv_path,
+                tar_handlers_map_gv,
                 os.path.join(kdata_sub_colmap_path, 'registered'),
                 os.path.join(kdata_sub_colmap_path, 'colmap.db'),
                 os.path.join(kdata_sub_colmap_path, 'reconstruction'),
                 colmap_binary,
+                keypoints_type,
                 False,
                 ['--Mapper.ba_refine_focal_length', '0',
                  '--Mapper.ba_refine_principal_point', '0',
@@ -387,6 +453,7 @@ def local_sfm_command_line():
                         default=None,
                         type=str,
                         help='text file containing the image pairs between query and mapping images')
+    parser.add_argument('-desc', '--descriptors-type', default=None, help='kapture descriptors type.')
 
     args = parser.parse_args()
 
@@ -399,7 +466,9 @@ def local_sfm_command_line():
     if not os.path.exists(args.output):
         os.makedirs(args.output)
 
-    local_sfm(args.map_plus_query, args.map_plus_query_gv, args.query, args.pairsfile_path, args.output,
+    local_sfm(args.map_plus_query, args.map_plus_query_gv, args.query,
+              args.descriptors_type,
+              args.pairsfile_path, args.output,
               args.colmap_binary, args.force)
 
 
