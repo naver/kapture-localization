@@ -30,6 +30,9 @@ def mapping_pipeline(kapture_path: str,
                      global_features_path: str,
                      matches_path: str,
                      matches_gv_path: str,
+                     keypoints_type: Optional[str],
+                     descriptors_type: Optional[str],
+                     global_features_type: Optional[str],
                      colmap_map_path: str,
                      colmap_binary: str,
                      python_binary: Optional[str],
@@ -80,6 +83,9 @@ def mapping_pipeline(kapture_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_compute_image_pairs.py
@@ -111,6 +117,9 @@ def mapping_pipeline(kapture_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_gv_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_run_colmap_gv.py
@@ -193,6 +202,9 @@ def mapping_pipeline_command_line():
                                                  'colmap_build_map'],
                         nargs='+', default=[],
                         help='steps to skip')
+    parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
+    parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
+    parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -216,6 +228,9 @@ def mapping_pipeline_command_line():
                          args.global_features_path,
                          args.matches_path,
                          args.matches_gv_path,
+                         args.keypoints_type,
+                         args.descriptors_type,
+                         args.global_features_type,
                          args.colmap_map,
                          args.colmap_binary,
                          python_binary,

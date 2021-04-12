@@ -138,9 +138,11 @@ def compute_matches_from_loaded_data(input_path: str,
             continue
 
         descriptor1 = load_descriptors(descriptors_type, input_path, tar_handlers,
-                                       image_path1, kdata.descriptors.dtype, kdata.descriptors.dsize)
+                                       image_path1, kdata.descriptors[descriptors_type].dtype,
+                                       kdata.descriptors[descriptors_type].dsize)
         descriptor2 = load_descriptors(descriptors_type, input_path, tar_handlers,
-                                       image_path2, kdata.descriptors.dtype, kdata.descriptors.dsize)
+                                       image_path2, kdata.descriptors[descriptors_type].dtype,
+                                       kdata.descriptors[descriptors_type].dsize)
         matches = matcher.match_descriptors(descriptor1, descriptor2)
         matches_path = get_matches_fullpath((image_path1, image_path2), keypoints_type, input_path, tar_handlers)
         image_matches_to_file(matches_path, matches)

@@ -143,12 +143,12 @@ def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
         if use_colmap_matches_importer:
             logger.info('Step 2: Run geometric verification')
             logger.debug('running colmap matches_importer...')
-            colmap_lib.run_matches_importer_from_kapture(
+            colmap_lib.run_matches_importer_from_kapture_matches(
                 colmap_binary,
                 colmap_use_cpu=True,
                 colmap_gpu_index=None,
                 colmap_db_path=colmap_db_path,
-                kapture_data=kapture_data,
+                kapture_matches=kapture_data.matches[keypoints_type],
                 force=force
             )
         else:

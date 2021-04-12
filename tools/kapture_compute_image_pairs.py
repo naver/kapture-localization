@@ -15,7 +15,7 @@ import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
 from kapture.io.csv import kapture_from_dir, table_to_file
-from kapture.io.csv import ImageFeatureConfig, get_all_tar_handlers
+from kapture.io.csv import GlobalFeaturesConfig, get_all_tar_handlers
 from kapture.io.features import global_features_to_filepaths
 from kapture.utils.Collections import try_get_only_key_from_collection
 
@@ -56,11 +56,12 @@ def compute_image_pairs(mapping_path: str,
         assert global_features_type is not None
         assert global_features_type in kdata_mapping.global_features
 
-        global_features_config = ImageFeatureConfig(kdata_mapping.global_features.type_name,
-                                                    kdata_mapping.global_features.dtype,
-                                                    kdata_mapping.global_features.dsize)
+        global_features_config = GlobalFeaturesConfig(kdata_mapping.global_features[global_features_type].type_name,
+                                                      kdata_mapping.global_features[global_features_type].dtype,
+                                                      kdata_mapping.global_features[global_features_type].dsize,
+                                                      kdata_mapping.global_features[global_features_type].metric_type)
 
-        logger.info(f'computing pairs with {kdata_mapping.global_features.type_name}...')
+        logger.info(f'computing pairs with {global_features_type}...')
 
         mapping_global_features_to_filepaths = global_features_to_filepaths(
             kdata_mapping.global_features[global_features_type],

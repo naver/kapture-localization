@@ -29,6 +29,26 @@ def absolute_symlink(
     os.symlink(os.path.abspath(source_path), dest_path)
 
 
+def guess_feature_name(feature_path: str) -> str:
+    feature_path_c = feature_path.replace('\\', '/').rstrip('/')
+    feature_path_split = feature_path_c.split('/')
+    feature_name = None
+    if feature_path_split[-1] not in ['keypoints', 'descriptors', 'global_features', 'matches']:
+        feature_name = feature_path_split[-1]
+    else:
+        for parent_folder_name in ['local_features', 'global_features']:
+            try:
+                index = feature_path_split.index(parent_folder_name)
+                if index + 1 < len(feature_path_split):
+                    feature_name = feature_path_split[index + 1]
+                    break
+            except Exception:
+                continue
+    if feature_name is None:
+        raise ValueError(f'failed to guess feature name from path {feature_path}')
+    return feature_name
+
+
 def create_kapture_proxy(
         output_path: str,
         source_path: str,
@@ -36,6 +56,9 @@ def create_kapture_proxy(
         descriptors_path: Optional[str],
         global_features_path: Optional[str],
         matches_path: Optional[str],
+        keypoints_type: Optional[str],
+        descriptors_type: Optional[str],
+        global_features_type: Optional[str],
         force: bool
 ):
     """
@@ -69,16 +92,30 @@ def create_kapture_proxy(
     os.makedirs(reconstruction_out_path)
     if keypoints_path is not None:
         assert path.exists(keypoints_path)
-        absolute_symlink(keypoints_path, os.path.join(reconstruction_out_path, 'keypoints'))
+        if keypoints_type is None:
+            keypoints_type = guess_feature_name(keypoints_path)
+        os.makedirs(os.path.join(reconstruction_out_path, 'keypoints'), exist_ok=True)
+        absolute_symlink(keypoints_path, os.path.join(reconstruction_out_path, 'keypoints', keypoints_type))
 
     if descriptors_path is not None:
         assert path.exists(descriptors_path)
-        absolute_symlink(descriptors_path, os.path.join(reconstruction_out_path, 'descriptors'))
+        if descriptors_type is None:
+            descriptors_type = guess_feature_name(descriptors_path)
+        os.makedirs(os.path.join(reconstruction_out_path, 'descriptors'), exist_ok=True)
+        absolute_symlink(descriptors_path, os.path.join(reconstruction_out_path, 'descriptors', descriptors_type))
 
     if global_features_path is not None:
         assert path.exists(global_features_path)
-        absolute_symlink(global_features_path, os.path.join(reconstruction_out_path, 'global_features'))
+        if global_features_type is None:
+            global_features_type = guess_feature_name(global_features_path)
+        os.makedirs(os.path.join(reconstruction_out_path, 'global_features'), exist_ok=True)
+        absolute_symlink(global_features_path, os.path.join(reconstruction_out_path,
+                                                            'global_features',
+                                                            global_features_type))
 
     if matches_path is not None:
         assert path.exists(matches_path)
-        absolute_symlink(matches_path, os.path.join(reconstruction_out_path, 'matches'))
+        if keypoints_type is None:
+            keypoints_type = guess_feature_name(matches_path)
+        os.makedirs(os.path.join(reconstruction_out_path, 'matches'), exist_ok=True)
+        absolute_symlink(matches_path, os.path.join(reconstruction_out_path, 'matches', keypoints_type))

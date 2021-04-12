@@ -30,13 +30,19 @@ from kapture.utils.Collections import try_get_only_key_from_collection
 logger = logging.getLogger()
 
 
-def sub_kapture_from_img_list(kdata, kdata_path, img_list, pairs):
+def sub_kapture_from_img_list(kdata, kdata_path, tar_handler, img_list, pairs, keypoints_type, descriptors_type):
     trajectories = kapture.Trajectories()
     sensors = kapture.Sensors()
     records = kapture.RecordsCamera()
-    keypoints = kapture.Keypoints(kdata.keypoints._tname, kdata.keypoints._dtype, kdata.keypoints._dsize)
-    if kdata.descriptors is not None:
-        descriptors = kapture.Descriptors(kdata.descriptors._tname, kdata.descriptors._dtype, kdata.descriptors._dsize)
+    keypoints = kapture.Keypoints(kdata.keypoints[keypoints_type].type_name,
+                                  kdata.keypoints[keypoints_type].dtype,
+                                  kdata.keypoints[keypoints_type].dsize)
+    if kdata.descriptors is not None and descriptors_type in kdata.descriptors:
+        descriptors = kapture.Descriptors(kdata.descriptors[descriptors_type].type_name,
+                                          kdata.descriptors[descriptors_type].dtype,
+                                          kdata.descriptors[descriptors_type].dsize,
+                                          kdata.descriptors[descriptors_type].keypoints_type,
+                                          kdata.descriptors[descriptors_type].metric_type)
     else:
         descriptors = None
     matches = kapture.Matches()
@@ -54,35 +60,50 @@ def sub_kapture_from_img_list(kdata, kdata_path, img_list, pairs):
             descriptors.add(img)
 
     for i in pairs:
-        image_matches_filepath = get_matches_fullpath((i[0], i[1]), kdata_path)
-        if os.path.exists(image_matches_filepath):
-            matches.add(i[0], i[1])
+        image_matches_filepath = get_matches_fullpath((i[0], i[1]), keypoints_type, kdata_path, tar_handler)
+        if isinstance(image_matches_filepath, str):
+            if os.path.exists(image_matches_filepath):
+                matches.add(i[0], i[1])
+        else:
+            if image_matches_filepath[0] in image_matches_filepath[1].content:
+                matches.add(i[0], i[1])
     matches.normalize()
 
-    return kapture.Kapture(sensors=sensors, trajectories=trajectories, records_camera=records, descriptors=descriptors,
-                           keypoints=keypoints, matches=matches)
+    return kapture.Kapture(sensors=sensors, trajectories=trajectories, records_camera=records,
+                           descriptors={descriptors_type: descriptors},
+                           keypoints={keypoints_type: keypoints},
+                           matches={keypoints_type: matches})
 
 
-def add_image_to_kapture(kdata_src, kdata_src_path, kdata_trg, img_name, pairs, add_pose=False):
+def add_image_to_kapture(kdata_src, kdata_src_path, tar_handler,
+                         kdata_trg, img_name, pairs,
+                         keypoints_type, descriptors_type,
+                         add_pose=False):
     timestamp_sensor_id_from_image_name = {img_name: (timestamp, sensor_id) for timestamp, sensor_id, img_name in
                                            kapture.flatten(kdata_src.records_camera)}
     timestamp, sensor_id = timestamp_sensor_id_from_image_name[img_name]
     kdata_trg.sensors[sensor_id] = kdata_src.sensors[sensor_id]
     kdata_trg.records_camera[timestamp, sensor_id] = img_name
-    kdata_trg.keypoints.add(img_name)
-    if kdata_trg.descriptors is not None:
-        kdata_trg.descriptors.add(img_name)
+    kdata_trg.keypoints[keypoints_type].add(img_name)
+    if kdata_trg.descriptors is not None and descriptors_type in kdata_trg.descriptors:
+        kdata_trg.descriptors[descriptors_type].add(img_name)
 
     if add_pose:
         kdata_trg.trajectories[timestamp, sensor_id] = kdata_src.trajectories[timestamp, sensor_id]
 
     if os.path.exists(kdata_src_path) and len(pairs) != 0:
-        kdata_trg.matches = kapture.Matches()
+        if kdata_trg.matches is None:
+            kdata_trg.matches = {}
+        kdata_trg.matches[keypoints_type] = kapture.Matches()
         for i in pairs:
-            image_matches_filepath = get_matches_fullpath((i[0], i[1]), kdata_src_path)
-            if os.path.exists(image_matches_filepath):
-                kdata_trg.matches.add(i[0], i[1])
-        kdata_trg.matches.normalize()
+            image_matches_filepath = get_matches_fullpath((i[0], i[1]), keypoints_type, kdata_src_path, tar_handler)
+            if isinstance(image_matches_filepath, str):
+                if os.path.exists(image_matches_filepath):
+                    kdata_trg.matches[keypoints_type].add(i[0], i[1])
+            else:
+                if image_matches_filepath[0] in image_matches_filepath[1].content:
+                    kdata_trg.matches[keypoints_type].add(i[0], i[1])
+        kdata_trg.matches[keypoints_type].normalize()
 
     return kdata_trg
 
@@ -272,8 +293,12 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
         query_pairs = write_pairfile_img_vs_img_list(img_query, img_list_map, query_img_kapture_pairsfile_path)
 
         # create sub-kapture
-        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, img_list_map, map_pairs)
-        kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, img_list_map, map_pairs)
+        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, tar_handlers_map,
+                                              img_list_map, map_pairs,
+                                              keypoints_type, descriptors_type)
+        kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, tar_handlers_map_gv,
+                                                 img_list_map, map_pairs,
+                                                 keypoints_type, descriptors_type)
 
         # match missing pairs for mapping
         compute_matches_from_loaded_data(map_plus_query_path,
@@ -283,10 +308,12 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                                          map_pairs)
 
         # kdata_sub needs to be re-created to add the new matches
-        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, img_list_map, map_pairs)
+        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, tar_handlers_map,
+                                              img_list_map, map_pairs,
+                                              keypoints_type, descriptors_type)
 
         # run colmap gv on missing pairs
-        if len(kdata_sub.matches) != len(kdata_sub_gv.matches):
+        if len(kdata_sub.matches[keypoints_type]) != len(kdata_sub_gv.matches[keypoints_type]):
             run_colmap_gv_from_loaded_data(kdata_sub,
                                            kdata_sub_gv,
                                            map_plus_query_path,
@@ -298,10 +325,12 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                                            [],
                                            True)
             # kdata_sub_gv needs to be re-created to add the new matches
-            kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, img_list_map, map_pairs)
+            kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, tar_handlers_map_gv,
+                                                     img_list_map, map_pairs,
+                                                     keypoints_type, descriptors_type)
 
         # sanity check
-        if len(map_pairs) != len(kdata_sub_gv.matches):
+        if len(map_pairs) != len(kdata_sub_gv.matches[keypoints_type]):
             logger.info(f'not all mapping matches available')
 
         # build COLMAP map
@@ -326,11 +355,20 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
             continue
 
         # create single image kapture (kdata_sub needs to be recreated because descriptors are deleted in build_colmap_model)
-        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, img_list_map, map_pairs)
-        kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, img_list_map, map_pairs)
-        query_img_kapture = add_image_to_kapture(kdata_map, map_plus_query_path, kdata_sub, img_query, query_pairs)
-        query_img_kapture_gv = add_image_to_kapture(kdata_map_gv, map_plus_query_gv_path, kdata_sub_gv, img_query,
-                                                    query_pairs)
+        kdata_sub = sub_kapture_from_img_list(kdata_map, map_plus_query_path, tar_handlers_map,
+                                              img_list_map, map_pairs,
+                                              keypoints_type,
+                                              descriptors_type)
+        kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, map_plus_query_gv_path, tar_handlers_map_gv,
+                                                 img_list_map, map_pairs,
+                                                 keypoints_type,
+                                                 descriptors_type)
+        query_img_kapture = add_image_to_kapture(kdata_map, map_plus_query_path, tar_handlers_map,
+                                                 kdata_sub, img_query, query_pairs,
+                                                 keypoints_type, descriptors_type)
+        query_img_kapture_gv = add_image_to_kapture(kdata_map_gv, map_plus_query_gv_path, tar_handlers_map_gv,
+                                                    kdata_sub_gv, img_query, query_pairs,
+                                                    keypoints_type, descriptors_type)
 
         # match missing pairs for localization
         compute_matches_from_loaded_data(map_plus_query_path,
@@ -340,10 +378,12 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                                          query_pairs)
 
         # query_img_kapture needs to be re-created to add the new matches
-        query_img_kapture = add_image_to_kapture(kdata_map, map_plus_query_path, kdata_sub, img_query, query_pairs)
+        query_img_kapture = add_image_to_kapture(kdata_map, map_plus_query_path, tar_handlers_map,
+                                                 kdata_sub, img_query, query_pairs,
+                                                 keypoints_type, descriptors_type)
 
         # run colmap gv on missing pairs
-        if len(query_img_kapture.matches) != len(query_img_kapture_gv.matches):
+        if len(query_img_kapture.matches[keypoints_type]) != len(query_img_kapture_gv.matches[keypoints_type]):
             run_colmap_gv_from_loaded_data(query_img_kapture,
                                            query_img_kapture_gv,
                                            map_plus_query_path,
@@ -355,11 +395,12 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                                            [],
                                            True)
             # query_img_kapture_gv needs to be re-created to add the new matches
-            query_img_kapture_gv = add_image_to_kapture(kdata_map_gv, map_plus_query_gv_path, kdata_sub_gv, img_query,
-                                                        query_pairs)
+            query_img_kapture_gv = add_image_to_kapture(kdata_map_gv, map_plus_query_gv_path, tar_handlers_map_gv,
+                                                        kdata_sub_gv, img_query,  query_pairs,
+                                                        keypoints_type, descriptors_type)
 
         # sanity check
-        if len(query_pairs) != len(query_img_kapture_gv.matches):
+        if len(query_pairs) != len(query_img_kapture_gv.matches[keypoints_type]):
             logger.info(f'not all query matches available')
 
         # localize in COLMAP map

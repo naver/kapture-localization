@@ -215,13 +215,19 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     if use_colmap_matches_importer:
         logger.info('Step 2: Run geometric verification')
         logger.debug('running colmap matches_importer...')
+
+        if keypoints_type is None:
+            keypoints_type = try_get_only_key_from_collection(kapture_data.matches)
+        assert keypoints_type is not None
+        assert keypoints_type in kapture_data.matches
+
         # compute two view geometry
-        colmap_lib.run_matches_importer_from_kapture(
+        colmap_lib.run_matches_importer_from_kapture_matches(
             colmap_binary,
             colmap_use_cpu=True,
             colmap_gpu_index=None,
             colmap_db_path=colmap_db_path,
-            kapture_data=kapture_data,
+            kapture_matches=kapture_data.matches[keypoints_type],
             force=force)
     else:
         logger.info('Step 2: Run geometric verification - skipped')

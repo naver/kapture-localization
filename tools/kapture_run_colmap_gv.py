@@ -113,12 +113,12 @@ def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
         colmap_db.close()
 
         logger.debug('run matches_importer command.')
-        colmap_lib.run_matches_importer_from_kapture(
+        colmap_lib.run_matches_importer_from_kapture_matches(
             colmap_binary,
             colmap_use_cpu=True,
             colmap_gpu_index=None,
             colmap_db_path=colmap_db_path,
-            kapture_data=kapture_data_to_export,
+            kapture_matches=matches_to_verify,
             force=force
         )
 
@@ -128,11 +128,13 @@ def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
         colmap_db = COLMAPDatabase.connect(colmap_db_path)
         kapture_data = kapture.Kapture()
         kapture_data.records_camera, _ = get_images_and_trajectories_from_database(colmap_db)
-        kapture_data.matches = get_matches_from_database(colmap_db, kapture_data.records_camera,
-                                                         kapture_colmap_matches_dirpath,
-                                                         tar_handlers_colmap_matches,
-                                                         keypoints_type,
-                                                         no_geometric_filtering=False)
+        kapture_data.matches = {
+            keypoints_type: get_matches_from_database(colmap_db, kapture_data.records_camera,
+                                                      kapture_colmap_matches_dirpath,
+                                                      tar_handlers_colmap_matches,
+                                                      keypoints_type,
+                                                      no_geometric_filtering=False)
+        }
         colmap_db.close()
 
     if 'delete_db' not in skip_list:

@@ -4,6 +4,7 @@
 import argparse
 import logging
 import os
+from typing import Optional
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
@@ -15,7 +16,7 @@ from kapture_localization.pose_approximation.pose_interpolation import get_inter
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
-from kapture.io.csv import kapture_from_dir, ImageFeatureConfig, kapture_to_dir, get_all_tar_handlers
+from kapture.io.csv import kapture_from_dir, GlobalFeaturesConfig, kapture_to_dir, get_all_tar_handlers
 from kapture.io.features import global_features_to_filepaths
 from kapture.io.structure import delete_existing_kapture_files
 from kapture.utils.Collections import try_get_only_key_from_collection
@@ -67,11 +68,12 @@ def pose_approximation(mapping_path: str,
         assert global_features_type is not None
         assert global_features_type in kdata_map.global_features
 
-        global_features_config = ImageFeatureConfig(kdata_map.global_features.type_name,
-                                                    kdata_map.global_features.dtype,
-                                                    kdata_map.global_features.dsize)
+        global_features_config = GlobalFeaturesConfig(kdata_map.global_features[global_features_type].type_name,
+                                                      kdata_map.global_features[global_features_type].dtype,
+                                                      kdata_map.global_features[global_features_type].dsize,
+                                                      kdata_map.global_features[global_features_type].metric_type)
 
-        logger.info(f'computing pairs with {kdata_map.global_features.type_name}...')
+        logger.info(f'computing pairs with {global_features_type}...')
 
         map_global_features_to_filepaths = global_features_to_filepaths(
             kdata_map.global_features[global_features_type],
