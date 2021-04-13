@@ -112,7 +112,8 @@ def pose_approximation(mapping_path: str,
         query_list = list(sorted(query_global_features_to_filepaths.items()))
         query_stacked_features = stack_global_features(global_features_config, query_list)
 
-    logger.info(f'computing pose approximation from with {kdata_map.global_features.type_name}...')
+    logger.info('computing pose approximation from with'
+                f' {kdata_map.global_features[global_features_type].type_name}...')
 
     # main code
     weights = get_interpolation_weights(method,
