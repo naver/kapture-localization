@@ -6,6 +6,8 @@ import argparse
 import logging
 from re import T
 from typing import List, Optional
+from kapture.core.ImageFeatures import Descriptors, GlobalFeatures
+from kapture.core.Matches import Matches
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
@@ -37,7 +39,11 @@ def run_colmap_gv(kapture_none_matches_dirpath: str,
     with kapture.io.csv.get_all_tar_handlers(kapture_none_matches_dirpath) as tar_handlers_none:
         kapture_none_matches = kapture_from_dir(kapture_none_matches_dirpath, pairsfile_path,
                                                 tar_handlers=tar_handlers_none)
-        with kapture.io.csv.get_all_tar_handlers(kapture_colmap_matches_dirpath) as tar_handlers_colmap:
+        with kapture.io.csv.get_all_tar_handlers(kapture_colmap_matches_dirpath,
+                                                 mode={kapture.Keypoints: 'r',
+                                                       kapture.Descriptors: 'r',
+                                                       kapture.GlobalFeatures: 'r',
+                                                       kapture.Matches: 'a'}) as tar_handlers_colmap:
             kapture_colmap_matches = kapture_from_dir(kapture_colmap_matches_dirpath, pairsfile_path,
                                                       tar_handlers=tar_handlers_colmap)
             run_colmap_gv_from_loaded_data(kapture_none_matches,

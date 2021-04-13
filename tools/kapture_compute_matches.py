@@ -78,7 +78,11 @@ def compute_matches(input_path: str,
     :type pairsfile_path: str
     """
     logger.info(f'compute_matches. loading input: {input_path}')
-    with kapture.io.csv.get_all_tar_handlers(input_path) as tar_handlers:
+    with kapture.io.csv.get_all_tar_handlers(input_path,
+                                             mode={kapture.Keypoints: 'r',
+                                                   kapture.Descriptors: 'r',
+                                                   kapture.GlobalFeatures: 'r',
+                                                   kapture.Matches: 'a'}) as tar_handlers:
         kdata = kapture_from_dir(input_path, pairsfile_path, skip_list=[kapture.GlobalFeatures,
                                                                         kapture.Observations,
                                                                         kapture.Points3d],

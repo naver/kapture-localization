@@ -82,7 +82,8 @@ def compute_image_pairs(mapping_path: str,
                                                                         kapture.Descriptors,
                                                                         kapture.Matches,
                                                                         kapture.Observations,
-                                                                        kapture.Points3d])
+                                                                        kapture.Points3d],
+                                           tar_handlers=query_tar_handlers)
             assert kdata_query.sensors is not None
             assert kdata_query.records_camera is not None
             assert kdata_query.global_features is not None
