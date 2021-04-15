@@ -6,8 +6,6 @@ import argparse
 import logging
 from re import T
 from typing import List, Optional
-from kapture.core.ImageFeatures import Descriptors, GlobalFeatures
-from kapture.core.Matches import Matches
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
