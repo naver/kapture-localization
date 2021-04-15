@@ -85,7 +85,7 @@ def pose_approximation(mapping_path: str,
         map_stacked_features = stack_global_features(global_features_config, mapping_list)
 
     logger.info(f'pose_approximation. loading query: {query_path}')
-    with kapture.io.csv.get_all_tar_handlers(query_path) as query_tar_handlers:
+    with get_all_tar_handlers(query_path) as query_tar_handlers:
         kdata_query = kapture_from_dir(query_path, None, skip_list=[kapture.Keypoints,
                                                                     kapture.Descriptors,
                                                                     kapture.Matches,

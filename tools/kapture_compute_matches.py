@@ -17,7 +17,7 @@ from kapture_localization.matching import MatchPairNnTorch
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
-from kapture.io.csv import kapture_from_dir, table_from_file
+from kapture.io.csv import kapture_from_dir, table_from_file, get_all_tar_handlers
 from kapture.io.features import get_descriptors_fullpath, get_matches_fullpath
 from kapture.io.features import image_descriptors_from_file
 from kapture.io.features import matches_check_dir, image_matches_to_file
@@ -78,11 +78,11 @@ def compute_matches(input_path: str,
     :type pairsfile_path: str
     """
     logger.info(f'compute_matches. loading input: {input_path}')
-    with kapture.io.csv.get_all_tar_handlers(input_path,
-                                             mode={kapture.Keypoints: 'r',
-                                                   kapture.Descriptors: 'r',
-                                                   kapture.GlobalFeatures: 'r',
-                                                   kapture.Matches: 'a'}) as tar_handlers:
+    with get_all_tar_handlers(input_path,
+                              mode={kapture.Keypoints: 'r',
+                                    kapture.Descriptors: 'r',
+                                    kapture.GlobalFeatures: 'r',
+                                    kapture.Matches: 'a'}) as tar_handlers:
         kdata = kapture_from_dir(input_path, pairsfile_path, skip_list=[kapture.GlobalFeatures,
                                                                         kapture.Observations,
                                                                         kapture.Points3d],

@@ -18,7 +18,7 @@ from kapture_compute_matches import compute_matches_from_loaded_data
 
 import kapture
 import kapture.utils.logging
-from kapture.io.csv import kapture_from_dir, kapture_to_dir, table_from_file
+from kapture.io.csv import kapture_from_dir, kapture_to_dir, table_from_file, get_all_tar_handlers
 from kapture.core.Trajectories import rigs_remove_inplace
 from kapture.io.features import get_matches_fullpath
 from kapture.io.records import TransferAction
@@ -197,9 +197,9 @@ def local_sfm(map_plus_query_path: str,
     :param force: silently overwrite already existing results
     """
     kdata_query = kapture_from_dir(query_path)
-    with kapture.io.csv.get_all_tar_handlers(map_plus_query_path) as tar_handlers_map:
+    with get_all_tar_handlers(map_plus_query_path) as tar_handlers_map:
         kdata_map = kapture_from_dir(map_plus_query_path, tar_handlers=tar_handlers_map)
-        with kapture.io.csv.get_all_tar_handlers(map_plus_query_path) as tar_handlers_map_gv:
+        with get_all_tar_handlers(map_plus_query_path) as tar_handlers_map_gv:
             kdata_map_gv = kapture_from_dir(map_plus_query_gv_path, tar_handlers=tar_handlers_map_gv)
             local_sfm_from_loaded_data(kdata_map, kdata_map_gv, kdata_query,
                                        map_plus_query_path, map_plus_query_gv_path,
