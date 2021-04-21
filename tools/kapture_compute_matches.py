@@ -156,6 +156,14 @@ def compute_matches_from_loaded_data(input_path: str,
         logger.debug(f'{skip_count} pairs were skipped because the match file already existed')
     if not matches_check_dir(new_matches, keypoints_type, input_path, tar_handlers):
         logger.critical('matching ended successfully but not all files were saved')
+
+    # update kapture matches
+    if kdata.matches is None:
+        kdata.matches = {}
+    if keypoints_type not in kdata.matches:
+        kdata.matches[keypoints_type] = kapture.Matches()
+    kdata.matches[keypoints_type].update(new_matches)
+
     logger.info('all done')
 
 

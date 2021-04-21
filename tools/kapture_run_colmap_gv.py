@@ -141,6 +141,12 @@ def run_colmap_gv_from_loaded_data(kapture_none_matches: kapture.Kapture,
         }
         colmap_db.close()
 
+        if kapture_colmap_matches.matches is None:
+            kapture_colmap_matches.matches = {}
+        if keypoints_type not in kapture_colmap_matches.matches:
+            kapture_colmap_matches.matches[keypoints_type] = kapture.Matches()
+        kapture_colmap_matches.matches[keypoints_type].update(kapture_data.matches[keypoints_type])
+
     if 'delete_db' not in skip_list:
         logger.debug('delete intermediate colmap db.')
         os.remove(colmap_db_path)
