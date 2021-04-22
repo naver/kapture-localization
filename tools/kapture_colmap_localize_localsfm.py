@@ -236,7 +236,6 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                 kdata_output.trajectories) != 0 and not force:
             kdata_query.trajectories = kdata_output.trajectories
 
-    # load kapture maps
     if kdata_map.rigs is not None:
         rigs_remove_inplace(kdata_map.trajectories, kdata_map.rigs)
     if kdata_map_gv.rigs is not None:
@@ -365,7 +364,6 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                 logger.info(f'processing {img_query}')
                 table_to_file(fid, map_pairs)
             map_pairs = [(i, j) for i, j, _ in map_pairs]
-            exit
             kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, img_list_map, map_pairs,
                                                      keypoints_type, descriptors_type)
             # sanity check
