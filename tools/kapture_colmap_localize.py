@@ -53,7 +53,7 @@ def colmap_localize(kapture_path: str,
     :param input_reconstruction_path: path to the map reconstruction folder
     :param colmap_binary: path to the colmap binary executable
     :param pairs_file_path: Optional[str],
-    :param keypoints_type: types of keypoints to export
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param image_registrator_options: options for the image registrator
     :param skip_list: list of steps to skip
@@ -101,7 +101,7 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param input_database_path: path to the map colmap.db
     :param input_reconstruction_path: path to the map reconstruction folder
     :param colmap_binary: path to the colmap binary executable
-    :param keypoints_type: types of keypoints to export
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param image_registrator_options: options for the image registrator
     :param skip_list: list of steps to skip

@@ -166,7 +166,7 @@ def local_sfm(map_plus_query_path: str,
     :param map_plus_query_path: path to the kapture data consisting of mapping and query data (sensors and reconstruction)
     :param map_plus_query_gv_path: path to the kapture data consisting of mapping and query data after geometric verification (sensors and reconstruction)
     :param query_path: path to the query kapture data (sensors)
-    :param descriptors_type: types of descriptors used to match
+    :param descriptors_type: type of descriptors, name of the descriptors subfolder
     :param pairsfile_path: path to the pairsfile that contains the topk retrieved mapping images for each query image
     :param output_path_root: root path where outputs should be stored
     :param colmap_binary: path to the COLMAP binary
@@ -214,7 +214,7 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
     :param map_plus_query_path: path to the kapture data consisting of mapping and query data (sensors and reconstruction)
     :param map_plus_query_gv_path: path to the kapture data consisting of mapping and query data after geometric verification (sensors and reconstruction)
     :param query_path: path to the query kapture data (sensors)
-    :param descriptors_type: types of descriptors used to match
+    :param descriptors_type: type of descriptors, name of the descriptors subfolder
     :param pairsfile_path: path to the pairsfile that contains the topk retrieved mapping images for each query image
     :param output_path_root: root path where outputs should be stored
     :param colmap_binary: path to the COLMAP binary
@@ -236,6 +236,7 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                 kdata_output.trajectories) != 0 and not force:
             kdata_query.trajectories = kdata_output.trajectories
 
+    # load kapture maps
     if kdata_map.rigs is not None:
         rigs_remove_inplace(kdata_map.trajectories, kdata_map.rigs)
     if kdata_map_gv.rigs is not None:
@@ -364,6 +365,7 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
                 logger.info(f'processing {img_query}')
                 table_to_file(fid, map_pairs)
             map_pairs = [(i, j) for i, j, _ in map_pairs]
+            exit
             kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, img_list_map, map_pairs,
                                                      keypoints_type, descriptors_type)
             # sanity check

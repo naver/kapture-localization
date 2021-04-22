@@ -53,7 +53,7 @@ def load_descriptors(descriptors_type: str, input_path: str,
     """
     load a descriptor. this functions caches up to 50 descriptors
 
-    :param descriptors_type: the name of the descriptors type
+    :param descriptors_type: type of descriptors, name of the descriptors subfolder
     :param input_path: input path to kapture input root directory
     :param tar_handler: collection of preloaded tar archives
     :param image_name: name of the image
@@ -73,7 +73,7 @@ def compute_matches(input_path: str,
 
     :param input_path: input path to kapture input root directory
     :type input_path: str
-    :param descriptors_type: types of descriptors used to match
+    :param descriptors_type: type of descriptors, name of the descriptors subfolder
     :param pairsfile_path: path to pairs file (csv with 3 fields, name1, name2, score)
     :type pairsfile_path: str
     """

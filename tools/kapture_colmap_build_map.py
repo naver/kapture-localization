@@ -48,7 +48,7 @@ def colmap_build_map(kapture_path: str,
       :param colmap_path: path to the colmap build
       :param colmap_binary: path to the colmap executable
       :param pairs_file_path: Optional[str],
-      :param keypoints_type: types of keypoints to export
+      :param keypoints_type: type of keypoints, name of the keypoints subfolder
       :param use_colmap_matches_importer: bool,
       :param point_triangulator_options: options for the point triangulator
       :param skip_list: list of steps to skip
@@ -89,7 +89,7 @@ def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
     :param tar_handler: collection of preloaded tar archives
     :param colmap_path: path to the colmap build
     :param colmap_binary: path to the colmap executable
-    :param keypoints_type: types of keypoints to export
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param point_triangulator_options: options for the point triangulator
     :param skip_list: list of steps to skip
