@@ -41,7 +41,7 @@ def pose_approximation(mapping_path: str,
     :type query_path: str
     :param output_path: output path to pairsfile
     :type output_path: str
-    :param global_features_type: types of global features to export
+    :param global_features_type: type of global_features, name of the global_features subfolder
     :param topk: the max number of top retained images
     :type topk: int
     :param additional_parameters: store method specific args
