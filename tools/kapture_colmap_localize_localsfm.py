@@ -282,7 +282,7 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
             map_pairs = get_pairfile_from_img_list(img_list_map)
             query_pairs = get_pairfile_img_vs_img_list(img_query, img_list_map)
             with open(sub_kapture_pairsfile_path, 'w') as fid:
-                logger.info(f'processing {img_query}')
+                logger.info(f'matching for {img_query}')
                 table_to_file(fid, map_pairs)
                 table_to_file(fid, query_pairs)
 
@@ -313,7 +313,7 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
             map_pairs = get_pairfile_from_img_list(img_list_map)
             query_pairs = get_pairfile_img_vs_img_list(img_query, img_list_map)
             with open(sub_kapture_pairsfile_path, 'w') as fid:
-                logger.info(f'processing {img_query}')
+                logger.info(f'geometric verification of {img_query}')
                 table_to_file(fid, map_pairs)
                 table_to_file(fid, query_pairs)
 
@@ -357,11 +357,9 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
         if img_query in img_skip_list:
             continue
         else:
-            logger.info(f'processing {img_query}')
-
             map_pairs = get_pairfile_from_img_list(img_list_map)
             with open(sub_kapture_pairsfile_path, 'w') as fid:
-                logger.info(f'processing {img_query}')
+                logger.info(f'mapping and localization for {img_query}')
                 table_to_file(fid, map_pairs)
             map_pairs = [(i, j) for i, j, _ in map_pairs]
             kdata_sub_gv = sub_kapture_from_img_list(kdata_map_gv, img_list_map, map_pairs,
@@ -393,7 +391,6 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
 
         query_pairs = get_pairfile_img_vs_img_list(img_query, img_list_map)
         with open(sub_kapture_pairsfile_path, 'w') as fid:
-            logger.info(f'processing {img_query}')
             table_to_file(fid, query_pairs)
         query_pairs = [(i, j) for i, j, _ in query_pairs]
         query_img_kapture_gv = add_image_to_kapture(kdata_map_gv,
