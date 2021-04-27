@@ -30,7 +30,7 @@ def absolute_symlink(
 
 
 def guess_feature_name(feature_path: str) -> str:
-    feature_path_c = feature_path.replace('\\', '/').rstrip('/')
+    feature_path_c = os.path.abspath(feature_path).replace('\\', '/').rstrip('/')
     feature_path_split = feature_path_c.split('/')
     feature_name = None
     if feature_path_split[-1] not in ['keypoints', 'descriptors', 'global_features', 'matches']:
