@@ -33,6 +33,9 @@ def image_retrieval_benchmark(kapture_map_path: str,
                               global_features_path: str,
                               matches_path: str,
                               matches_gv_path: str,
+                              keypoints_type: Optional[str],
+                              descriptors_type: Optional[str],
+                              global_features_type: Optional[str],
                               colmap_map_path: str,
                               localization_output_path: str,
                               colmap_binary: str,
@@ -124,6 +127,9 @@ def image_retrieval_benchmark(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # build proxy kapture query in output folder
@@ -134,6 +140,9 @@ def image_retrieval_benchmark(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_compute_image_pairs.py
@@ -168,6 +177,9 @@ def image_retrieval_benchmark(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_compute_matches.py
@@ -186,6 +198,9 @@ def image_retrieval_benchmark(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_gv_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_run_colmap_gv.py
@@ -423,6 +438,9 @@ def image_retrieval_benchmark_get_parser():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
+    parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
+    parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
     return parser
 
 
@@ -455,6 +473,9 @@ def image_retrieval_benchmark_command_line():
                                   args.global_features_path,
                                   args.matches_path,
                                   args.matches_gv_path,
+                                  args.keypoints_type,
+                                  args.descriptors_type,
+                                  args.global_features_type,
                                   args.colmap_map,
                                   args.output,
                                   args.colmap_binary,

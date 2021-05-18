@@ -5,6 +5,7 @@ import argparse
 import logging
 import os
 import pathlib
+from typing import Optional
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
@@ -14,8 +15,9 @@ import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
 from kapture.io.csv import kapture_from_dir, table_to_file
-from kapture.io.csv import ImageFeatureConfig
+from kapture.io.csv import GlobalFeaturesConfig, get_all_tar_handlers
 from kapture.io.features import global_features_to_filepaths
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 logger = logging.getLogger('compute_image_pairs')
 
@@ -23,6 +25,7 @@ logger = logging.getLogger('compute_image_pairs')
 def compute_image_pairs(mapping_path: str,
                         query_path: str,
                         output_path: str,
+                        global_features_type: Optional[str],
                         topk: int):
     """
     compute image pairs between query -> mapping from global features, and write the result in a text file
@@ -33,55 +36,73 @@ def compute_image_pairs(mapping_path: str,
     :type query_path: str
     :param output_path: output path to pairsfile
     :type output_path: str
+    :param global_features_type: type of global_features, name of the global_features subfolder
     :param topk: the max number of top retained images
     :type topk: int
     """
     logger.info(f'compute_image_pairs. loading mapping: {mapping_path}')
-    kdata_mapping = kapture_from_dir(mapping_path, None, skip_list=[kapture.Keypoints,
-                                                                    kapture.Descriptors,
-                                                                    kapture.Matches,
-                                                                    kapture.Observations,
-                                                                    kapture.Points3d])
-    assert kdata_mapping.sensors is not None
-    assert kdata_mapping.records_camera is not None
-    assert kdata_mapping.global_features is not None
+    with get_all_tar_handlers(mapping_path) as mapping_tar_handlers:
+        kdata_mapping = kapture_from_dir(mapping_path, None, skip_list=[kapture.Keypoints,
+                                                                        kapture.Descriptors,
+                                                                        kapture.Matches,
+                                                                        kapture.Observations,
+                                                                        kapture.Points3d],
+                                         tar_handlers=mapping_tar_handlers)
+        assert kdata_mapping.sensors is not None
+        assert kdata_mapping.records_camera is not None
+        assert kdata_mapping.global_features is not None
+        if global_features_type is None:
+            global_features_type = try_get_only_key_from_collection(kdata_mapping.global_features)
+        assert global_features_type is not None
+        assert global_features_type in kdata_mapping.global_features
+
+        global_features_config = GlobalFeaturesConfig(kdata_mapping.global_features[global_features_type].type_name,
+                                                      kdata_mapping.global_features[global_features_type].dtype,
+                                                      kdata_mapping.global_features[global_features_type].dsize,
+                                                      kdata_mapping.global_features[global_features_type].metric_type)
+
+        logger.info(f'computing pairs with {global_features_type}...')
+
+        mapping_global_features_to_filepaths = global_features_to_filepaths(
+            kdata_mapping.global_features[global_features_type],
+            global_features_type,
+            mapping_path,
+            mapping_tar_handlers
+        )
+        mapping_list = list(sorted(mapping_global_features_to_filepaths.items()))
+        mapping_stacked_features = stack_global_features(global_features_config, mapping_list)
 
     if mapping_path == query_path:
         kdata_query = kdata_mapping
-    else:
-        logger.info(f'compute_image_pairs. loading query: {query_path}')
-        kdata_query = kapture_from_dir(query_path, None, skip_list=[kapture.Keypoints,
-                                                                    kapture.Descriptors,
-                                                                    kapture.Matches,
-                                                                    kapture.Observations,
-                                                                    kapture.Points3d])
-        assert kdata_query.sensors is not None
-        assert kdata_query.records_camera is not None
-        assert kdata_query.global_features is not None
-
-    assert kdata_mapping.global_features is not None
-    assert kdata_query.global_features is not None
-    assert kdata_mapping.global_features.type_name == kdata_query.global_features.type_name
-    assert kdata_mapping.global_features.dtype == kdata_query.global_features.dtype
-    assert kdata_mapping.global_features.dsize == kdata_query.global_features.dsize
-    global_features_config = ImageFeatureConfig(kdata_mapping.global_features.type_name,
-                                                kdata_mapping.global_features.dtype,
-                                                kdata_mapping.global_features.dsize)
-
-    logger.info(f'computing pairs with {kdata_mapping.global_features.type_name}...')
-
-    mapping_global_features_to_filepaths = global_features_to_filepaths(kdata_mapping.global_features,
-                                                                        mapping_path)
-    mapping_list = list(kapture.flatten(mapping_global_features_to_filepaths, is_sorted=True))
-    mapping_stacked_features = stack_global_features(global_features_config, mapping_list)
-
-    if mapping_path == query_path:
         query_stacked_features = mapping_stacked_features
     else:
-        query_global_features_to_filepaths = global_features_to_filepaths(kdata_query.global_features,
-                                                                          query_path)
-        query_list = list(kapture.flatten(query_global_features_to_filepaths, is_sorted=True))
-        query_stacked_features = stack_global_features(global_features_config, query_list)
+        logger.info(f'compute_image_pairs. loading query: {query_path}')
+        with get_all_tar_handlers(query_path) as query_tar_handlers:
+            kdata_query = kapture_from_dir(query_path, None, skip_list=[kapture.Keypoints,
+                                                                        kapture.Descriptors,
+                                                                        kapture.Matches,
+                                                                        kapture.Observations,
+                                                                        kapture.Points3d],
+                                           tar_handlers=query_tar_handlers)
+            assert kdata_query.sensors is not None
+            assert kdata_query.records_camera is not None
+            assert kdata_query.global_features is not None
+            assert global_features_type in kdata_query.global_features
+
+            kdata_mapping_gfeat = kdata_mapping.global_features[global_features_type]
+            kdata_query_gfeat = kdata_query.global_features[global_features_type]
+            assert kdata_mapping_gfeat.type_name == kdata_query_gfeat.type_name
+            assert kdata_mapping_gfeat.dtype == kdata_query_gfeat.dtype
+            assert kdata_mapping_gfeat.dsize == kdata_query_gfeat.dsize
+
+            query_global_features_to_filepaths = global_features_to_filepaths(
+                kdata_query_gfeat,
+                global_features_type,
+                query_path,
+                query_tar_handlers
+            )
+            query_list = list(sorted(query_global_features_to_filepaths.items()))
+            query_stacked_features = stack_global_features(global_features_config, query_list)
 
     similarity = get_similarity(query_stacked_features, mapping_stacked_features)
 
@@ -115,7 +136,7 @@ def compute_image_pairs_command_line():
                               'use the same value as mapping if you want to compute mapping <-> mapping matches'))
     parser.add_argument('-o', '--output', required=True,
                         help='output path to pairsfile')
-
+    parser.add_argument('-gfeat', '--global-features-type', default=None, help='kapture global features type.')
     parser.add_argument('--topk',
                         default=20,
                         type=int,
@@ -130,7 +151,7 @@ def compute_image_pairs_command_line():
 
     logger.debug(''.join(['\n\t{:13} = {}'.format(k, v)
                           for k, v in vars(args).items()]))
-    compute_image_pairs(args.mapping, args.query, args.output, args.topk)
+    compute_image_pairs(args.mapping, args.query, args.output, args.global_features_type, args.topk)
 
 
 if __name__ == '__main__':

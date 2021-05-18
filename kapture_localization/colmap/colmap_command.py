@@ -204,13 +204,13 @@ def run_matches_importer(colmap_binary_path: str,
     run_colmap_command(colmap_binary_path, matches_importer_args)
 
 
-def run_matches_importer_from_kapture(colmap_binary_path: str,
-                                      colmap_use_cpu: bool,
-                                      colmap_gpu_index: Optional[str],
-                                      colmap_db_path: str,
-                                      kapture_data: kapture.Kapture,
-                                      force: bool = True,
-                                      clean: bool = True) -> None:
+def run_matches_importer_from_kapture_matches(colmap_binary_path: str,
+                                              colmap_use_cpu: bool,
+                                              colmap_gpu_index: Optional[str],
+                                              colmap_db_path: str,
+                                              kapture_matches: kapture.Matches,
+                                              force: bool = True,
+                                              clean: bool = True) -> None:
     """
     export list of matches from kapture data then run colmap matches_importer
 
@@ -222,8 +222,8 @@ def run_matches_importer_from_kapture(colmap_binary_path: str,
     :type colmap_gpu_index: str
     :param colmap_db_path: value for --database_path
     :type colmap_db_path: str
-    :param kapture_data: kapture data that contains the matches (that are already in the colmap database) to verify
-    :type kapture_data: kapture.Kapture
+    :param kapture_matches: kapture data that contains the matches (that are already in the colmap database) to verify
+    :type kapture_matches: kapture.Matches
     :param force: do not ask before overwriting match_list.txt, defaults to True
     :type force: bool, optional
     :param clean: remove match_list.txt before exiting, defaults to True
@@ -232,7 +232,7 @@ def run_matches_importer_from_kapture(colmap_binary_path: str,
     db_dir = path.dirname(colmap_db_path)
     match_list_path = path.join(db_dir, 'match_list.txt')
     safe_remove_file(match_list_path, force)
-    save_match_list(kapture_data, match_list_path)
+    save_match_list(kapture_matches, match_list_path)
     run_matches_importer(colmap_binary_path, colmap_use_cpu, colmap_gpu_index, colmap_db_path, match_list_path)
     if clean:
         os.remove(match_list_path)

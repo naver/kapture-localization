@@ -33,6 +33,9 @@ def localize_pipeline(kapture_map_path: str,
                       global_features_path: str,
                       matches_path: str,
                       matches_gv_path: str,
+                      keypoints_type: Optional[str],
+                      descriptors_type: Optional[str],
+                      global_features_type: Optional[str],
                       colmap_map_path: str,
                       localization_output_path: str,
                       colmap_binary: str,
@@ -107,6 +110,9 @@ def localize_pipeline(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # build proxy kapture query in output folder
@@ -117,6 +123,9 @@ def localize_pipeline(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_compute_image_pairs.py
@@ -151,6 +160,9 @@ def localize_pipeline(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_compute_matches.py
@@ -169,6 +181,9 @@ def localize_pipeline(kapture_map_path: str,
                          descriptors_path,
                          global_features_path,
                          matches_gv_path,
+                         keypoints_type,
+                         descriptors_type,
+                         global_features_type,
                          force_overwrite_existing)
 
     # kapture_run_colmap_gv.py
@@ -317,6 +332,9 @@ def localize_pipeline_command_line():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
+    parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
+    parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -341,6 +359,9 @@ def localize_pipeline_command_line():
                           args.global_features_path,
                           args.matches_path,
                           args.matches_gv_path,
+                          args.keypoints_type,
+                          args.descriptors_type,
+                          args.global_features_type,
                           args.colmap_map,
                           args.output,
                           args.colmap_binary,

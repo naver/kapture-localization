@@ -23,6 +23,8 @@ import kapture.io.csv
 import kapture.utils.logging
 from kapture.utils.paths import safe_remove_file, safe_remove_any_path
 from kapture.core.Trajectories import rigs_remove_inplace
+from kapture.io.tar import TarCollection
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 from kapture.converter.colmap.database import COLMAPDatabase
 import kapture.converter.colmap.database_extra as database_extra
@@ -36,6 +38,7 @@ def colmap_localize(kapture_path: str,
                     input_reconstruction_path: str,
                     colmap_binary: str,
                     pairs_file_path: Optional[str],
+                    keypoints_type: Optional[str],
                     use_colmap_matches_importer: bool,
                     image_registrator_options: List[str],
                     skip_list: List[str],
@@ -50,6 +53,7 @@ def colmap_localize(kapture_path: str,
     :param input_reconstruction_path: path to the map reconstruction folder
     :param colmap_binary: path to the colmap binary executable
     :param pairs_file_path: Optional[str],
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param image_registrator_options: options for the image registrator
     :param skip_list: list of steps to skip
@@ -57,26 +61,31 @@ def colmap_localize(kapture_path: str,
     """
     # Load input files first to make sure it is OK
     logger.info('loading kapture files...')
-    kapture_data = kapture.io.csv.kapture_from_dir(kapture_path, pairs_file_path)
+    with kapture.io.csv.get_all_tar_handlers(kapture_path) as tar_handlers:
+        kapture_data = kapture.io.csv.kapture_from_dir(kapture_path, pairs_file_path, tar_handlers=tar_handlers)
 
-    colmap_localize_from_loaded_data(kapture_data,
-                                     kapture_path,
-                                     colmap_path,
-                                     input_database_path,
-                                     input_reconstruction_path,
-                                     colmap_binary,
-                                     use_colmap_matches_importer,
-                                     image_registrator_options,
-                                     skip_list,
-                                     force)
+        colmap_localize_from_loaded_data(kapture_data,
+                                         kapture_path,
+                                         tar_handlers,
+                                         colmap_path,
+                                         input_database_path,
+                                         input_reconstruction_path,
+                                         colmap_binary,
+                                         keypoints_type,
+                                         use_colmap_matches_importer,
+                                         image_registrator_options,
+                                         skip_list,
+                                         force)
 
 
 def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
                                      kapture_path: str,
+                                     tar_handlers: Optional[TarCollection],
                                      colmap_path: str,
                                      input_database_path: str,
                                      input_reconstruction_path: str,
                                      colmap_binary: str,
+                                     keypoints_type: Optional[str],
                                      use_colmap_matches_importer: bool,
                                      image_registrator_options: List[str],
                                      skip_list: List[str],
@@ -86,11 +95,13 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
 
     :param kapture_data: kapture data to use
     :param kapture_path: path to the kapture to use
+    :param tar_handler: collection of preloaded tar archives
     :param colmap_path: path to the colmap build
     :param input_database_path: path to the map colmap.db
     :param input_database_path: path to the map colmap.db
     :param input_reconstruction_path: path to the map reconstruction folder
     :param colmap_binary: path to the colmap binary executable
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param image_registrator_options: options for the image registrator
     :param skip_list: list of steps to skip
@@ -152,6 +163,13 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
 
     if 'import_to_db' not in skip_list:
         logger.info("Step 1: Add precomputed keypoints and matches to colmap db")
+
+        if keypoints_type is None:
+            keypoints_type = try_get_only_key_from_collection(kapture_data.keypoints)
+        assert keypoints_type is not None
+        assert keypoints_type in kapture_data.keypoints
+        assert keypoints_type in kapture_data.matches
+
         cameras_to_add = kapture.Sensors()
         for _, (_, kapture_cam_id) in images_to_add.items():
             if kapture_cam_id not in colmap_camera_ids:
@@ -170,34 +188,46 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
         # add new features
         colmap_keypoints = database_extra.get_keypoints_set_from_database(colmap_db, colmap_image_ids_reversed)
 
-        keypoints_all = kapture_data.keypoints
+        keypoints_all = kapture_data.keypoints[keypoints_type]
         keypoints_to_add = {name for name in keypoints_all if name not in colmap_keypoints}
         keypoints_to_add = kapture.Keypoints(keypoints_all.type_name, keypoints_all.dtype, keypoints_all.dsize,
                                              keypoints_to_add)
-        database_extra.add_keypoints_to_database(colmap_db, keypoints_to_add, kapture_path, colmap_image_ids)
+        database_extra.add_keypoints_to_database(colmap_db, keypoints_to_add,
+                                                 keypoints_type, kapture_path,
+                                                 tar_handlers,
+                                                 colmap_image_ids)
 
         # add new matches
         colmap_matches = kapture.Matches(database_extra.get_matches_set_from_database(colmap_db,
                                                                                       colmap_image_ids_reversed))
         colmap_matches.normalize()
 
-        matches_all = kapture_data.matches
+        matches_all = kapture_data.matches[keypoints_type]
         matches_to_add = kapture.Matches({pair for pair in matches_all if pair not in colmap_matches})
         # print(list(matches_to_add))
-        database_extra.add_matches_to_database(colmap_db, matches_to_add, kapture_path, colmap_image_ids,
+        database_extra.add_matches_to_database(colmap_db, matches_to_add,
+                                               keypoints_type, kapture_path,
+                                               tar_handlers,
+                                               colmap_image_ids,
                                                export_two_view_geometry=not use_colmap_matches_importer)
         colmap_db.close()
 
     if use_colmap_matches_importer:
         logger.info('Step 2: Run geometric verification')
         logger.debug('running colmap matches_importer...')
+
+        if keypoints_type is None:
+            keypoints_type = try_get_only_key_from_collection(kapture_data.matches)
+        assert keypoints_type is not None
+        assert keypoints_type in kapture_data.matches
+
         # compute two view geometry
-        colmap_lib.run_matches_importer_from_kapture(
+        colmap_lib.run_matches_importer_from_kapture_matches(
             colmap_binary,
             colmap_use_cpu=True,
             colmap_gpu_index=None,
             colmap_db_path=colmap_db_path,
-            kapture_data=kapture_data,
+            kapture_matches=kapture_data.matches[keypoints_type],
             force=force)
     else:
         logger.info('Step 2: Run geometric verification - skipped')
@@ -258,6 +288,7 @@ def colmap_localize_command_line():
                         type=str,
                         help=('text file in the csv format; where each line is image_name1, image_name2, score '
                               'which contains the image pairs to match, can be used to filter loaded matches'))
+    parser.add_argument('-kpt', '--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('-s', '--skip', choices=['delete_existing',
                                                  'import_to_db',
                                                  'image_registrator',
@@ -282,7 +313,9 @@ def colmap_localize_command_line():
     colmap_localize(args.input, args.output,
                     args.database, args.reconstruction,
                     args.colmap_binary,
-                    args.pairs_file_path, args.use_colmap_matches_importer,
+                    args.pairs_file_path,
+                    args.keypoints_type,
+                    args.use_colmap_matches_importer,
                     image_registrator_options,
                     args.skip, args.force)
 

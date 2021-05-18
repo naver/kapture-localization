@@ -23,6 +23,8 @@ import kapture.utils.logging
 from kapture.utils.paths import safe_remove_file, safe_remove_any_path
 from kapture.core.Trajectories import rigs_remove_inplace
 from kapture.io.records import get_image_fullpath
+from kapture.io.tar import TarCollection
+from kapture.utils.Collections import try_get_only_key_from_collection
 
 from kapture.converter.colmap.database import COLMAPDatabase
 import kapture.converter.colmap.database_extra as database_extra
@@ -34,6 +36,7 @@ def colmap_build_map(kapture_path: str,
                      colmap_path: str,
                      colmap_binary: str,
                      pairs_file_path: Optional[str],
+                     keypoints_type: Optional[str],
                      use_colmap_matches_importer: bool,
                      point_triangulator_options: List[str],
                      skip_list: List[str],
@@ -45,6 +48,7 @@ def colmap_build_map(kapture_path: str,
       :param colmap_path: path to the colmap build
       :param colmap_binary: path to the colmap executable
       :param pairs_file_path: Optional[str],
+      :param keypoints_type: type of keypoints, name of the keypoints subfolder
       :param use_colmap_matches_importer: bool,
       :param point_triangulator_options: options for the point triangulator
       :param skip_list: list of steps to skip
@@ -52,22 +56,27 @@ def colmap_build_map(kapture_path: str,
       """
     # Load input files first to make sure it is OK
     logger.info('loading kapture files...')
-    kapture_data = kapture.io.csv.kapture_from_dir(kapture_path, pairs_file_path)
+    with kapture.io.csv.get_all_tar_handlers(kapture_path) as tar_handlers:
+        kapture_data = kapture.io.csv.kapture_from_dir(kapture_path, pairs_file_path, tar_handlers=tar_handlers)
 
-    colmap_build_map_from_loaded_data(kapture_data,
-                                      kapture_path,
-                                      colmap_path,
-                                      colmap_binary,
-                                      use_colmap_matches_importer,
-                                      point_triangulator_options,
-                                      skip_list,
-                                      force)
+        colmap_build_map_from_loaded_data(kapture_data,
+                                          kapture_path,
+                                          tar_handlers,
+                                          colmap_path,
+                                          colmap_binary,
+                                          keypoints_type,
+                                          use_colmap_matches_importer,
+                                          point_triangulator_options,
+                                          skip_list,
+                                          force)
 
 
 def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
                                       kapture_path: str,
+                                      tar_handlers: Optional[TarCollection],
                                       colmap_path: str,
                                       colmap_binary: str,
+                                      keypoints_type: Optional[str],
                                       use_colmap_matches_importer: bool,
                                       point_triangulator_options: List[str],
                                       skip_list: List[str],
@@ -77,8 +86,10 @@ def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
 
     :param kapture_data: kapture data to use
     :param kapture_path: path to the kapture to use
+    :param tar_handler: collection of preloaded tar archives
     :param colmap_path: path to the colmap build
     :param colmap_binary: path to the colmap executable
+    :param keypoints_type: type of keypoints, name of the keypoints subfolder
     :param use_colmap_matches_importer: bool,
     :param point_triangulator_options: options for the point triangulator
     :param skip_list: list of steps to skip
@@ -115,7 +126,16 @@ def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
         colmap_db = COLMAPDatabase.connect(colmap_db_path)
         if kapture_data.descriptors is not None:
             kapture_data.descriptors.clear()
-        database_extra.kapture_to_colmap(kapture_data, kapture_path, colmap_db,
+
+        if keypoints_type is None:
+            keypoints_type = try_get_only_key_from_collection(kapture_data.keypoints)
+        assert keypoints_type is not None
+        assert keypoints_type in kapture_data.keypoints
+        assert keypoints_type in kapture_data.matches
+
+        database_extra.kapture_to_colmap(kapture_data, kapture_path, tar_handlers,
+                                         colmap_db,
+                                         keypoints_type, None,
                                          export_two_view_geometry=not use_colmap_matches_importer)
         # close db before running colmap processes in order to avoid locks
         colmap_db.close()
@@ -123,12 +143,12 @@ def colmap_build_map_from_loaded_data(kapture_data: kapture.Kapture,
         if use_colmap_matches_importer:
             logger.info('Step 2: Run geometric verification')
             logger.debug('running colmap matches_importer...')
-            colmap_lib.run_matches_importer_from_kapture(
+            colmap_lib.run_matches_importer_from_kapture_matches(
                 colmap_binary,
                 colmap_use_cpu=True,
                 colmap_gpu_index=None,
                 colmap_db_path=colmap_db_path,
-                kapture_data=kapture_data,
+                kapture_matches=kapture_data.matches[keypoints_type],
                 force=force
             )
         else:
@@ -217,6 +237,7 @@ def colmap_build_map_command_line():
                         type=str,
                         help=('text file in the csv format; where each line is image_name1, image_name2, score '
                               'which contains the image pairs to match, can be used to filter loaded matches'))
+    parser.add_argument('-kpt', '--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('-s', '--skip', choices=['delete_existing',
                                                  'colmap_db',
                                                  'priors_for_reconstruction',
@@ -239,7 +260,9 @@ def colmap_build_map_command_line():
     logger.debug('colmap_build_map.py \\\n' + '  \\\n'.join(
         '--{:20} {:100}'.format(k, str(v)) for k, v in args_dict.items()))
     colmap_build_map(args.input, args.output, args.colmap_binary,
-                     args.pairs_file_path, args.use_colmap_matches_importer, point_triangulator_options,
+                     args.pairs_file_path,
+                     args.keypoints_type,
+                     args.use_colmap_matches_importer, point_triangulator_options,
                      args.skip, args.force)
 
 
