@@ -1,4 +1,4 @@
-kapture>=1.0.13
+kapture>=1.1.0
 # numpy 1.20 requires python 3.7
 numpy>=1.16
 numpy-quaternion
