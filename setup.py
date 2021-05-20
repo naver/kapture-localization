@@ -45,7 +45,7 @@ long_description = read_doc(readme_filepath)
 setuptools.setup(
     # description
     name='kapture-localization',
-    version="0.0.4",
+    version="0.1.0",
     author="naverlabs",
     author_email="kapture@naverlabs.com",
     description="kapture-localization: localization pipelines based on kapture.",
@@ -61,7 +61,7 @@ setuptools.setup(
     # dependencies
     python_requires='>=3.6',
     install_requires=[
-        'kapture>=1.0.13',
+        'kapture>=1.1.0',
         'numpy>=1.16',
         'numpy-quaternion',
         'numba',
