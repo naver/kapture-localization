@@ -25,14 +25,13 @@ jobs:
         pip install setuptools wheel twine
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: build pip package
+    - name: pypi Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
-
-    - name: push pip package
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_TOKEN }}
+        twine upload --verbose --skip-existing dist/*
 
   deploy_docker:
     runs-on: ubuntu-latest
