@@ -30,7 +30,8 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                colmap_binary: str,
                                python_binary: Optional[str],
                                vocab_tree_path: str,
-                               config: int,
+                               mapping_config: int,
+                               localize_config: int,
                                prepend_cam: bool,
                                bins_as_str: List[str],
                                skip_list: List[str],
@@ -52,8 +53,10 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
     :type python_binary: Optional[str]
     :param vocab_tree_path: full path to Vocabulary Tree file used for matching
     :type vocab_tree_path: str
-    :param config: index of the config parameters to use for image registrator
-    :type config: int
+    :param mapping_config: index of the config parameters to use for point triangulator
+    :type mapping_config: int
+    :param localize_config: index of the config parameters to use for image registrator
+    :type localize_config: int
     :param prepend_cam: prepend camera names to filename in LTVL2020 formatted output
     :type prepend_cam: bool
     :param bins_as_str: list of bin names
@@ -82,9 +85,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                '-colmap', colmap_binary]
         if force_overwrite_existing:
             build_sift_map_args.append('-f')
-        build_sift_map_args += ['--Mapper.ba_refine_focal_length', '0',
-                                '--Mapper.ba_refine_principal_point', '0',
-                                '--Mapper.ba_refine_extra_params', '0']
+        build_sift_map_args += CONFIGS[mapping_config]
         run_python_command(local_build_sift_map_path, build_sift_map_args, python_binary)
 
     if kapture_query_path is None:
@@ -110,7 +111,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                               '-colmap', colmap_binary]
         if force_overwrite_existing:
             localize_sift_args.append('-f')
-        localize_sift_args += CONFIGS[config]
+        localize_sift_args += CONFIGS[localize_config]
         run_python_command(local_localize_sift_path, localize_sift_args, python_binary)
 
     # kapture_import_colmap.py
@@ -201,7 +202,9 @@ def colmap_vocab_tree_pipeline_command_line():
     parser.add_argument('-voc', '--vocab_tree_path', required=True,
                         help='full path to Vocabulary Tree file'
                              ' used for matching.')
-    parser.add_argument('--config', default=1, type=int,
+    parser.add_argument('--mapping-config', default=1, type=int,
+                        choices=[0, 1], help='what config to use for point triangulator')
+    parser.add_argument('--localize-config', default=1, type=int,
                         choices=list(range(len(CONFIGS))), help='what config to use for image registrator')
     parser.add_argument('--prepend_cam', action='store_true', default=False,
                         help=('prepend camera names to filename in LTVL2020 formatted output. '
@@ -238,7 +241,8 @@ def colmap_vocab_tree_pipeline_command_line():
                                args.colmap_binary,
                                python_binary,
                                args.vocab_tree_path,
-                               args.config,
+                               args.mapping_config,
+                               args.localize_config,
                                args.prepend_cam,
                                args.bins,
                                args.skip,

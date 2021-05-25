@@ -317,7 +317,7 @@ kapture_pipeline_colmap_vocab_tree.py -v info \
         --query ./query \
         -o ./sift_colmap_vocab_tree/ \
         -voc ./vocab_tree_flickr100K_words32K.bin \
-        --config 2
+        --localize-config 2
 ----
 
 `kapture_pipeline_colmap_vocab_tree.py` will run the following sequence:
@@ -329,7 +329,7 @@ kapture_pipeline_colmap_vocab_tree.py -v info \
  . `kapture_export_LTVL2020.py` exports the localized images to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark.
 
-In this script, the --config option will set the parameters passed to the COLMAP image_registrator.
+In this script, the --localize-config option will set the parameters passed to the COLMAP image_registrator.
 The parameters are described in link:../kapture_localization/colmap/colmap_command.py[colmap_command.py].
 
 The resulting `./sift_colmap_vocab_tree/eval/stats.txt` will look similar to:

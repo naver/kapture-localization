@@ -16,6 +16,7 @@ import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
 from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy
 from kapture_localization.utils.subprocess import run_python_command
+from kapture_localization.colmap.colmap_command import CONFIGS
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
@@ -37,6 +38,7 @@ def mapping_pipeline(kapture_path: str,
                      colmap_binary: str,
                      python_binary: Optional[str],
                      topk: int,
+                     config: int,
                      skip_list: List[str],
                      force_overwrite_existing: bool) -> None:
     """
@@ -62,6 +64,8 @@ def mapping_pipeline(kapture_path: str,
     :type python_binary: Optional[str]
     :param topk: the max number of top retained images when computing image pairs from global features
     :type topk: int
+    :param config: index of the config parameters to use for point triangulator
+    :type config: int
     :param skip_list: list of steps to ignore
     :type skip_list: List[str]
     :param force_overwrite_existing: silently overwrite files if already exists
@@ -144,9 +148,7 @@ def mapping_pipeline(kapture_path: str,
                           '--pairs-file-path', pairfile_path]
         if force_overwrite_existing:
             build_map_args.append('-f')
-        build_map_args += ['--Mapper.ba_refine_focal_length', '0',
-                           '--Mapper.ba_refine_principal_point', '0',
-                           '--Mapper.ba_refine_extra_params', '0']
+        build_map_args += CONFIGS[config]
         run_python_command(local_build_map_path, build_map_args, python_binary)
 
 
@@ -196,6 +198,8 @@ def mapping_pipeline_command_line():
                         default=20,
                         type=int,
                         help='the max number of top retained images when computing image pairs from global features')
+    parser.add_argument('--config', default=1, type=int,
+                        choices=[0, 1], help='what config to use for point triangulator')
     parser.add_argument('-s', '--skip', choices=['compute_image_pairs',
                                                  'compute_matches',
                                                  'geometric_verification',
@@ -235,6 +239,7 @@ def mapping_pipeline_command_line():
                          args.colmap_binary,
                          python_binary,
                          args.topk,
+                         args.config,
                          args.skip,
                          args.force)
     else:
