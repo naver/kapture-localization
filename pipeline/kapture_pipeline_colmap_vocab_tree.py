@@ -143,7 +143,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         local_evaluate_path = path.join(pipeline_import_paths.HERE_PATH, '../tools/kapture_evaluate.py')
         evaluate_args = ['-v', str(logger.level),
                          '-i', kapture_localize_recover_path,
-                         '--labels', f'sift_colmap_vocab_tree_config_{config}',
+                         '--labels', f'sift_colmap_vocab_tree_config_{localize_config}',
                          '-gt', kapture_query_path,
                          '-o', eval_path]
         evaluate_args += ['--bins'] + bins_as_str
