@@ -24,7 +24,7 @@ If this benchmark is used in research, please cite this paper:
 = Datasets
 
 In order to download the 3 datasets used in the paper, we recommend using the kapture dataset downloader.
-Note that the dataset downloader does not only provide the raw datasets, it also provides some precomputed data such as the COLMAP map and the global features used in the paper.
+Note that the dataset downloader does not only provide the raw datasets, it also provides some precomputed data such as the global features used in the paper.
 In this tutorial, we will store all datasets in a folder called `kapture_datasets`.
 This folder will not only contain the raw datasets in kapture format, but also all processed data (features, matches, etc.) and benchmark results.
 
@@ -272,6 +272,54 @@ Note that this data can be stored in kapture folders as well (as defined in the 
 However, for easy reuse we recommend to store them somewhere else (as done in this example).
 The kapture pipelines will generate links to these folders.
 
+= Mapping
+
+You have to create a map on which you'll evaluate your global features.
+Different global features should be evaluated on the same map or the global sfm scores won't be comparable.
+In order to have numbers similar to what we reported, we provide the pairsfile we used for the mapping.
+
+```
+# for all kapture_pipeline_mapping.py commands,
+# if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
+#   example: -colmap C:/Workspace/dev/colmap/colmap.bat
+
+# Aachen Day-Night v1.1
+mkdir -p Aachen-Day-Night-v1.1/pairsfile/mapping
+wget Aachen_Day_Night_1_1_ir_benchmark_pairs.txt Aachen-Day-Night-v1.1/pairsfile/mapping/ # TODO
+kapture_pipeline_mapping.py -v info \
+    -i Aachen-Day-Night-v1.1/mapping \
+    -kpt Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints \
+    -desc Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors \
+    --pairsfile-path Aachen-Day-Night-v1.1/pairsfile/mapping/Aachen_Day_Night_1_1_ir_benchmark_pairs.txt \
+    -matches Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+    -matches-gv Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+    --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap
+
+# Baidu Mall
+mkdir -p baidu-mall/pairsfile/mapping
+wget baidu_mall_ir_benchmark_pairs.txt baidu-mall/pairsfile/mapping/ # TODO
+kapture_pipeline_mapping.py -v info \
+    -i baidu-mall/mapping \
+    -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
+    -desc baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors \
+    --pairsfile-path baidu-mall/pairsfile/mapping/baidu_mall_ir_benchmark_pairs.txt \
+    -matches baidu-mall/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+    -matches-gv baidu-mall/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+    --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap
+
+# RobotCar Seasons
+mkdir -p RobotCar_Seasons-v1/pairsfile/mapping
+wget RobotCar_Seasons_v1_ir_benchmark_pairs.txt RobotCar_Seasons-v1/pairsfile/mapping/ # TODO
+kapture_pipeline_mapping.py -v info \
+    -i RobotCar_Seasons-v1/mapping \
+    -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
+    -desc RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors \
+    --pairsfile-path RobotCar_Seasons-v1/pairsfile/mapping/RobotCar_Seasons_v1_ir_benchmark_pairs.txt \
+    -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+    -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+    --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap
+```
+
 = Benchmark
 
 ```
@@ -289,8 +337,8 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat Aachen-Day-Night-v1.1/global_features/AP-GeM-LM18/global_features \
       -matches Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
-      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20 \
+      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
+      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
 
@@ -303,8 +351,8 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
       -matches baidu-mall/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv baidu-mall/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
-      -o baidu-mall/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20 \
+      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
+      -o baidu-mall/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
 
@@ -317,8 +365,8 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
       -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/frustum_topk50_far50/colmap \
-      -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_topk50_far50/AP-GeM-LM18_top20 \
+      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
+      -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2 \
       --prepend_cam # important for RobotCar (needed for visuallocalization.net)
