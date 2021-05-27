@@ -8,6 +8,7 @@ from typing import Optional
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 from kapture.utils.paths import safe_remove_any_path
+from kapture.io.features import guess_feature_name_from_path
 
 
 def can_use_symlinks():
@@ -27,26 +28,6 @@ def absolute_symlink(
 ):
     """ make sure it create an absolute symlink, even if source uis relative."""
     os.symlink(os.path.abspath(source_path), dest_path)
-
-
-def guess_feature_name(feature_path: str) -> str:
-    feature_path_c = os.path.abspath(feature_path).replace('\\', '/').rstrip('/')
-    feature_path_split = feature_path_c.split('/')
-    feature_name = None
-    if feature_path_split[-1] not in ['keypoints', 'descriptors', 'global_features', 'matches']:
-        feature_name = feature_path_split[-1]
-    else:
-        for parent_folder_name in ['local_features', 'global_features']:
-            try:
-                index = feature_path_split.index(parent_folder_name)
-                if index + 1 < len(feature_path_split):
-                    feature_name = feature_path_split[index + 1]
-                    break
-            except Exception:
-                continue
-    if feature_name is None:
-        raise ValueError(f'failed to guess feature name from path {feature_path}')
-    return feature_name
 
 
 def create_kapture_proxy(
@@ -93,21 +74,21 @@ def create_kapture_proxy(
     if keypoints_path is not None:
         assert path.exists(keypoints_path)
         if keypoints_type is None:
-            keypoints_type = guess_feature_name(keypoints_path)
+            keypoints_type = guess_feature_name_from_path(keypoints_path)
         os.makedirs(os.path.join(reconstruction_out_path, 'keypoints'), exist_ok=True)
         absolute_symlink(keypoints_path, os.path.join(reconstruction_out_path, 'keypoints', keypoints_type))
 
     if descriptors_path is not None:
         assert path.exists(descriptors_path)
         if descriptors_type is None:
-            descriptors_type = guess_feature_name(descriptors_path)
+            descriptors_type = guess_feature_name_from_path(descriptors_path)
         os.makedirs(os.path.join(reconstruction_out_path, 'descriptors'), exist_ok=True)
         absolute_symlink(descriptors_path, os.path.join(reconstruction_out_path, 'descriptors', descriptors_type))
 
     if global_features_path is not None:
         assert path.exists(global_features_path)
         if global_features_type is None:
-            global_features_type = guess_feature_name(global_features_path)
+            global_features_type = guess_feature_name_from_path(global_features_path)
         os.makedirs(os.path.join(reconstruction_out_path, 'global_features'), exist_ok=True)
         absolute_symlink(global_features_path, os.path.join(reconstruction_out_path,
                                                             'global_features',
@@ -116,6 +97,6 @@ def create_kapture_proxy(
     if matches_path is not None:
         assert path.exists(matches_path)
         if keypoints_type is None:
-            keypoints_type = guess_feature_name(matches_path)
+            keypoints_type = guess_feature_name_from_path(matches_path)
         os.makedirs(os.path.join(reconstruction_out_path, 'matches'), exist_ok=True)
         absolute_symlink(matches_path, os.path.join(reconstruction_out_path, 'matches', keypoints_type))
