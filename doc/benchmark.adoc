@@ -285,7 +285,8 @@ In order to have numbers similar to what we reported, we provide the pairsfile w
 
 # Aachen Day-Night v1.1
 mkdir -p Aachen-Day-Night-v1.1/pairsfile/mapping
-wget Aachen_Day_Night_1_1_ir_benchmark_pairs.txt Aachen-Day-Night-v1.1/pairsfile/mapping/ # TODO
+wget -O Aachen-Day-Night-v1.1/pairsfile/mapping/Aachen_Day_Night_1_1_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_ir_benchmark_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_ir_benchmark_pairs.txt.sha256sum
 kapture_pipeline_mapping.py -v info \
     -i Aachen-Day-Night-v1.1/mapping \
     -kpt Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints \
@@ -297,7 +298,7 @@ kapture_pipeline_mapping.py -v info \
 
 # Baidu Mall
 mkdir -p baidu-mall/pairsfile/mapping
-wget baidu_mall_ir_benchmark_pairs.txt baidu-mall/pairsfile/mapping/ # TODO
+wget -O baidu-mall/pairsfile/mapping/baidu_mall_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/baidu_mall_ir_benchmark_pairs.txt
 kapture_pipeline_mapping.py -v info \
     -i baidu-mall/mapping \
     -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
