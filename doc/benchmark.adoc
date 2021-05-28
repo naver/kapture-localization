@@ -299,6 +299,7 @@ kapture_pipeline_mapping.py -v info \
 # Baidu Mall
 mkdir -p baidu-mall/pairsfile/mapping
 wget -O baidu-mall/pairsfile/mapping/baidu_mall_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/baidu_mall_ir_benchmark_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/baidu_mall_ir_benchmark_pairs.txt.sha256sum
 kapture_pipeline_mapping.py -v info \
     -i baidu-mall/mapping \
     -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
@@ -310,7 +311,8 @@ kapture_pipeline_mapping.py -v info \
 
 # RobotCar Seasons
 mkdir -p RobotCar_Seasons-v1/pairsfile/mapping
-wget RobotCar_Seasons_v1_ir_benchmark_pairs.txt RobotCar_Seasons-v1/pairsfile/mapping/ # TODO
+wget -O RobotCar_Seasons-v1/pairsfile/mapping/RobotCar_Seasons_v1_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/RobotCar_Seasons_v1_ir_benchmark_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/RobotCar_Seasons_v1_ir_benchmark_pairs.txt.sha256sum
 kapture_pipeline_mapping.py -v info \
     -i RobotCar_Seasons-v1/mapping \
     -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
