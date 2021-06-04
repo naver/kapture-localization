@@ -4,15 +4,15 @@
 import argparse
 import logging
 from functools import lru_cache
-from typing import List, Optional, Tuple
+from typing import Optional
 import torch
 from tqdm import tqdm
 import os
-from collections import OrderedDict
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
 from kapture_localization.matching import MatchPairNnTorch
+from kapture_localization.utils.pairsfile import get_pairs_from_file
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -25,25 +25,6 @@ from kapture.io.tar import TarCollection
 from kapture.utils.Collections import try_get_only_key_from_collection
 
 logger = logging.getLogger('compute_matches')
-
-
-def get_pairs_from_file(pairsfile_path: str) -> List[Tuple[str, str]]:
-    """
-    read a pairs file (csv with 3 fields, name1, name2, score) and return the list of matches
-
-    :param pairsfile_path: path to pairsfile
-    :type pairsfile_path: str
-    """
-    logger.info('reading pairs from pairsfile')
-    image_pairs = []
-    with open(pairsfile_path, 'r') as fid:
-        table = table_from_file(fid)
-        for query_name, map_name, _ in table:  # last field score is not used
-            if query_name != map_name:
-                image_pairs.append((query_name, map_name) if query_name < map_name else (map_name, query_name))
-    # remove duplicates without breaking order
-    image_pairs = list(OrderedDict.fromkeys(image_pairs))
-    return image_pairs
 
 
 @lru_cache(maxsize=50)
@@ -87,7 +68,7 @@ def compute_matches(input_path: str,
                                                                         kapture.Observations,
                                                                         kapture.Points3d],
                                  tar_handlers=tar_handlers)
-        image_pairs = get_pairs_from_file(pairsfile_path)
+        image_pairs = get_pairs_from_file(pairsfile_path, kdata.records_camera, kdata.records_camera)
         compute_matches_from_loaded_data(input_path,
                                          tar_handlers,
                                          kdata,
