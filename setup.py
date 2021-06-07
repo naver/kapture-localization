@@ -61,7 +61,7 @@ setuptools.setup(
     # dependencies
     python_requires='>=3.6',
     install_requires=[
-        'kapture>=1.1.0',
+        'kapture>=1.1.0,<1.2.0',
         'numpy>=1.16',
         'numpy-quaternion',
         'numba',
