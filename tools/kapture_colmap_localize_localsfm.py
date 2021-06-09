@@ -50,10 +50,11 @@ def sub_kapture_from_img_list(kdata, img_list, pairs, keypoints_type, descriptor
                                            kapture.flatten(kdata.records_camera)}
     for img in img_list:
         timestamp, sensor_id = timestamp_sensor_id_from_image_name[img]
-        pose = kdata.trajectories[timestamp][sensor_id]
         sensors[sensor_id] = kdata.sensors[sensor_id]
         records[timestamp, sensor_id] = img
-        trajectories[timestamp, sensor_id] = pose
+        if (timestamp, sensor_id) in kdata.trajectories:
+            pose = kdata.trajectories[timestamp][sensor_id]
+            trajectories[timestamp, sensor_id] = pose
         keypoints.add(img)
         if kdata.descriptors is not None:
             descriptors.add(img)
@@ -227,6 +228,18 @@ def local_sfm_from_loaded_data(kdata_map: kapture.Kapture,
         kdata_query.trajectories.clear()
     else:
         kdata_query.trajectories = kapture.Trajectories()
+
+    # clear query trajectories in map_plus_query
+    kdata_map_cleared_trajectories = kapture.Trajectories()
+    query_image_list = set(kdata_query.records_camera.data_list())
+    for timestamp, subdict in kdata_map.records_camera.items():
+        for sensor_id, image_name in subdict.items():
+            if image_name in query_image_list:
+                continue
+            if (timestamp, sensor_id) in kdata_map.trajectories:
+                pose = kdata_map.trajectories.get(timestamp)[sensor_id]
+                kdata_map_cleared_trajectories.setdefault(timestamp, {})[sensor_id] = pose
+    kdata_map.trajectories = kdata_map_cleared_trajectories
 
     # load output kapture
     output_path = os.path.join(output_path_root, 'localized')
