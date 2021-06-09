@@ -354,17 +354,19 @@ def image_retrieval_benchmark(kapture_map_path: str,
         local_evaluate_path = path.join(pipeline_import_paths.HERE_PATH, '../tools/kapture_evaluate.py')
         input_list = []
         label_list = []
-        if 'global_sfm' not in skip_list:
+        if os.path.isdir(global_sfm_kapture_localize_recover_path):
             input_list.append(global_sfm_kapture_localize_recover_path)
             label_list.append(f'global_sfm_config_{config}')
-        if 'local_sfm' not in skip_list:
+        if os.path.isdir(local_sfm_localize_path):
             input_list.append(local_sfm_localize_path)
             label_list.append('local_sfm')
-        if 'pose_approximation' not in skip_list:
+        if os.path.isdir(pose_approx_EWB_path):
             input_list.append(pose_approx_EWB_path)
             label_list.append('EWB')
+        if os.path.isdir(pose_approx_BDI_path):
             input_list.append(pose_approx_BDI_path)
             label_list.append('BDI')
+        if os.path.isdir(pose_approx_CSI_path):
             input_list.append(pose_approx_CSI_path)
             label_list.append('CSI')
         evaluate_args = ['-v', str(logger.level),
