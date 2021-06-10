@@ -68,7 +68,7 @@ def get_ordered_pairs_from_file(pairsfile_path: str,
                 continue
             if query_name not in image_pairs:
                 image_pairs[query_name] = []
-            image_pairs[query_name].append((map_name, score))
+            image_pairs[query_name].append((map_name, float(score)))
     for k in image_pairs.keys():
         sorted_by_score = list(sorted(image_pairs[k], key=lambda x: x[1], reverse=True))
         if topk_override is not None and topk_override > len(sorted_by_score):
