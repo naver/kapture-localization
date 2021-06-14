@@ -15,7 +15,7 @@ from tabulate import tabulate
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
-from kapture_localization.evaluation import evaluate, EvaluationStatistics
+from kapture_localization.evaluation import evaluate, fill_bins, EvaluationStatistics
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
