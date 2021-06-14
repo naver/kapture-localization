@@ -119,7 +119,7 @@ class EvaluationStatistics:
     def __init__(self, result: List[Tuple[str, float, float]],
                  bins: List[Tuple[float, float]]):
         """
-        [summary]
+        compute some statistics of already evaluated results
 
         :param result: output of evaluate, list of name, position_error, rotation_error
         :param bins: list of (position_threshold, rotation_threshold in degree)
