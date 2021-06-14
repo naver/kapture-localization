@@ -6,6 +6,7 @@ Evaluation with kapture objects
 
 import math
 from typing import Union, List, Tuple, Set
+from statistics import mean, median
 
 import kapture
 from kapture.algo.pose_operations import world_pose_transform_distance
@@ -111,3 +112,56 @@ def fill_bins(results: List[Tuple[str, float, float]],
                 number_of_images_in_bin += 1
         filled_bins.append((trans_threshold, rot_threshold, number_of_images_in_bin))
     return filled_bins
+
+
+class EvaluationStatistics:
+
+    def __init__(self, result: List[Tuple[str, float, float]],
+                 bins: List[Tuple[float, float]]):
+        positions_errors_all = [position_error if not math.isnan(position_error) else float("inf")
+                                for _, position_error, _ in result]
+        rotation_errors_all = [rotation_error if not math.isnan(rotation_error) else float("inf")
+                               for _, _, rotation_error in result]
+
+        positions_errors = [position_error
+                            for _, position_error, _ in result if not math.isnan(position_error)]
+        rotation_errors = [rotation_error
+                           for _, _, rotation_error in result if not math.isnan(rotation_error)]
+
+        mean_localized_positions = mean(positions_errors)
+        mean_localized_rotations = mean(rotation_errors)
+
+        median_localized_positions = median(positions_errors)
+        median_localized_rotations = median(rotation_errors)
+
+        median_all_positions = median(positions_errors_all)
+        median_all_rotations = median(rotation_errors_all)
+
+        min_position_error = min(positions_errors)
+        min_rotation_error = min(rotation_errors)
+
+        max_position_error = max(positions_errors)
+        max_rotation_error = max(rotation_errors)
+
+        filled_bins = fill_bins(result, bins)
+
+        self.number_of_images = len(result)
+        self.number_of_localized_positions = len(positions_errors)
+        self.number_of_localized_rotations = len(rotation_errors)
+
+        self.mean_localized_positions = mean_localized_positions
+        self.mean_localized_rotations = mean_localized_rotations
+
+        self.median_localized_positions = median_localized_positions
+        self.median_localized_rotations = median_localized_rotations
+
+        self.median_all_positions = median_all_positions
+        self.median_all_rotations = median_all_rotations
+
+        self.min_position_error = min_position_error
+        self.min_rotation_error = min_rotation_error
+
+        self.max_position_error = max_position_error
+        self.max_rotation_error = max_rotation_error
+
+        self.filled_bins = filled_bins

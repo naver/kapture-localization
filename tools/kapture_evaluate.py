@@ -10,14 +10,12 @@ import logging
 import os
 import os.path as path
 import numpy as np
-from statistics import mean, median
-from math import isnan
 from typing import List, Tuple
 from tabulate import tabulate
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
-from kapture_localization.evaluation import evaluate, fill_bins
+from kapture_localization.evaluation import evaluate, EvaluationStatistics
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -81,40 +79,34 @@ def write_statistics_to_file(output_folder: str,
     for i in range(0, len(results)):
         label = labels[i]
         result = results[i]
-        number_of_images = len(result)
-
-        positions_errors_all = [position_error if not isnan(position_error) else float("inf")
-                                for name, position_error, rotation_error in result]
-        rotation_errors_all = [rotation_error if not isnan(rotation_error) else float("inf")
-                               for name, position_error, rotation_error in result]
-
-        positions_errors = [position_error
-                            for name, position_error, rotation_error in result if not isnan(position_error)]
-        rotation_errors = [rotation_error
-                           for name, position_error, rotation_error in result if not isnan(rotation_error)]
+        evaluation_statistics = EvaluationStatistics(result, bins)
+        number_of_images = evaluation_statistics.number_of_images
 
         print_line += 'Model: {}\n\n'.format(label)
         print_line += 'Found {} / {} image positions ({:.2f} %).\n'.format(
-            len(positions_errors), number_of_images, float(100.0*len(positions_errors)/number_of_images))
+            evaluation_statistics.number_of_localized_positions, number_of_images,
+            float(100.0*evaluation_statistics.number_of_localized_positions/number_of_images))
         print_line += 'Found {} / {} image rotations ({:.2f} %).\n'.format(
-            len(rotation_errors), number_of_images, float(100.0*len(rotation_errors)/number_of_images))
+            evaluation_statistics.number_of_localized_rotations, number_of_images,
+            float(100.0*evaluation_statistics.number_of_localized_rotations/number_of_images))
 
         print_line += 'Localized images: mean=({:.4f}m, {:.4f} deg) / median=({:.4f}m, {:.4f} deg)\n'.format(
-            mean(positions_errors),
-            mean(rotation_errors),
-            median(positions_errors),
-            median(rotation_errors))
-        print_line += 'All: median=({:.4f}m, {:.4f} deg)\n'.format(median(positions_errors_all),
-                                                                   median(rotation_errors_all))
-        print_line += 'Min: {:.4f}m; {:.4f} deg\n'.format(min(positions_errors), min(rotation_errors))
-        print_line += 'Max: {:.4f}m; {:.4f} deg\n\n'.format(max(positions_errors), max(rotation_errors))
+            evaluation_statistics.mean_localized_positions,
+            evaluation_statistics.mean_localized_rotations,
+            evaluation_statistics.median_localized_positions,
+            evaluation_statistics.median_localized_rotations)
+        print_line += 'All: median=({:.4f}m, {:.4f} deg)\n'.format(evaluation_statistics.median_all_positions,
+                                                                   evaluation_statistics.median_all_rotations)
+        print_line += 'Min: {:.4f}m; {:.4f} deg\n'.format(evaluation_statistics.min_position_error,
+                                                          evaluation_statistics.min_rotation_error)
+        print_line += 'Max: {:.4f}m; {:.4f} deg\n\n'.format(evaluation_statistics.max_position_error,
+                                                            evaluation_statistics.max_rotation_error)
 
-        filled_bins = fill_bins(result, bins)
         bins_lines = ['({}m, {} deg): {:.2f}%\n'.format(
             position_error,
             rotation_error,
             (number_of_images_in_bin / number_of_images) * 100.0)
-            for position_error, rotation_error, number_of_images_in_bin in filled_bins]
+            for position_error, rotation_error, number_of_images_in_bin in evaluation_statistics.filled_bins]
         print_line += ''.join(bins_lines)
         print_line += '\n'
         bins_table_data.append([label, *[bins_line.rstrip().split(': ')[1] for bins_line in bins_lines]])
