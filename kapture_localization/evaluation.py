@@ -118,6 +118,12 @@ class EvaluationStatistics:
 
     def __init__(self, result: List[Tuple[str, float, float]],
                  bins: List[Tuple[float, float]]):
+        """
+        [summary]
+
+        :param result: output of evaluate, list of name, position_error, rotation_error
+        :param bins: list of (position_threshold, rotation_threshold in degree)
+        """
         positions_errors_all = [position_error if not math.isnan(position_error) else float("inf")
                                 for _, position_error, _ in result]
         rotation_errors_all = [rotation_error if not math.isnan(rotation_error) else float("inf")
