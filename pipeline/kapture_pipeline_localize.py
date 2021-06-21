@@ -248,7 +248,8 @@ def localize_pipeline(kapture_map_path: str,
                                 '-o', LTVL2020_output_path]
         if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
             export_LTVL2020_args.append('-p')
-        elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station or BenchmarkFormatStyle.RobotCar_Seasons:
+        elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
+                or BenchmarkFormatStyle.Hyundai_Department_Store:
             export_LTVL2020_args.append('--full_file_name')
         elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
             export_LTVL2020_args.append('--full_file_name')

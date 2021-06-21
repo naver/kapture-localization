@@ -161,7 +161,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
             export_LTVL2020_args.append('-p')
         elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                or BenchmarkFormatStyle.RobotCar_Seasons:
+                or BenchmarkFormatStyle.Hyundai_Department_Store:
             export_LTVL2020_args.append('--full_file_name')
         elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
             export_LTVL2020_args.append('--full_file_name')
