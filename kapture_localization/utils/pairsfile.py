@@ -1,6 +1,5 @@
-
-import kapture
 import kapture_localization.utils.path_to_kapture  # noqa: F401
+import kapture
 from kapture_localization.utils.logging import getLogger
 from kapture.io.csv import table_from_file
 from collections import OrderedDict

@@ -227,7 +227,10 @@ image::../doc/colmap_mapping.jpg[reconstruction]
 ----
 # If the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
-# For RobotCar or RobotCar_v2 --prepend_cam needs to be added.
+# For RobotCar or RobotCar_v2 --benchmark-style RobotCar_Seasons needs to be added.
+# For Gangnam_Station --benchmark-style Gangnam_Station
+# For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
+# For RIO10 --benchmark-style RIO10
 kapture_pipeline_localize.py -v info \
       -i ./mapping \
       --query ./query \
@@ -311,7 +314,10 @@ curl -C - --output ./vocab_tree_flickr100K_words32K.bin --url https://demuc.de/c
 ----
 # if the COLMAP executable is not available from PATH,
 # the parameter -colmap needs to be set. example -colmap C:/Workspace/dev/colmap/colmap.bat
-# For RobotCar or RobotCar_v2 --prepend_cam needs to be added
+# For RobotCar or RobotCar_v2 --benchmark-style RobotCar_Seasons needs to be added.
+# For Gangnam_Station --benchmark-style Gangnam_Station
+# For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
+# For RIO10 --benchmark-style RIO10
 kapture_pipeline_colmap_vocab_tree.py -v info \
         -i ./mapping \
         --query ./query \
@@ -402,7 +408,10 @@ Example using the small virtual gallery dataset from above:
 ----
 # if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
-# for RobotCar or RobotCar_v2 --prepend_cam needs to be added
+# For RobotCar or RobotCar_v2 --benchmark-style RobotCar_Seasons needs to be added.
+# For Gangnam_Station --benchmark-style Gangnam_Station
+# For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
+# For RIO10 --benchmark-style RIO10
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i ./mapping \
       --query ./query \

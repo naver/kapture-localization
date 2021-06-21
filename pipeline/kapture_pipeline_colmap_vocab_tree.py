@@ -16,6 +16,7 @@ import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
 from kapture_localization.utils.subprocess import run_python_command
 from kapture_localization.colmap.colmap_command import CONFIGS
+from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
@@ -32,7 +33,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                vocab_tree_path: str,
                                mapping_config: int,
                                localize_config: int,
-                               prepend_cam: bool,
+                               benchmark_format_style: BenchmarkFormatStyle,
                                bins_as_str: List[str],
                                skip_list: List[str],
                                force_overwrite_existing: bool) -> None:
@@ -57,8 +58,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
     :type mapping_config: int
     :param localize_config: index of the config parameters to use for image registrator
     :type localize_config: int
-    :param prepend_cam: prepend camera names to filename in LTVL2020 formatted output
-    :type prepend_cam: bool
+    :param benchmark_format_style: LTVL2020/RIO10 format output style
     :param bins_as_str: list of bin names
     :type bins_as_str: List[str]
     :param skip_list: list of steps to ignore
@@ -158,8 +158,15 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         export_LTVL2020_args = ['-v', str(logger.level),
                                 '-i', kapture_localize_recover_path,
                                 '-o', LTVL2020_output_path]
-        if prepend_cam:
+        if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
             export_LTVL2020_args.append('-p')
+        elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
+                or BenchmarkFormatStyle.RobotCar_Seasons:
+            export_LTVL2020_args.append('--full_file_name')
+        elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
+            export_LTVL2020_args.append('--full_file_name')
+            export_LTVL2020_args.append('--truncate_extensions')
+            export_LTVL2020_args.append('--inverse-pose')
         if force_overwrite_existing:
             export_LTVL2020_args.append('-f')
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
@@ -206,9 +213,15 @@ def colmap_vocab_tree_pipeline_command_line():
                         choices=[0, 1], help='what config to use for point triangulator')
     parser.add_argument('--localize-config', default=1, type=int,
                         choices=list(range(len(CONFIGS))), help='what config to use for image registrator')
-    parser.add_argument('--prepend_cam', action='store_true', default=False,
-                        help=('prepend camera names to filename in LTVL2020 formatted output. '
-                              'Toggle this only for RobotCar_Seasons and RobotCar Seasons v2'))
+    parser.add_argument('--benchmark-style',
+                        default=BenchmarkFormatStyle.Default,
+                        type=BenchmarkFormatStyle,
+                        choices=list(BenchmarkFormatStyle),
+                        help=('select which output format to use for the export_LTVL2020 part.'
+                              ' Default is the https://www.visuallocalization.net default. '
+                              '     RobotCar_Seasons, Gangnam_Station, Hyundai_Department_Store are also part of'
+                              ' https://www.visuallocalization.net but require a different format.'
+                              ' RIO10 is for http://vmnavab26.in.tum.de/RIO10/'))
     parser.add_argument('--bins', nargs='+', default=["0.25 2", "0.5 5", "5 10"],
                         help='the desired positions/rotations thresholds for bins'
                         'format is string : position_threshold_in_m space rotation_threshold_in_degree')
@@ -243,7 +256,7 @@ def colmap_vocab_tree_pipeline_command_line():
                                args.vocab_tree_path,
                                args.mapping_config,
                                args.localize_config,
-                               args.prepend_cam,
+                               args.benchmark_style,
                                args.bins,
                                args.skip,
                                args.force)

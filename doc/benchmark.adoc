@@ -372,7 +372,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2 \
-      --prepend_cam # important for RobotCar (needed for visuallocalization.net)
+      --benchmark-style RobotCar_Seasons # important for RobotCar (needed for visuallocalization.net)
 ```
 
 The benchmark script will execute the following commands:
