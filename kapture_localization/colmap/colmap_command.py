@@ -374,7 +374,8 @@ def run_image_registrator(colmap_binary_path: str,
 
 def run_model_converter(colmap_binary_path: str,
                         input_path: str,
-                        output_path: str) -> None:
+                        output_path: str,
+                        output_type: str = 'TXT') -> None:
     """
     run colmap model_converter with --output_type TXT:
      convert reconstruction from binary files to TXT files
@@ -392,7 +393,7 @@ def run_model_converter(colmap_binary_path: str,
                             "--output_path",
                             output_path,
                             "--output_type",
-                            "TXT"]
+                            output_type]
     run_colmap_command(colmap_binary_path, model_converter_args)
 
 
