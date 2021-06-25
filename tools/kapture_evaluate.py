@@ -232,7 +232,7 @@ def evaluate_command_line() -> None:
                         help='output directory.', required=True)
     parser.add_argument('-l', '--image-list', default="",
                         help='optional, path to a text file containing the list of images to consider'
-                        ' (1 line per image). if not present, all gt images are used')
+                        ' (1 line per image or a pairsfile). if not present, all gt images are used')
     parser.add_argument('--bins', nargs='+', default=["0.25 2", "0.5 5", "5 10"],
                         help='the desired positions/rotations thresholds for bins'
                         'format is string : position_threshold_in_m space rotation_threshold_in_degree')
@@ -279,7 +279,8 @@ def evaluate_command_line() -> None:
 
         if args.image_list:
             with open(args.image_list, 'r') as fid:
-                image_set = {line[0] for line in table_from_file(fid)}
+                table = table_from_file(fid)
+                image_set = {line[0] for line in table}
         else:
             if gt_kapture.rigs is not None:
                 gt_trajectories = kapture.rigs_remove(gt_kapture.trajectories, gt_kapture.rigs)

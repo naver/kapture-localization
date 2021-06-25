@@ -52,6 +52,23 @@ def convert_pairs_to_hloc_format(pairsfile_path_kapture: str, pairsfile_path_hlo
             fid.write(f'{query_name} {map_name}\n')
 
 
+def convert_kapture_to_hloc_image_list(kapture_path: str, output_path: str):
+    """
+    convert kapture records_camera to hloc image list
+    """
+    skip_heavy_useless = [kapture.Trajectories,
+                          kapture.RecordsLidar, kapture.RecordsWifi,
+                          kapture.Keypoints, kapture.Descriptors, kapture.GlobalFeatures,
+                          kapture.Matches, kapture.Points3d, kapture.Observations]
+    kapture_to_convert = kapture_from_dir(kapture_path, skip_list=skip_heavy_useless)
+    output_content = []
+    for _, sensor_id, filename in kapture.flatten(kapture_to_convert.records_camera, is_sorted=True):
+        line = filename
+        output_content.append(line)
+    with open(output_path, 'w') as fid:
+        fid.write('\n'.join(output_content))
+
+
 def export_image_list(kapture_path: str, output_path: str):
     """
     export from kapture to image list with camera params
@@ -148,10 +165,14 @@ def hloc_pipeline_from_kapture_dataset(kapture_path_map: str,
 
     feature_path = Path(output_dir, feature_conf['output']+'.h5')
     if "extract_features_map" not in skip_list:
-        feature_path_map = extract_features.main(feature_conf, Path(images_map), Path(output_dir))
+        image_list_map_path = path.join(output_dir, 'image_list_map.txt')
+        convert_kapture_to_hloc_image_list(kapture_path_map, image_list_map_path)
+        feature_path_map = extract_features.main(feature_conf, Path(images_map), Path(output_dir), image_list=Path(image_list_map_path))
         assert feature_path_map.resolve() == feature_path.resolve()
     if "extract_features_query" not in skip_list:
-        feature_path_query = extract_features.main(feature_conf, Path(images_query), Path(output_dir))
+        image_list_query_path = path.join(output_dir, 'image_list_query.txt')
+        convert_kapture_to_hloc_image_list(kapture_path_query, image_list_query_path)
+        feature_path_query = extract_features.main(feature_conf, Path(images_query), Path(output_dir), image_list=Path(image_list_query_path))
         assert feature_path_query.resolve() == feature_path.resolve()
 
     pairsfile_path_map_pathlib = Path(pairsfile_path_map)
