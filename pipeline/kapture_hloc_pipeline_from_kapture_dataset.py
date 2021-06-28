@@ -167,12 +167,14 @@ def hloc_pipeline_from_kapture_dataset(kapture_path_map: str,
     if "extract_features_map" not in skip_list:
         image_list_map_path = path.join(output_dir, 'image_list_map.txt')
         convert_kapture_to_hloc_image_list(kapture_path_map, image_list_map_path)
-        feature_path_map = extract_features.main(feature_conf, Path(images_map), Path(output_dir), image_list=Path(image_list_map_path))
+        feature_path_map = extract_features.main(feature_conf, Path(
+            images_map), Path(output_dir), image_list=Path(image_list_map_path))
         assert feature_path_map.resolve() == feature_path.resolve()
     if "extract_features_query" not in skip_list:
         image_list_query_path = path.join(output_dir, 'image_list_query.txt')
         convert_kapture_to_hloc_image_list(kapture_path_query, image_list_query_path)
-        feature_path_query = extract_features.main(feature_conf, Path(images_query), Path(output_dir), image_list=Path(image_list_query_path))
+        feature_path_query = extract_features.main(feature_conf, Path(
+            images_query), Path(output_dir), image_list=Path(image_list_query_path))
         assert feature_path_query.resolve() == feature_path.resolve()
 
     pairsfile_path_map_pathlib = Path(pairsfile_path_map)
@@ -280,13 +282,13 @@ def hloc_pipeline_from_kapture_dataset_command_line():
     parser.add_argument('-o', '--output', required=True,
                         help='output directory.')
     parser.add_argument('--feature-conf',
-                        default='d2net-ss',
+                        default='superpoint_max', choices=list(extract_features.confs.keys()),
                         type=str,
-                        help='features to use in hloc; see hloc.extract_features.confs')
+                        help='features to use in hloc')
     parser.add_argument('--matcher-conf',
-                        default='NN',
+                        default='superglue', choices=list(match_features.confs.keys()),
                         type=str,
-                        help='matcher to use in hloc; see hloc.match_features.confs')
+                        help='matcher to use in hloc')
     parser.add_argument('--covisibility-clustering', action='store_true', default=False, required=False,
                         help='use covisibility_clustering=True in hloc localize')
     parser.add_argument('--bins', nargs='+', default=["0.25 2", "0.5 5", "5 10"],
