@@ -284,8 +284,6 @@ def localize_pipeline_command_line():
                         help='input path to the orphan keypoints folder')
     parser.add_argument('-desc', '--descriptors-path', required=True,
                         help='input path to the orphan descriptors folder')
-    parser.add_argument('-gfeat', '--global-features-path', required=True,
-                        help='input path to the orphan global features folder')
     parser_pairing = parser.add_mutually_exclusive_group(required=True)
     parser_pairing.add_argument('-gfeat', '--global-features-path', default=None,
                                 help='input path to the orphan global features folder')
