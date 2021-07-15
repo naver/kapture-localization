@@ -243,9 +243,7 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
 
 def get_pycolmap_localize_argparser():
     parser = argparse.ArgumentParser(description=('localize images with pycolmap '
-                                                  'from data specified in kapture format.'
-                                                  'Only images and cameras are taken into account '
-                                                  ' (no features or matches)'))
+                                                  'from data specified in kapture format.'))
     parser_verbosity = parser.add_mutually_exclusive_group()
     parser_verbosity.add_argument('-v', '--verbose', nargs='?', default=logging.WARNING, const=logging.INFO,
                                   action=kapture.utils.logging.VerbosityParser,
