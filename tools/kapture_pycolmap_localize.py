@@ -276,9 +276,9 @@ def get_pycolmap_localize_argparser():
                         default=RerankCorrespondencesStrategy.none,
                         type=RerankCorrespondencesStrategy,
                         choices=list(RerankCorrespondencesStrategy),
-                        help=('reran strategy before ignore'))
+                        help=('rerank strategy before ignore'))
     parser.add_argument('--write-detailed-report', action='store_true', default=False,
-                        help='refine poses with pycolmap.')
+                        help='write inliers and reprojection error in a json for each query.')
     return parser
 
 
