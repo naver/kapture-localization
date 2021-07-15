@@ -3,7 +3,6 @@
 
 """
 This script localize images using pycolmap from kapture format
-images, cameras, trajectories: no features or matches!
 """
 
 import argparse
