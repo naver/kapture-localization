@@ -16,8 +16,8 @@ try:
     from pprint import pformat  # noqa: F401
     import h5py  # noqa: F401
     import cv2  # noqa: F401
-    from hloc import extract_features, match_features, pairs_from_covisibility
-    from hloc import triangulation, localize_sfm, visualization
+    from hloc import extract_features, match_features, pairs_from_covisibility  # noqa: F401
+    from hloc import triangulation, localize_sfm, visualization  # noqa: F401
 except Exception as e:
     raise ImportError(f' {e} hloc have additional requirements compared to kapture-localization, '
                       'please see https://github.com/cvg/Hierarchical-Localization/blob/master/requirements.txt '
