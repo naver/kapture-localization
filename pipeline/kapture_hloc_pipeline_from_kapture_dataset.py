@@ -216,7 +216,7 @@ def hloc_pipeline_from_kapture_dataset(kapture_path_map: str,
     results_file = path.join(output_dir, f'results_{feature_conf_str}_{matcher_conf_str}.txt')
     if 'localize' not in skip_list:
         localize_sfm.main(
-            Path(triangulate_path) / 'model',
+            Path(triangulate_path),
             Path(query_as_txt),
             pairsfile_path_query_pathlib,
             feature_path,
