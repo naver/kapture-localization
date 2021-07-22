@@ -92,6 +92,8 @@ NOTE: __kapture-localization__ can also work as a stand-alone, without being ins
 In addition to the package (<<pip: the simple way>>) requirements, you need to install __git__,
 and optionally (for documentation), __pandoc__ and __asciidoctor__.
 
+When you install __kapture-localization__ from source, you should also install __kapture__ from source, as the most recent changes in __kapture-localization__ might use code from __kapture__ which are not part of a release or pushed to pip yet.
+
 === Linux (Ubuntu 18.04 LTS)
 
 In a terminal, do:
