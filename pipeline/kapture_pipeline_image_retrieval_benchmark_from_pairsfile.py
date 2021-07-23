@@ -14,7 +14,7 @@ from typing import List, Optional
 
 import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
-from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy
+from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy_single_features
 from kapture_localization.utils.subprocess import run_python_command
 from kapture_localization.colmap.colmap_command import CONFIGS
 from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
@@ -112,29 +112,29 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
     # build proxy kapture map in output folder
     proxy_kapture_map_path = path.join(localization_output_path, 'kapture_inputs/proxy_mapping')
-    create_kapture_proxy(proxy_kapture_map_path,
-                         kapture_map_path,
-                         keypoints_path,
-                         descriptors_path,
-                         None,
-                         matches_path,
-                         keypoints_type,
-                         descriptors_type,
-                         None,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_map_path,
+                                         kapture_map_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         None,
+                                         matches_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         None,
+                                         force_overwrite_existing)
 
     # build proxy kapture query in output folder
     proxy_kapture_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_query')
-    create_kapture_proxy(proxy_kapture_query_path,
-                         kapture_query_path,
-                         keypoints_path,
-                         descriptors_path,
-                         None,
-                         matches_path,
-                         keypoints_type,
-                         descriptors_type,
-                         None,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_query_path,
+                                         kapture_query_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         None,
+                                         matches_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         None,
+                                         force_overwrite_existing)
 
     # kapture_merge.py
     if merge_path is None:
@@ -150,16 +150,16 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
     # build proxy kapture map+query in output folder
     proxy_kapture_map_plus_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query')
-    create_kapture_proxy(proxy_kapture_map_plus_query_path,
-                         map_plus_query_path,
-                         keypoints_path,
-                         descriptors_path,
-                         None,
-                         matches_path,
-                         keypoints_type,
-                         descriptors_type,
-                         None,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_map_plus_query_path,
+                                         map_plus_query_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         None,
+                                         matches_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         None,
+                                         force_overwrite_existing)
 
     # kapture_compute_matches.py
     if 'compute_matches' not in skip_list:
@@ -171,16 +171,16 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
     # build proxy gv kapture in output folder
     proxy_kapture_map_plus_query_gv_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query_gv')
-    create_kapture_proxy(proxy_kapture_map_plus_query_gv_path,
-                         map_plus_query_path,
-                         keypoints_path,
-                         descriptors_path,
-                         None,
-                         matches_gv_path,
-                         keypoints_type,
-                         descriptors_type,
-                         None,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_map_plus_query_gv_path,
+                                         map_plus_query_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         None,
+                                         matches_gv_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         None,
+                                         force_overwrite_existing)
 
     # kapture_run_colmap_gv.py
     if 'geometric_verification' not in skip_list:

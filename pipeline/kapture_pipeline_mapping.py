@@ -14,7 +14,7 @@ from typing import List, Optional
 
 import pipeline_import_paths  # noqa: F401
 import kapture_localization.utils.logging
-from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy
+from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy_single_features
 from kapture_localization.utils.subprocess import run_python_command
 from kapture_localization.colmap.colmap_command import CONFIGS
 
@@ -73,16 +73,16 @@ def mapping_pipeline(kapture_path: str,
 
     # build proxy kapture in output folder
     proxy_kapture_path = path.join(colmap_map_path, 'kapture_inputs/proxy_mapping')
-    create_kapture_proxy(proxy_kapture_path,
-                         kapture_path,
-                         keypoints_path,
-                         descriptors_path,
-                         global_features_path,
-                         matches_path,
-                         keypoints_type,
-                         descriptors_type,
-                         global_features_type,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_path,
+                                         kapture_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         global_features_path,
+                                         matches_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         global_features_type,
+                                         force_overwrite_existing)
 
     # kapture_compute_image_pairs.py
     if global_features_path is not None and 'compute_image_pairs' not in skip_list:
@@ -107,16 +107,16 @@ def mapping_pipeline(kapture_path: str,
 
     # build proxy gv kapture in output folder
     proxy_kapture_gv_path = path.join(colmap_map_path, 'kapture_inputs/proxy_mapping_gv')
-    create_kapture_proxy(proxy_kapture_gv_path,
-                         kapture_path,
-                         keypoints_path,
-                         descriptors_path,
-                         global_features_path,
-                         matches_gv_path,
-                         keypoints_type,
-                         descriptors_type,
-                         global_features_type,
-                         force_overwrite_existing)
+    create_kapture_proxy_single_features(proxy_kapture_gv_path,
+                                         kapture_path,
+                                         keypoints_path,
+                                         descriptors_path,
+                                         global_features_path,
+                                         matches_gv_path,
+                                         keypoints_type,
+                                         descriptors_type,
+                                         global_features_type,
+                                         force_overwrite_existing)
 
     # kapture_run_colmap_gv.py
     if 'geometric_verification' not in skip_list:
