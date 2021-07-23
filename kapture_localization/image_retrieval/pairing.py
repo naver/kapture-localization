@@ -58,7 +58,7 @@ def get_similarity_matrix(query_features: StackedGlobalFeatures, map_features: S
 def get_similarity(query_features: StackedGlobalFeatures,
                    map_features: StackedGlobalFeatures) -> Dict[str, List[Tuple[str, float]]]:
     """
-    get similarity in the form of a dictionary dictionary
+    get similarity in the form of a dictionary
 
     :param query_features: stacked query global features
     :type query_features: StackedGlobalFeatures
@@ -68,13 +68,23 @@ def get_similarity(query_features: StackedGlobalFeatures,
     :rtype: Dict[str, List[Tuple[str, float]]]
     """
     similarity_matrix = get_similarity_matrix(query_features, map_features)
+    return get_similarity_dict_from_similarity_matrix(similarity_matrix, query_features.index, map_features.index)
 
+
+def get_similarity_dict_from_similarity_matrix(
+    similarity_matrix: np.ndarray,
+    query_features_index: Union[np.array, List[str]],
+    map_features_index: Union[np.array, List[str]],
+) -> Dict[str, List[Tuple[str, float]]]:
+    """
+    convert similarity_matrix to a dictionary
+    """
     similarity_dict = {}
     for i, line in enumerate(similarity_matrix):
         scores = line
         indexes = np.argsort(-scores)
-        query_name = query_features.index[i]
-        similarity_dict[query_name] = list(zip(map_features.index[indexes], scores[indexes]))
+        query_name = query_features_index[i]
+        similarity_dict[query_name] = list(zip(map_features_index[indexes], scores[indexes]))
     return similarity_dict
 
 
