@@ -13,7 +13,7 @@ For both pipelines (custom and COLMAP), we explain how to build a map using stru
 
 We will use the `virtual_gallery_tutorial` dataset as an example. It is a subset of the https://europe.naverlabs.com/research/3d-vision/virtual-gallery-dataset/[virtual gallery dataset].
 The sample dataset can be found in the `samples/` folder.
-The tutorial can be used for any dataset that follows the <<recommended dataset structure>>.
+The tutorial can be used for any dataset that follows the <<Recommended dataset structure>>.
 Further information about the pipelines can be found in link:../pipeline/README.adoc[pipeline/README].
 
 If you use this work for your research, please cite the respective paper:
@@ -132,7 +132,7 @@ cd kapture-localization
 
 == Prepare data
 
-Before going through the <<kapture pipeline>>, __local features__ and __global features__ have to be extracted for each image.
+Before going through the kapture pipelines, __local features__ and __global features__ have to be extracted for each image.
 
 .precomputed features
 For easy use of this tutorial, we provide precomputed local and global features (virtual_gallery_tutorial):
@@ -152,7 +152,7 @@ For example, __AP-GeM__ global features can be extracted using https://github.co
 in the https://github.com/naver/deep-image-retrieval#feature-extraction-with-kapture-datasets[deep-image-retrieval git repository]
 See https://github.com/naver/kapture#global-features[here] for more global feature types that are directly supported in kapture.
 
-Features for mapping and query images need to be in the same folder (see the <<recommended dataset structure>> above).
+Features for mapping and query images need to be in the same folder (see the <<Recommended dataset structure>> above).
 
 .previous experiments
 To be sure starting from scratch, unwanted files (e.g. previous experiments) should be deleted before running this tutorial.
@@ -205,7 +205,7 @@ colmap gui \
 ----
 
 NOTE: For Windows user, replace "colmap" with the full path to "colmap.bat",
-as described in <<install kapture-localization>>.
+as described in <<Install kapture-localization>>.
 
 NOTE: For older versions of COLMAP (< 3.6) the model needs to be imported manually: menu `file` > `import model` > browse to
 `colmap-sfm/r2d2_500/AP-GeM-LM18_top5/reconstruction` >  click `yes` and `save` in the following two dialogs.
@@ -296,10 +296,10 @@ image::../doc/colmap_localized.jpg[localized]
 
 == Kapture pipeline (COLMAP)
 
-In contrast to <<kapture pipeline>>, this section walks through a simpler pipeline fully based on COLMAP using SIFT local features
+This section describes a simpler pipeline fully based on COLMAP using SIFT local features
 and Vocabulary Tree matching.
 
-This tutorial also needs to be started from scratch. To clean unwanted files (e.g. previous experiments) see <<preparing data>>.
+This tutorial also needs to be started from scratch. To clean unwanted files (e.g. previous experiments) see <<Prepare data>>.
 
 As keypoint matching is done with a vocabulary tree, an index file can be downloaded from https://demuc.de/colmap/.
 In this tutorial, we will use `vocab_tree_flickr100K_words32K.bin`.
