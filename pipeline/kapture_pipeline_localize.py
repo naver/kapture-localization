@@ -329,7 +329,7 @@ def localize_pipeline_command_line():
     parser.add_argument('--bins', nargs='+', default=["0.25 2", "0.5 5", "5 10"],
                         help='the desired positions/rotations thresholds for bins'
                         'format is string : position_threshold_in_m space rotation_threshold_in_degree')
-    parser.add_argument('-s', '--skip', choices=['compute_image_pairs'
+    parser.add_argument('-s', '--skip', choices=['compute_image_pairs',
                                                  'compute_matches',
                                                  'geometric_verification',
                                                  'colmap_localize',
