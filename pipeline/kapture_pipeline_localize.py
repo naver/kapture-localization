@@ -6,7 +6,6 @@ This script localize images on an existing COLMAP model (map)
 """
 
 import argparse
-from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 import logging
 import os
 import os.path as path
