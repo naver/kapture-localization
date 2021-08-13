@@ -2,16 +2,19 @@
 # but first pull the most recent version.
 
 # docker pull kapture/kapture-localization
-# docker run --runtime=nvidia -it --rm --volume /tmp-network:/tmp-network kapture/kapture-localization
+# docker run --runtime=nvidia -it --rm --volume <my_data>:<my_data> kapture/kapture-localization
 # once the docker container is launched, go to your working directory of your choice (all data will be stored there)
 # and run this script from there (of course you can also change WORKING_DIR=${PWD} to something else and run the script from somewhere else)
 
-# 0a) Define paths
+# 0a) Define paths and params
 PYTHONBIN=python3.6
 WORKING_DIR=${PWD}
 DATASETS_PATH=${WORKING_DIR}/datasets
 DATASET=Aachen-Day-Night-v1.1
 mkdir -p ${DATASETS_PATH}
+
+TOPK=20  # number of retrieved images for mapping and localization
+KPTS=20000 # number of local features to extract
 
 # 0b) Get extraction code for local and global features
 # ! skip if already done !
@@ -64,7 +67,7 @@ rm -rf ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/global_features/R
 
 # 5) Extract local features (we will use R2D2 here)
 cd ${WORKING_DIR}/r2d2
-${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_query/ --top-k 20000 --max-size 1024
+${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_query/ --min-scale 0.3 --min-size 128 --max-scale 9999 --max-keypoints ${KPTS}
 # move to right location
 mkdir -p ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors
 mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors/
@@ -73,15 +76,16 @@ mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/keypoints/r2d2_WASF_N
 
 # 6) mapping pipeline
 LOCAL=r2d2_WASF_N8_big
+GLOBAL=Resnet101-AP-GeM-LM18
 kapture_pipeline_mapping.py -v debug -f \
   -i ${WORKING_DIR}/${DATASET}/mapping \
   -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
   -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
-  -gfeat ${WORKING_DIR}/${DATASET}/global_features/Resnet101-AP-GeM-LM18/global_features \
+  -gfeat ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features \
   -matches ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_no_gv/matches \
   -matches-gv ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_colmap_gv/matches \
-  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/Resnet101-AP-GeM-LM18 \
-  --topk 20
+  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/${GLOBAL} \
+  --topk ${TOPK}
 
 # 7) localization pipeline
 kapture_pipeline_localize.py -v debug -f \
@@ -89,10 +93,10 @@ kapture_pipeline_localize.py -v debug -f \
   --query ${WORKING_DIR}/${DATASET}/query \
   -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
   -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
-  -gfeat ${WORKING_DIR}/${DATASET}/global_features/Resnet101-AP-GeM-LM18/global_features \
+  -gfeat ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features \
   -matches ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_no_gv/matches \
   -matches-gv ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_colmap_gv/matches \
-  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/Resnet101-AP-GeM-LM18 \
-  -o ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/Resnet101-AP-GeM-LM18 \
-  --topk 20 \
+  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/${GLOBAL} \
+  -o ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/${GLOBAL} \
+  --topk ${TOPK} \
   --config 2

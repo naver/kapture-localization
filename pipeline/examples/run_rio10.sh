@@ -5,7 +5,7 @@
 # but first pull the most recent version.
 
 # docker pull kapture/kapture-localization
-# docker run --runtime=nvidia -it --rm --volume /tmp-network:/tmp-network kapture/kapture-localization
+# docker run --runtime=nvidia -it --rm --volume <my_data>:<my_data> kapture/kapture-localization
 # once the docker container is launched, go to your working directory of your choice (all data will be stored there)
 # and run this script from there (of course you can also change WORKING_DIR=${PWD} to something else and run the script from somewhere else)
 
@@ -15,6 +15,9 @@ WORKING_DIR=${PWD}
 DATASETS_PATH=${WORKING_DIR}/datasets
 DATASET=RIO10
 mkdir -p ${DATASETS_PATH}
+
+TOPK=20  # number of retrieved images for mapping and localization
+KPTS=20000 # number of local features to extract
 
 # 0b) Download RIO10 dataset
 ${PYTHONBIN} ${DATASETS_PATH}/download.py -o ${DATASETS_PATH} --type=kapture --id 3
@@ -71,7 +74,7 @@ for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 sce
 
   # 4) Extract local features (we will use R2D2 here)
   cd ${WORKING_DIR}/r2d2
-  ${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_testing/ --top-k 20000 --max-size 1024
+  ${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_testing/ --min-scale 0.3 --min-size 128 --max-scale 9999 --max-keypoints ${KPTS}
   # move to right location
   mkdir -p ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors
   mv ${WORKING_DIR}/${DATASET}/map_plus_testing/reconstruction/descriptors/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors/
@@ -81,7 +84,6 @@ for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 sce
   # 5) mapping pipeline
   LOCAL=r2d2_WASF_N8_big
   GLOBAL=Resnet101-AP-GeM-LM18
-  TOPK=20
   kapture_pipeline_mapping.py -v debug -f \
     -i ${WORKING_DIR}/${DATASET}/mapping \
     -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
