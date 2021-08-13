@@ -294,6 +294,44 @@ colmap gui \
 [[fig_localized]]
 image::../doc/colmap_localized.jpg[localized]
 
+== Examples
+
+This section presents examples of how to use the custom pipeline with some public datasets. To use these examples with other datasets that are available in kapture format, only very little adaptions are needed (some parameters need to be changed; please see the documentation of the source code of the functions used for more details).
+
+We will use the pre-built docker container for these examples.
+```
+docker pull kapture/kapture-localization
+docker run --runtime=nvidia -it --rm --volume <my_data>:<my_data> kapture/kapture-localization
+```
+
+The path specified in WORKING_DIR (defined in the scripts) can be the same for all examples. There will be a subfolder that contains the downloaded datasets and a subfolder that contains the processed data for each example.
+
+=== Aachen Day-Night v.1.1
+
+1) Point WORKING_DIR in the script to a location where you want the dataset to be downloaded and processed data to be stored.
+
+2) Execute the script.
+```
+cd kapture-localization/pipeline/examples
+./run_aachen-v11.sh
+```
+
+3) If everything was successful, you should get a file named `LTVL2020_style_result.txt` in `${WORKING_DIR}/Aachen-Day-Night-v1.1/colmap-localize/r2d2_WASF-N8_20k/Resnet101-AP-GeM-LM18`. This file can be uploaded to the benchmark at https://www.visuallocalization.net.
+
+=== RIO10
+
+RIO10 consists of 10 individual scenes that are processed within a for loop. At the end, all result files are concatenated. If you only want to download and process one scene, please modify the script accordingly.
+
+1) Point WORKING_DIR in the script to a location where you want the dataset to be downloaded and processed data to be stored.
+
+2) Execute the script.
+```
+cd kapture-localization/pipeline/examples
+./run_rio10.sh
+```
+
+3) If everything was successful, you should get a file named `LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_AP-GeM-LM18.txt` in `${WORKING_DIR}/RIO10`. This file can be uploaded to the benchmark at https://waldjohannau.github.io/RIO10/.
+
 == Kapture pipeline (COLMAP)
 
 This section describes a simpler pipeline fully based on COLMAP using SIFT local features
