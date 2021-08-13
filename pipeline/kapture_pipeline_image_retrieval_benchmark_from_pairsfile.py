@@ -243,7 +243,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
             if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
                 export_LTVL2020_args.append('-p')
             elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or BenchmarkFormatStyle.Hyundai_Department_Store:
+                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
                 export_LTVL2020_args.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 export_LTVL2020_args.append('--full_file_name')
@@ -279,7 +279,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
             if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
                 export_LTVL2020_args.append('-p')
             elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or BenchmarkFormatStyle.Hyundai_Department_Store:
+                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
                 export_LTVL2020_args.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 export_LTVL2020_args.append('--full_file_name')
@@ -319,7 +319,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
             if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
                 args_append_array.append('-p')
             elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or BenchmarkFormatStyle.Hyundai_Department_Store:
+                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
                 args_append_array.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 args_append_array.append('--full_file_name')
