@@ -165,7 +165,7 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
             export_LTVL2020_args.append('--full_file_name')
         elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
             export_LTVL2020_args.append('--full_file_name')
-            export_LTVL2020_args.append('--truncate_extensions')
+            export_LTVL2020_args.append('--truncate-extensions')
             export_LTVL2020_args.append('--inverse-pose')
         if force_overwrite_existing:
             export_LTVL2020_args.append('-f')

@@ -254,7 +254,7 @@ def hloc_pipeline_from_kapture_dataset(kapture_path_map: str,
             export_LTVL2020_args.append('--full_file_name')
         elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
             export_LTVL2020_args.append('--full_file_name')
-            export_LTVL2020_args.append('--truncate_extensions')
+            export_LTVL2020_args.append('--truncate-extensions')
             export_LTVL2020_args.append('--inverse-pose')
         export_LTVL2020_args.append('-f')
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)

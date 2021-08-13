@@ -268,7 +268,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                 export_LTVL2020_args.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 export_LTVL2020_args.append('--full_file_name')
-                export_LTVL2020_args.append('--truncate_extensions')
+                export_LTVL2020_args.append('--truncate-extensions')
                 export_LTVL2020_args.append('--inverse-pose')
             if force_overwrite_existing:
                 export_LTVL2020_args.append('-f')
@@ -304,7 +304,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                 export_LTVL2020_args.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 export_LTVL2020_args.append('--full_file_name')
-                export_LTVL2020_args.append('--truncate_extensions')
+                export_LTVL2020_args.append('--truncate-extensions')
                 export_LTVL2020_args.append('--inverse-pose')
             if force_overwrite_existing:
                 export_LTVL2020_args.append('-f')
@@ -349,7 +349,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                 args_append_array.append('--full_file_name')
             elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
                 args_append_array.append('--full_file_name')
-                args_append_array.append('--truncate_extensions')
+                args_append_array.append('--truncate-extensions')
                 args_append_array.append('--inverse-pose')
             if force_overwrite_existing:
                 args_append_array.append('-f')
