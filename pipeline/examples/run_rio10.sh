@@ -43,7 +43,7 @@ cd dirtorch/data/
 gdown --id 1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I # downloads a pre-trained model of AP-GeM
 unzip Resnet101-AP-GeM-LM18.pt.zip
 rm -rf Resnet101-AP-GeM-LM18.pt.zip
-R2D2
+# R2D2
 cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
 
