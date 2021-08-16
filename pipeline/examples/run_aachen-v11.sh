@@ -67,7 +67,7 @@ rm -rf ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/global_features/R
 
 # 5) Extract local features (we will use R2D2 here)
 cd ${WORKING_DIR}/r2d2
-${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_query/ --min-scale 0.3 --min-size 128 --max-scale 9999 --max-keypoints ${KPTS}
+${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_query/ --min-scale 0.3 --min-size 128 --max-scale 9999 --top-k ${KPTS}
 # move to right location
 mkdir -p ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors
 mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors/
