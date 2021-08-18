@@ -111,9 +111,6 @@ my_dataset
       └─ global_features
 ----
 
-WARNING: Windows users need to have the file extension `.py` associated to the python3.6 executable and elevated rights
-to allow symlink. They should also enable long paths. See link:installation.adoc[installation instructions] for more details.
-
 == Install kapture-localization
 
 See link:installation.adoc[] for more details.
@@ -122,6 +119,8 @@ For __Windows__ users: Please use `colmap.bat`. If the __colmap__ path is not av
 environment variable, you have to provide it to kapture tools through the parameter `-colmap`,
 e.g. `-colmap C:/Workspace/dev/colmap/colmap.bat`.
 
+WARNING: Windows users need to have the file extension `.py` associated to the python3.6 executable and elevated rights
+to allow symlink. They should also enable long paths. See link:installation.adoc[installation instructions] for more details.
 
 .using docker
 [source,bash]
