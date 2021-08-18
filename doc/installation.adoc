@@ -74,6 +74,16 @@ However, symbolic links are not fully supported on __windows__ platforms and may
 For most kapture scripts, you can use __copy__ or __skip__ as transfer mode in order to avoid this issue.
 For the pipeline scripts, you cannot avoid the use of symlinks and will have to run them as administrator.
 
+.Long Paths
+
+__kapture__ matches folder contains file with long names. When running the pipelines, you will most likely hit the 260 character filename limit. On Windows 10 version 1607 and later, you can enable long paths by running the following command in an elevated powershell prompt. More information https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=powershell[here]
+
+[source,bash]
+----
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+----
+
+
 .Python file extension
 You should have the file extension `.py` associated to the python 3.6 executable:
 

@@ -112,7 +112,7 @@ my_dataset
 ----
 
 WARNING: Windows users need to have the file extension `.py` associated to the python3.6 executable and elevated rights
-to allow symlink. See link:installation.adoc[installation instructions] for more details.
+to allow symlink. They should also enable long paths. See link:installation.adoc[installation instructions] for more details.
 
 == Install kapture-localization
 
