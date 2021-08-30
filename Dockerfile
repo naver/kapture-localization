@@ -53,9 +53,9 @@ RUN python3 -m pip install --upgrade setuptools wheel twine
 # ├── eigen
 # └── ceres
 
-# Eigen 3.2.10
+# Eigen 3.3.9
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 3.2.10 https://gitlab.com/libeigen/eigen.git eigen
+RUN     git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git eigen
 RUN     mkdir -p eigen/build
 WORKDIR ${SOURCE_PREFIX}/eigen/build
 RUN     cmake \
@@ -63,9 +63,9 @@ RUN     cmake \
          .. && \
         make ${MAKE_OPTIONS} && make install && make clean
 
-# ceres 1.14.0
+# ceres 2.0.0
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 1.14.0 https://github.com/ceres-solver/ceres-solver.git
+RUN     git clone -b 2.0.0 https://github.com/ceres-solver/ceres-solver.git
 RUN     mkdir -p ceres-solver/build
 WORKDIR ${SOURCE_PREFIX}/ceres-solver/build
 RUN     cmake \
@@ -78,9 +78,11 @@ RUN     cmake \
 
 # colmap
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 3.6-dev.3 https://github.com/colmap/colmap.git
-RUN     mkdir -p colmap/build
-WORKDIR colmap/build
+RUN     git clone -b dev https://github.com/colmap/colmap.git 
+WORKDIR ${SOURCE_PREFIX}/colmap
+RUN     git checkout 06a230fe9bea71170583dcd4e7acc14aac4ef2fb
+RUN     mkdir -p build
+WORKDIR ${SOURCE_PREFIX}/colmap/build
 RUN     cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DTESTS_ENABLED=OFF \
@@ -99,6 +101,11 @@ RUN      python3 -m pip install "torch==1.4.0" "torchvision==0.5.0" "scikit_lear
 RUN      python3 -m pip install -r requirements.txt --use-feature=2020-resolver
 RUN      python3 setup.py install
 
+######### PYCOLMAP #############################################################
+WORKDIR ${SOURCE_PREFIX}
+RUN     git clone --recursive https://github.com/mihaidusmanu/pycolmap.git
+WORKDIR ${SOURCE_PREFIX}/pycolmap
+RUN     python3 -m pip install ./
 
 ### FINALIZE ###################################################################
 # save space: purge apt-get
