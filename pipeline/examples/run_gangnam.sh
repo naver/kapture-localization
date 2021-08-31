@@ -1,6 +1,3 @@
-# IMPORTANT: in order to download RIO10, get download.py from the RIO10 website and put it in DATASETS_PATH
-# this script will us download.py and will not work without it
-
 # Run this script in docker,
 # but first pull the most recent version.
 
@@ -13,28 +10,16 @@
 PYTHONBIN=python3.6
 WORKING_DIR=${PWD}
 DATASETS_PATH=${WORKING_DIR}/datasets
-DATASET=RIO10
+DATASET=GangnamStation
 mkdir -p ${DATASETS_PATH}
 
 TOPK=20  # number of retrieved images for mapping and localization
 KPTS=20000 # number of local features to extract
 
-# 0b) Download RIO10 dataset
-${PYTHONBIN} ${DATASETS_PATH}/download.py -o ${DATASETS_PATH} --type=kapture --id 3
-cd ${DATASETS_PATH}
-for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 scene09 scene10; do 
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_mapping.tar.gz
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_validation.tar.gz
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_testing.tar.gz
-  rm -rf ${DATASETS_PATH}/${SCENE}
-done
-
-# 0c) Get extraction code for local and global features
+# 0b) Get extraction code for local and global features
 # ! skip if already done !
 # Deep Image retrieval - AP-GeM
 pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
-apt update
-apt install unzip
 cd ${WORKING_DIR}
 git clone https://github.com/naver/deep-image-retrieval.git
 cd deep-image-retrieval
@@ -47,44 +32,51 @@ rm -rf Resnet101-AP-GeM-LM18.pt.zip
 cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
 
-for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 scene09 scene10; do 
-  DATASET=RIO10/${SCENE}
+# 0c) Download dataset
+cd ${DATASETS_PATH}
+kapture_download_dataset.py --install_path ${DATASETS_PATH} update
+for SCENE in B1 B2; do
+ kapture_download_dataset.py --install_path ${DATASETS_PATH} install GangnamStation_${SCENE}_release_mapping GangnamStation_${SCENE}_release_test
+done
+
+for SCENE in B1 B2; do
+  DATASET=GangnamStation/${SCENE}/release
   # 1) Create temporal mapping and query sets (they will be modified)
   mkdir -p ${WORKING_DIR}/${DATASET}/mapping/sensors
   cp ${DATASETS_PATH}/${DATASET}/mapping/sensors/*.txt ${WORKING_DIR}/${DATASET}/mapping/sensors/
   ln -s ${DATASETS_PATH}/${DATASET}/mapping/sensors/records_data ${WORKING_DIR}/${DATASET}/mapping/sensors/records_data
 
-  mkdir -p ${WORKING_DIR}/${DATASET}/testing/sensors
-  cp ${DATASETS_PATH}/${DATASET}/testing/sensors/*.txt ${WORKING_DIR}/${DATASET}/testing/sensors/
-  ln -s ${DATASETS_PATH}/${DATASET}/testing/sensors/records_data ${WORKING_DIR}/${DATASET}/testing/sensors/records_data
+  mkdir -p ${WORKING_DIR}/${DATASET}/test/sensors
+  cp ${DATASETS_PATH}/${DATASET}/test/sensors/*.txt ${WORKING_DIR}/${DATASET}/test/sensors/
+  ln -s ${DATASETS_PATH}/${DATASET}/test/sensors/records_data ${WORKING_DIR}/${DATASET}/test/sensors/records_data
 
-  # 2) Merge mapping and testing kaptures (this will make it easier to extract the local and global features and it will be used for the localization step)
+  # 2) Merge mapping and test kaptures (this will make it easier to extract the local and global features and it will be used for the localization step)
   kapture_merge.py -v debug -f \
-    -i ${WORKING_DIR}/${DATASET}/mapping ${WORKING_DIR}/${DATASET}/testing \
-    -o ${WORKING_DIR}/${DATASET}/map_plus_testing \
+    -i ${WORKING_DIR}/${DATASET}/mapping ${WORKING_DIR}/${DATASET}/test \
+    -o ${WORKING_DIR}/${DATASET}/map_plus_test \
     --image_transfer link_relative
 
   # 3) Extract global features (we will use AP-GeM here)
   cd ${WORKING_DIR}/deep-image-retrieval
-  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_testing/ --checkpoint dirtorch/data/Resnet101-AP-GeM-LM18.pt --gpu 0
-  # move to right location
+  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_test/ --checkpoint dirtorch/data/Resnet101-AP-GeM-LM18.pt --gpu 0
+  move to right location
   mkdir -p ${WORKING_DIR}/${DATASET}/global_features/Resnet101-AP-GeM-LM18/global_features
-  mv ${WORKING_DIR}/${DATASET}/map_plus_testing/reconstruction/global_features/Resnet101-AP-GeM-LM18/* ${WORKING_DIR}/${DATASET}/global_features/Resnet101-AP-GeM-LM18/global_features/
-  rm -rf ${WORKING_DIR}/${DATASET}/map_plus_testing/reconstruction/global_features/Resnet101-AP-GeM-LM18
+  mv ${WORKING_DIR}/${DATASET}/map_plus_test/reconstruction/global_features/Resnet101-AP-GeM-LM18/* ${WORKING_DIR}/${DATASET}/global_features/Resnet101-AP-GeM-LM18/global_features/
+  rm -rf ${WORKING_DIR}/${DATASET}/map_plus_test/reconstruction/global_features/Resnet101-AP-GeM-LM18
 
   # 4) Extract local features (we will use R2D2 here)
   cd ${WORKING_DIR}/r2d2
-  ${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_testing/ --min-scale 0.3 --min-size 128 --max-size 9999 --top-k ${KPTS}
+  ${PYTHONBIN} extract_kapture.py --model models/r2d2_WASF_N8_big.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_test/ --min-scale 0.3 --min-size 128 --max-size 9999 --top-k ${KPTS}
   # move to right location
   mkdir -p ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors
-  mv ${WORKING_DIR}/${DATASET}/map_plus_testing/reconstruction/descriptors/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors/
+  mv ${WORKING_DIR}/${DATASET}/map_plus_test/reconstruction/descriptors/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/descriptors/
   mkdir -p ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/keypoints
-  mv ${WORKING_DIR}/${DATASET}/map_plus_testing/reconstruction/keypoints/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/keypoints/
+  mv ${WORKING_DIR}/${DATASET}/map_plus_test/reconstruction/keypoints/r2d2_WASF_N8_big/* ${WORKING_DIR}/${DATASET}/local_features/r2d2_WASF_N8_big/keypoints/
 
   # 5) mapping pipeline
   LOCAL=r2d2_WASF_N8_big
   GLOBAL=Resnet101-AP-GeM-LM18
-  kapture_pipeline_mapping.py -v debug -f \
+  ${PYTHONBIN} /tmp-network/user/mhumenbe/src/kapture-localization/pipeline/kapture_pipeline_mapping.py -v debug -f \
     -i ${WORKING_DIR}/${DATASET}/mapping \
     -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
     -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
@@ -95,9 +87,9 @@ for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 sce
     --topk ${TOPK}
 
   # 6) localization pipeline
-  kapture_pipeline_localize.py -v debug -f \
+  ${PYTHONBIN} /tmp-network/user/mhumenbe/src/kapture-localization/pipeline/kapture_pipeline_localize.py -v debug -f \
     -i ${WORKING_DIR}/${DATASET}/mapping \
-    --query ${WORKING_DIR}/${DATASET}/testing \
+    --query ${WORKING_DIR}/${DATASET}/test \
     -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
     -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
     -gfeat ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features \
@@ -107,8 +99,8 @@ for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 sce
     -o ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/${GLOBAL} \
     --topk ${TOPK} \
     --config 2 \
-    --benchmark-style RIO10
+    --benchmark-style Gangnam_Station
 
   # 7) cat the output files in order to generate one file for benchmark submission
-  cat ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/${GLOBAL}/LTVL2020_style_result.txt >> ${WORKING_DIR}/RIO10/RIO10_LTVL2020_style_result_all_scenes_${LOCAL}_${GLOBAL}.txt
+  cat ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/${GLOBAL}/LTVL2020_style_result.txt >> ${WORKING_DIR}/GangnamStation/GangnamStation_LTVL2020_style_result_all_scenes_${LOCAL}_${GLOBAL}.txt
 done
