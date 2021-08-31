@@ -4,6 +4,7 @@ import numpy as np
 
 from kapture_localization.localization.DuplicateCorrespondencesStrategy import DuplicateCorrespondencesStrategy
 from kapture_localization.localization.RerankCorrespondencesStrategy import RerankCorrespondencesStrategy
+from kapture_localization.utils.logging import getLogger
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -27,10 +28,13 @@ def get_correspondences(kapture_data: kapture.Kapture, keypoints_type: str,
     for img_map in pairs:
         # get matches
         if img_query < img_map:
-            assert (img_query, img_map) in kapture_data.matches[keypoints_type]
+            if (img_query, img_map) not in kapture_data.matches[keypoints_type]:
+                getLogger().warning(f'pair {img_query}, {img_map} do not have a match file, skipped')
+                continue
             matches_path = get_matches_fullpath((img_query, img_map), keypoints_type, kapture_path, tar_handlers)
         else:
-            assert (img_map, img_query) in kapture_data.matches[keypoints_type]
+            if (img_map, img_query) not in kapture_data.matches[keypoints_type]:
+                getLogger().warning(f'pair {img_query}, {img_map} do not have a match file, skipped')
             matches_path = get_matches_fullpath((img_map, img_query), keypoints_type, kapture_path, tar_handlers)
         matches = image_matches_from_file(matches_path)
 
@@ -81,6 +85,8 @@ def get_correspondences(kapture_data: kapture.Kapture, keypoints_type: str,
     same_3d_multiple_2d_max = 0
     rejected_correspondences = 0
     for img_map in reranked_pairs:
+        if img_map not in correspondences:
+            continue
         for kpid_query, p3did in correspondences[img_map][1]:
             if kpid_query in assigned_keypoints_ids and p3did in assigned_keypoints_ids[kpid_query]:
                 true_duplicates_count += 1

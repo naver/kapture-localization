@@ -57,7 +57,7 @@ def pycolmap_localize(kapture_path: str,
     :param kapture_path: path to the kapture to use
     :param kapture_query_path: path to the kapture to use (mapping and query images)
     :param output_path: path to the write the localization results
-    :param pairsfile_path: Optional[str],
+    :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
     :param keypoints_type: types of keypoints (and observations) to use
     :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
@@ -115,7 +115,7 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param tar_handlers: collection of pre-opened tar archives
     :param kapture_data: loaded kapture data (mapping and query images)
     :param output_path: path to the write the localization results
-    :param pairsfile_path: Optional[str],
+    :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
     :param keypoints_type: types of keypoints (and observations) to use
     :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)

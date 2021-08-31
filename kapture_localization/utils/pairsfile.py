@@ -1,3 +1,5 @@
+# Copyright 2020-present NAVER Corp. Under BSD 3-clause license
+
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 from kapture_localization.utils.logging import getLogger

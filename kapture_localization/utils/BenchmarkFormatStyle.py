@@ -1,3 +1,5 @@
+# Copyright 2020-present NAVER Corp. Under BSD 3-clause license
+
 from enum import auto
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 from kapture.utils import AutoEnum
