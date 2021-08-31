@@ -13,7 +13,7 @@ def get_interpolation_weights(method: PoseApproximationMethods,
                               topk: int,
                               additional_parameters: dict):
     """
-    compute the pose weights for the given method as a dict { query image name -> list(map image name, weight) }  
+    compute the pose weights for the given method as a dict { query image name -> list(map image name, weight) }
 
     :param method: pose approximation method to use
     :type method: PoseApproximationMethods
