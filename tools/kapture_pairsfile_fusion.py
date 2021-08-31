@@ -12,7 +12,7 @@ import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
-from kapture.io.csv import table_to_file, table_to_file
+from kapture.io.csv import table_to_file
 
 import kapture_localization.utils.logging
 from kapture_localization.image_retrieval.pairing import get_image_pairs

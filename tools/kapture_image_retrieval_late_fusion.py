@@ -12,7 +12,7 @@ import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 import kapture.utils.logging
 from kapture.io.csv import kapture_from_dir, table_to_file
-from kapture.io.csv import GlobalFeaturesConfig, kapture_from_dir, table_to_file, get_all_tar_handlers
+from kapture.io.csv import GlobalFeaturesConfig, get_all_tar_handlers
 from kapture.io.tar import TarCollection
 from kapture.io.features import get_features_fullpath
 
@@ -142,7 +142,7 @@ def _image_retrieval_late_fusion_from_loaded_data(input_path: str,
         similarity_matrices.append(get_similarity_matrix(query_stacked_features, mapping_stacked_features))
 
     if method == LateFusionMethod.round_robin:
-        logger.info(f'Compute fused similarity from round_robin')
+        logger.info('Compute fused similarity from round_robin')
         similarity_dicts = [get_similarity_dict_from_similarity_matrix(similarity,
                                                                        stacked_query_index,
                                                                        stacked_map_index)
