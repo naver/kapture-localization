@@ -311,14 +311,14 @@ The path specified in WORKING_DIR (defined in the scripts) can be the same for a
 
 2) The datasets consist of 5 scenes, 2 for GangnamStation and 3 for Hyundai Department Store. If you do not want to process all of them, modify the for loops in the scripts. For example, the visual localization challenge in the https://sites.google.com/view/ltvl2021/home?authuser=0[LTVL workshop] (ICCV 2021) only requires B2 from Gangnam and 1F from Hyundai Department Store.
 
-2) Execute the scripts.
+3) Execute the scripts.
 ```
 cd kapture-localization/pipeline/examples
 ./run_gangnam.sh
 ./run_hyundai_dept_store.sh
 ```
 
-3) If everything was successful, you should get a file named `GangnamStation_LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_Resnet101-AP-GeM-LM18.txt` in `${WORKING_DIR}/GangnamStation` and a file named `HyundaiDepartmentStore_LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_Resnet101-AP-GeM-LM18.txt` in `${WORKING_DIR}/HyundaiDepartmentStore. These files can be uploaded to the benchmark at https://www.visuallocalization.net.
+4) If everything was successful, you should get a file named `GangnamStation_LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_Resnet101-AP-GeM-LM18.txt` in `${WORKING_DIR}/GangnamStation` and a file named `HyundaiDepartmentStore_LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_Resnet101-AP-GeM-LM18.txt` in `${WORKING_DIR}/HyundaiDepartmentStore. These files can be uploaded to the benchmark at https://www.visuallocalization.net.
 
 === Aachen Day-Night v.1.1
 
