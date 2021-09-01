@@ -66,6 +66,7 @@ def recover_timestamps_and_ids(input_path: str,
         reference_sensor_to_rig = {}
 
     if kdata.rigs is not None:
+        logger.warning("this script does not support nested rigs, result might not be correct in this case")
         sensor_to_rig = {camera_id: rig_id
                          for rig_id, camera_id, _ in kapture.flatten(kdata.rigs)}
     else:
@@ -97,12 +98,15 @@ def recover_timestamps_and_ids(input_path: str,
                                    for camera_id, ref_camera_id in sensor_mapping.items()})
 
     logger.info('recover rig ids in rigs')
-    out_rigs = kapture.Rigs()
-    for camera_id, ref_camera_id in sensor_mapping.items():
-        if camera_id in sensor_to_rig and ref_camera_id in reference_sensor_to_rig:
-            ref_rig_id = reference_sensor_to_rig[ref_camera_id]
-            rig_id = sensor_to_rig[camera_id]
-            out_rigs[ref_rig_id, ref_camera_id] = kdata[rig_id, camera_id]
+    if kdata.rigs is None and kdata_ref.rigs is not None:
+        out_rigs = kdata_ref.rigs
+    else:
+        out_rigs = kapture.Rigs()
+        for camera_id, ref_camera_id in sensor_mapping.items():
+            if camera_id in sensor_to_rig and ref_camera_id in reference_sensor_to_rig:
+                ref_rig_id = reference_sensor_to_rig[ref_camera_id]
+                rig_id = sensor_to_rig[camera_id]
+                out_rigs[ref_rig_id, ref_camera_id] = kdata[rig_id, camera_id]
 
     # prefer None over empty
     out_sensors = out_sensors or None
