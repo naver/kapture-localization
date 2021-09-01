@@ -173,9 +173,9 @@ def image_retrieval_late_fusion_command_line():
     parser_verbosity.add_argument('-q', '--silent', '--quiet',
                                   action='store_const', dest='verbose', const=logging.CRITICAL)
     parser.add_argument('-i', '--input', required=True,
-                        help='input path to kapture input root directory.')
+                        help='input path to kapture map data root directory.')
     parser.add_argument('--query', default=None, help='Keep to default (None) when mapping.\n'
-                        'input path to a kapture root directory containing query images.\n')
+                        'input path to a kapture query data root directory.\n')
     parser.add_argument('-gfeat', '--global_features_types', nargs='+', default=[],
                         help='Optional; types of the global features to fuse. if not given, they will all be fused')
     parser.add_argument('-o', '--output', required=True, help='output path to pairfile')
