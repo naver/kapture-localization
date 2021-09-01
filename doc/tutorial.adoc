@@ -230,6 +230,7 @@ image::../doc/colmap_mapping.jpg[reconstruction]
 # For Gangnam_Station --benchmark-style Gangnam_Station
 # For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
 # For RIO10 --benchmark-style RIO10
+# For ETH-Microsoft --benchmark-style ETH_Microsoft
 kapture_pipeline_localize.py -v info \
       -i ./mapping \
       --query ./query \
@@ -370,6 +371,7 @@ curl -C - --output ./vocab_tree_flickr100K_words32K.bin --url https://demuc.de/c
 # For Gangnam_Station --benchmark-style Gangnam_Station
 # For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
 # For RIO10 --benchmark-style RIO10
+# For ETH-Microsoft --benchmark-style ETH_Microsoft
 kapture_pipeline_colmap_vocab_tree.py -v info \
         -i ./mapping \
         --query ./query \
@@ -457,6 +459,7 @@ Note that the features needed to execute the command below are provided as part 
 Once everything is ready, the following example shows how the benchmark should be called.
 
 Example using the small virtual gallery dataset from above:
+[source,bash]
 ----
 # if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
@@ -464,6 +467,7 @@ Example using the small virtual gallery dataset from above:
 # For Gangnam_Station --benchmark-style Gangnam_Station
 # For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
 # For RIO10 --benchmark-style RIO10
+# For ETH-Microsoft --benchmark-style ETH_Microsoft
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i ./mapping \
       --query ./query \

@@ -17,7 +17,7 @@ import kapture_localization.utils.logging
 from kapture_localization.utils.symlink import can_use_symlinks, create_kapture_proxy_single_features
 from kapture_localization.utils.subprocess import run_python_command
 from kapture_localization.colmap.colmap_command import CONFIGS
-from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
+from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle, get_benchmark_format_command
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
@@ -235,22 +235,15 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
+            export_LTVL2020_script_name, export_LTVL2020_args = get_benchmark_format_command(
+                benchmark_format_style,
+                global_sfm_kapture_localize_recover_path,
+                global_sfm_LTVL2020_output_path,
+                force_overwrite_existing,
+                logger
+            )
             local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
-                                                   '../../kapture/tools/kapture_export_LTVL2020.py')
-            export_LTVL2020_args = ['-v', str(logger.level),
-                                    '-i', global_sfm_kapture_localize_recover_path,
-                                    '-o', global_sfm_LTVL2020_output_path]
-            if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
-                export_LTVL2020_args.append('-p')
-            elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
-                export_LTVL2020_args.append('--full_file_name')
-            elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
-                export_LTVL2020_args.append('--full_file_name')
-                export_LTVL2020_args.append('--truncate-extensions')
-                export_LTVL2020_args.append('--inverse-pose')
-            if force_overwrite_existing:
-                export_LTVL2020_args.append('-f')
+                                                   f'../../kapture/tools/{export_LTVL2020_script_name}')
             run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
     # -------- LOCAL SFM LOCALIZATION --------
@@ -271,22 +264,15 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
+            export_LTVL2020_script_name, export_LTVL2020_args = get_benchmark_format_command(
+                benchmark_format_style,
+                local_sfm_localize_path,
+                local_sfm_LTVL2020_output_path,
+                force_overwrite_existing,
+                logger
+            )
             local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
-                                                   '../../kapture/tools/kapture_export_LTVL2020.py')
-            export_LTVL2020_args = ['-v', str(logger.level),
-                                    '-i', local_sfm_localize_path,
-                                    '-o', local_sfm_LTVL2020_output_path]
-            if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
-                export_LTVL2020_args.append('-p')
-            elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
-                export_LTVL2020_args.append('--full_file_name')
-            elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
-                export_LTVL2020_args.append('--full_file_name')
-                export_LTVL2020_args.append('--truncate-extensions')
-                export_LTVL2020_args.append('--inverse-pose')
-            if force_overwrite_existing:
-                export_LTVL2020_args.append('-f')
+                                                   f'../../kapture/tools/{export_LTVL2020_script_name}')
             run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
     # -------- POSE APPROXIMATION LOCALIZATION --------
@@ -313,30 +299,27 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
         # kapture_export_LTVL2020.py
         if 'export_LTVL2020' not in skip_list:
-            local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
-                                                   '../../kapture/tools/kapture_export_LTVL2020.py')
-            args_append_array = []
-            if benchmark_format_style == BenchmarkFormatStyle.RobotCar_Seasons:
-                args_append_array.append('-p')
-            elif benchmark_format_style == BenchmarkFormatStyle.Gangnam_Station \
-                    or benchmark_format_style == BenchmarkFormatStyle.Hyundai_Department_Store:
-                args_append_array.append('--full_file_name')
-            elif benchmark_format_style == BenchmarkFormatStyle.RIO10:
-                args_append_array.append('--full_file_name')
-                args_append_array.append('--truncate-extensions')
-                args_append_array.append('--inverse-pose')
-            if force_overwrite_existing:
-                args_append_array.append('-f')
+            EWB_export_LTVL2020_script_name, EWB_export_LTVL2020_args = get_benchmark_format_command(
+                benchmark_format_style,
+                pose_approx_EWB_path,
+                pose_approx_EWB_LTVL2020_output_path,
+                force_overwrite_existing,
+                logger
+            )
+            EWB_local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
+                                                       f'../../kapture/tools/{EWB_export_LTVL2020_script_name}')
+            run_python_command(EWB_local_export_LTVL2020_path, EWB_export_LTVL2020_args, python_binary)
 
-            EWB_export_LTVL2020_args = ['-v', str(logger.level),
-                                        '-i', pose_approx_EWB_path,
-                                        '-o', pose_approx_EWB_LTVL2020_output_path] + args_append_array
-            run_python_command(local_export_LTVL2020_path, EWB_export_LTVL2020_args, python_binary)
-
-            CSI_export_LTVL2020_args = ['-v', str(logger.level),
-                                        '-i', pose_approx_CSI_path,
-                                        '-o', pose_approx_CSI_LTVL2020_output_path] + args_append_array
-            run_python_command(local_export_LTVL2020_path, CSI_export_LTVL2020_args, python_binary)
+            CSI_export_LTVL2020_script_name, CSI_export_LTVL2020_args = get_benchmark_format_command(
+                benchmark_format_style,
+                pose_approx_CSI_path,
+                pose_approx_CSI_LTVL2020_output_path,
+                force_overwrite_existing,
+                logger
+            )
+            CSI_local_export_LTVL2020_path = path.join(pipeline_import_paths.HERE_PATH,
+                                                       f'../../kapture/tools/{CSI_export_LTVL2020_script_name}')
+            run_python_command(CSI_local_export_LTVL2020_path, CSI_export_LTVL2020_args, python_binary)
 
     # -------- EVALUATE ALL AT ONCE --------
     # kapture_evaluate.py
@@ -415,8 +398,9 @@ def image_retrieval_benchmark_from_pairsfile_get_parser():
                         type=BenchmarkFormatStyle,
                         choices=list(BenchmarkFormatStyle),
                         help=('select which output format to use for the export_LTVL2020 part.'
-                              ' Default is the https://www.visuallocalization.net default. '
-                              '     RobotCar_Seasons, Gangnam_Station, Hyundai_Department_Store are also part of'
+                              ' Default is the https://www.visuallocalization.net default.'
+                              ' RobotCar_Seasons, Gangnam_Station, Hyundai_Department_Store,'
+                              ' ETH_Microsoft are also part of'
                               ' https://www.visuallocalization.net but require a different format.'
                               ' RIO10 is for http://vmnavab26.in.tum.de/RIO10/'))
     parser.add_argument('-s', '--skip', choices=['compute_matches',

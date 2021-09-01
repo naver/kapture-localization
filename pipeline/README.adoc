@@ -97,6 +97,7 @@ kapture_pipeline_localize.py
 # For Gangnam_Station --benchmark-style Gangnam_Station
 # For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
 # For RIO10 --benchmark-style RIO10
+# For ETH-Microsoft --benchmark-style ETH_Microsoft
 ----
 
 
@@ -132,4 +133,5 @@ kapture_pipeline_image_retrieval_benchmark.py
 # For Gangnam_Station --benchmark-style Gangnam_Station
 # For Hyundai_Department_Store --benchmark-style Hyundai_Department_Store
 # For RIO10 --benchmark-style RIO10
+# For ETH-Microsoft --benchmark-style ETH_Microsoft
 ----
