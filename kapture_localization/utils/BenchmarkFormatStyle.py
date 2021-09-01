@@ -23,6 +23,9 @@ def get_benchmark_format_command(benchmark_format_style: BenchmarkFormatStyle,
                                  output_path: str,
                                  force_overwrite_existing: bool,
                                  logger: logging.Logger):
+    """
+    get script_name and arguments for the export to benchmark format command
+    """
     export_LTVL_args = ['-v', str(logger.level),
                         '-i', input_path,
                         '-o', output_path]
