@@ -347,6 +347,18 @@ cd kapture-localization/pipeline/examples
 
 3) If everything was successful, you should get a file named `LTVL2020_style_result_all_scenes_r2d2_WASF-N8_20k_AP-GeM-LM18.txt` in `${WORKING_DIR}/RIO10`. This file can be uploaded to the benchmark at https://waldjohannau.github.io/RIO10/.
 
+=== ETH-Microsoft_ICCV2021_preview
+
+1) Point WORKING_DIR in the script to a location where you want the dataset to be downloaded and processed data to be stored.
+
+2) Execute the script.
+```
+cd kapture-localization/pipeline/examples
+./run_eth-microsoft_ICCV2021_preview.sh
+```
+
+3) If everything was successful, you should get a file named `LTVL2020_style_result.txt` in `${WORKING_DIR}/ETH-Microsoft_ICCV2021_preview/colmap-localize/r2d2_WASF-N8_20k/Resnet101-AP-GeM-LM18`. This file can be uploaded to the benchmark at https://www.visuallocalization.net.
+
 == Kapture pipeline (COLMAP)
 
 This section describes a simpler pipeline fully based on COLMAP using SIFT local features
