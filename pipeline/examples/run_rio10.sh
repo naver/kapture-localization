@@ -1,6 +1,3 @@
-# IMPORTANT: in order to download RIO10, get download.py from the RIO10 website and put it in DATASETS_PATH
-# this script will us download.py and will not work without it
-
 # Run this script in docker,
 # but first pull the most recent version.
 
@@ -13,20 +10,17 @@
 PYTHONBIN=python3.6
 WORKING_DIR=${PWD}
 DATASETS_PATH=${WORKING_DIR}/datasets
-DATASET=RIO10
 mkdir -p ${DATASETS_PATH}
 
 TOPK=20  # number of retrieved images for mapping and localization
 KPTS=20000 # number of local features to extract
 
 # 0b) Download RIO10 dataset
-${PYTHONBIN} ${DATASETS_PATH}/download.py -o ${DATASETS_PATH} --type=kapture --id 3
+# Note that you will be asked to accept or decline the license terms before download.
 cd ${DATASETS_PATH}
+kapture_download_dataset.py --install_path ${DATASETS_PATH} update
 for SCENE in scene01 scene02 scene03 scene04 scene05 scene06 scene07 scene08 scene09 scene10; do 
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_mapping.tar.gz
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_validation.tar.gz
-  tar -xvf ${DATASETS_PATH}/${SCENE}/RIO10_${SCENE}_testing.tar.gz
-  rm -rf ${DATASETS_PATH}/${SCENE}
+  kapture_download_dataset.py --install_path ${DATASETS_PATH} install "RIO10_${SCENE}_*"
 done
 
 # 0c) Get extraction code for local and global features

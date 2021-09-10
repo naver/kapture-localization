@@ -33,6 +33,7 @@ cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
 
 # 0c) Download dataset
+# Note that you will be asked to accept or decline the license terms before download.
 cd ${DATASETS_PATH}
 kapture_download_dataset.py --install_path ${DATASETS_PATH} update
 for SCENE in B1 B2; do

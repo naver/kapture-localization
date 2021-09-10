@@ -33,6 +33,7 @@ cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
 
 # 1) Download dataset
+# Note that you will be asked to accept or decline the license terms before download.
 mkdir ${DATASETS_PATH}
 kapture_download_dataset.py --install_path ${DATASETS_PATH} update
 kapture_download_dataset.py --install_path ${DATASETS_PATH} install ${DATASET}_mapping ${DATASET}_query_day ${DATASET}_query_night
