@@ -103,7 +103,7 @@ def get_image_pairs(similarity: Dict[str, List[Tuple[str, float]]],
     image_pairs = []
     for query_image_name, images_to_match in sorted(similarity.items()):
         k = 0
-        for mapping_image_name, score in images_to_match:
+        for mapping_image_name, score in sorted(images_to_match, key=lambda x: x[1], reverse=True):
             if topk is not None and k >= topk:
                 break
             # don't match image with itself
