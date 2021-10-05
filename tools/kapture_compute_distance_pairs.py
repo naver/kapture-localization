@@ -102,9 +102,7 @@ def compute_distance_pairs_command_line():
                                   help='verbosity level (debug, info, warning, critical, ... or int value) [warning]')
     parser_verbosity.add_argument('-q', '--silent', '--quiet',
                                   action='store_const', dest='verbose', const=logging.CRITICAL)
-    parser.add_argument('--mapping', required=True,
-                        help=('input path to kapture input root directory\n'
-                              'it must contain global features for all images'))
+    parser.add_argument('--mapping', required=True, help='input path to kapture input root directory')
     parser.add_argument('--query', default=None,
                         help=('input path to a kapture root directory containing query images, '
                               'keep to default None when mapping\n'))
