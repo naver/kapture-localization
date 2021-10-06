@@ -1,8 +1,6 @@
 # Copyright 2020-present NAVER Corp. Under BSD 3-clause license
 import logging
-
 import multiprocessing
-
 from typing import Optional
 from tqdm import tqdm
 

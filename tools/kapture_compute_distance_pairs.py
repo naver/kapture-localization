@@ -68,6 +68,7 @@ def compute_distance_pairs(mapping_path: str,
             if kdata_query is None:
                 kdata_query = kdata
             if kdata_query.rigs is not None:
+                assert kdata_query.trajectories is not None  # for ide
                 kapture.rigs_remove_inplace(kdata_query.trajectories, kdata_query.rigs)
             records_camera_list = [k
                                    for k in sorted(kapture.flatten(kdata_query.records_camera),
