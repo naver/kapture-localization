@@ -202,6 +202,9 @@ def get_pairs_observations(kdata: kapture.Kapture,
                            max_number_of_threads: Optional[int],
                            iou: bool,
                            topk: int):
+    """
+    get observations pairs as list
+    """
     if iou:
         individual_observations = get_observation_images(keypoints_type,
                                                          kdata, kdata_query,
