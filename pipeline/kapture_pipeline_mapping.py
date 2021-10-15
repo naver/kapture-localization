@@ -6,6 +6,7 @@ This script builds a COLMAP model (map) from kapture format (images, cameras, tr
 """
 
 import argparse
+from ctypes import DEFAULT_MODE
 import logging
 import os
 import os.path as path
@@ -23,6 +24,7 @@ import kapture.utils.logging
 from kapture.utils.paths import safe_remove_file
 
 logger = logging.getLogger('mapping_pipeline')
+DEFAULT_TOPK = 20
 
 
 def mapping_pipeline(kapture_path: str,
@@ -144,9 +146,9 @@ def mapping_pipeline(kapture_path: str,
         run_python_command(local_build_map_path, build_map_args, python_binary)
 
 
-def mapping_pipeline_command_line():
+def mapping_pipeline_get_parser():
     """
-    Parse the command line arguments to build a colmap map using the given kapture data.
+    get the argparse object for the kapture_pipeline_mapping.py command
     """
     parser = argparse.ArgumentParser(description=('create a Colmap model (map) from data specified in kapture format.'
                                                   'kapture data must contain keypoints, descriptors and '
@@ -190,9 +192,8 @@ def mapping_pipeline_command_line():
                                    ' can infer the python binary from the files itself, shebang or extension).')
     parser_python_bin.add_argument('--auto-python-binary', action='store_true', default=False,
                                    help='use sys.executable as python binary.')
-    default_topk = 20
     parser.add_argument('--topk',
-                        default=default_topk,
+                        default=DEFAULT_TOPK,
                         type=int,
                         help=('the max number of top retained images when computing image pairs from global features'
                               'ignored if global-features-path is None or pairfile is explicitely given'))
@@ -207,6 +208,14 @@ def mapping_pipeline_command_line():
     parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
     parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
+    return parser
+
+
+def mapping_pipeline_command_line():
+    """
+    Parse the command line arguments to build a colmap map using the given kapture data.
+    """
+    parser = mapping_pipeline_get_parser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -215,7 +224,8 @@ def mapping_pipeline_command_line():
         kapture.utils.logging.getLogger().setLevel(args.verbose)
         kapture_localization.utils.logging.getLogger().setLevel(args.verbose)
 
-    if args.pairsfile_path is not None and args.topk != default_topk:
+    # only show the warning if the user attempted to change the topk value since it'll have no effect
+    if args.pairsfile_path is not None and args.topk != DEFAULT_TOPK:
         logger.warning(f'pairsfile was given explicitely, paramerer topk={args.topk} will be ignored')
 
     args_dict = vars(args)

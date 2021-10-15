@@ -165,9 +165,9 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
 
-def colmap_vocab_tree_pipeline_command_line():
+def colmap_vocab_tree_pipeline_get_parser():
     """
-    Parse the command line arguments to build a map and localize images using colmap on the given kapture data.
+    get the argparse object for the kapture_pipeline_colmap_vocab_tree.py command
     """
     parser = argparse.ArgumentParser(description='localize images given in kapture format on a colmap map')
     parser_verbosity = parser.add_mutually_exclusive_group()
@@ -226,6 +226,14 @@ def colmap_vocab_tree_pipeline_command_line():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    return parser
+
+
+def colmap_vocab_tree_pipeline_command_line():
+    """
+    Parse the command line arguments to build a map and localize images using colmap on the given kapture data.
+    """
+    parser = colmap_vocab_tree_pipeline_get_parser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)

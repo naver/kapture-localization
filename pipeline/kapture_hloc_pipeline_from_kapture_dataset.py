@@ -254,9 +254,9 @@ def hloc_pipeline_from_kapture_dataset(kapture_path_map: str,
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
 
-def hloc_pipeline_from_kapture_dataset_command_line():
+def hloc_pipeline_from_kapture_dataset_get_parser():
     """
-    Parse the command line arguments to build a colmap map and localize using the given kapture data.
+    get the argparse object for the kapture_hloc_pipeline_from_kapture_dataset.py command
     """
     parser = argparse.ArgumentParser(description=('create a Colmap model (map) from data specified in kapture format.'))
     parser_verbosity = parser.add_mutually_exclusive_group()
@@ -325,6 +325,14 @@ def hloc_pipeline_from_kapture_dataset_command_line():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    return parser
+
+
+def hloc_pipeline_from_kapture_dataset_command_line():
+    """
+    Parse the command line arguments to build a colmap map and localize using the given kapture data.
+    """
+    parser = hloc_pipeline_from_kapture_dataset_get_parser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)

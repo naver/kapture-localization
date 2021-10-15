@@ -22,7 +22,9 @@ from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
 from kapture.utils.paths import safe_remove_file
+
 logger = logging.getLogger('localization_pipeline')
+DEFAULT_TOPK = 20
 
 
 def localize_pipeline(kapture_map_path: str,
@@ -252,9 +254,9 @@ def localize_pipeline(kapture_map_path: str,
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
 
-def localize_pipeline_command_line():
+def localize_pipeline_get_parser():
     """
-    Parse the command line arguments to localize images on a colmap map using the given kapture data.
+    get the argparse object for the kapture_pipeline_localize.py command
     """
     parser = argparse.ArgumentParser(description='localize images given in kapture format on a colmap map')
     parser_verbosity = parser.add_mutually_exclusive_group()
@@ -303,9 +305,8 @@ def localize_pipeline_command_line():
                                    ' can infer the python binary from the files itself, shebang or extension).')
     parser_python_bin.add_argument('--auto-python-binary', action='store_true', default=False,
                                    help='use sys.executable as python binary.')
-    default_topk = 20
     parser.add_argument('--topk',
-                        default=default_topk,
+                        default=DEFAULT_TOPK,
                         type=int,
                         help='the max number of top retained images when computing image pairs from global features')
     parser.add_argument('--config', default=1, type=int,
@@ -335,6 +336,14 @@ def localize_pipeline_command_line():
     parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
     parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
+    return parser
+
+
+def localize_pipeline_command_line():
+    """
+    Parse the command line arguments to localize images on a colmap map using the given kapture data.
+    """
+    parser = localize_pipeline_get_parser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -343,7 +352,8 @@ def localize_pipeline_command_line():
         kapture.utils.logging.getLogger().setLevel(args.verbose)
         kapture_localization.utils.logging.getLogger().setLevel(args.verbose)
 
-    if args.pairsfile_path is not None and args.topk != default_topk:
+    # only show the warning if the user attempted to change the topk value since it'll have no effect
+    if args.pairsfile_path is not None and args.topk != DEFAULT_TOPK:
         logger.warning(f'pairsfile was given explicitely, paramerer topk={args.topk} will be ignored')
 
     args_dict = vars(args)

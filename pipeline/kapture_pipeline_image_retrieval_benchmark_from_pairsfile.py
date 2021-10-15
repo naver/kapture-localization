@@ -348,6 +348,9 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
 
 
 def image_retrieval_benchmark_from_pairsfile_get_parser():
+    """
+    get the argparse object for the kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py command
+    """
     parser = argparse.ArgumentParser(description='run the image retrieval benchmark on kapture data')
     parser_verbosity = parser.add_mutually_exclusive_group()
     parser_verbosity.add_argument('-v', '--verbose', nargs='?', default=logging.WARNING, const=logging.INFO,
