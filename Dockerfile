@@ -89,6 +89,18 @@ RUN     cmake \
         .. && \
         make ${MAKE_OPTIONS} && make install && make clean
 
+######### POSELIB ##############################################################
+# force upgrade of cmake
+RUN     apt-get -y remove cmake
+RUN     python3 -m pip install cmake --upgrade
+
+WORKDIR ${SOURCE_PREFIX}
+RUN     git clone --recursive https://github.com/vlarsson/PoseLib.git
+RUN     mkdir -p ./PoseLib/_build
+RUN     cd  ./PoseLib/_build && \
+        cmake -DCMAKE_INSTALL_PREFIX=../_install .. && \
+        cmake --build . --target install -j 8 &&\
+        cmake --build . --target clean
 
 ########################################################################################################################
 # install kapture from pip.
@@ -106,6 +118,13 @@ WORKDIR ${SOURCE_PREFIX}
 RUN     git clone --recursive https://github.com/mihaidusmanu/pycolmap.git
 WORKDIR ${SOURCE_PREFIX}/pycolmap
 RUN     python3 -m pip install ./
+
+######### PYRANSACLIB ##########################################################
+WORKDIR ${SOURCE_PREFIX}
+RUN     git clone --recursive https://github.com/tsattler/RansacLib.git
+WORKDIR ${SOURCE_PREFIX}/RansacLib
+RUN     sed -i '4i set(CMAKE_CXX_STANDARD 14)' CMakeLists.txt
+RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib CMAKE_CXX_STANDARD=14 python3 -m pip install ./
 
 ### FINALIZE ###################################################################
 # save space: purge apt-get
