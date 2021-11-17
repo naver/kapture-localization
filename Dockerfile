@@ -124,7 +124,7 @@ WORKDIR ${SOURCE_PREFIX}
 RUN     git clone --recursive https://github.com/tsattler/RansacLib.git
 WORKDIR ${SOURCE_PREFIX}/RansacLib
 RUN     sed -i '4i set(CMAKE_CXX_STANDARD 14)' CMakeLists.txt
-RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib CMAKE_CXX_STANDARD=14 python3 -m pip install ./
+RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib python3 -m pip install ./
 
 ### FINALIZE ###################################################################
 # save space: purge apt-get
