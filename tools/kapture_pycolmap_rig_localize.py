@@ -320,7 +320,7 @@ def get_pycolmap_rig_localize_argparser():
     parser_verbosity.add_argument('-q', '--silent', '--quiet', action='store_const',
                                   dest='verbose', const=logging.CRITICAL)
     parser.add_argument('-f', '-y', '--force', action='store_true', default=False,
-                        help='silently delete database if already exists.')
+                        help='silently delete output if already exists.')
     parser.add_argument('-i', '--input', required=True,
                         help='input path to kapture data root directory (map + query)')
     parser.add_argument('--query', required=True,

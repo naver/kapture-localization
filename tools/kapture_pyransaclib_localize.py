@@ -2,20 +2,27 @@
 # Copyright 2020-present NAVER Corp. Under BSD 3-clause license
 
 """
-This script localize images using pycolmap from kapture format
+This script localize images using pyransaclib from kapture format
 """
 
 import argparse
 import logging
 import os
-from typing import Optional
 from tqdm import tqdm
-import numpy as np
+from typing import Optional
+try:
+    import pyransaclib
+    has_pyransaclib = True
+except ModuleNotFoundError:
+    has_pyransaclib = False
 try:
     import pycolmap
     has_pycolmap = True
 except ModuleNotFoundError:
     has_pycolmap = False
+
+import cv2
+import numpy as np
 
 
 import path_to_kapture_localization  # noqa: F401
@@ -38,31 +45,36 @@ from kapture.utils.Collections import try_get_only_key_from_collection
 from kapture.io.tar import TarCollection
 
 
-logger = logging.getLogger('pycolmap_localize')
+logger = logging.getLogger('pyransaclib_localize')
 
 
-def pycolmap_localize(kapture_path: str,
-                      kapture_query_path: str,
-                      output_path: str,
-                      pairsfile_path: str,
-                      max_error: float,
-                      keypoints_type: Optional[str],
-                      duplicate_strategy: DuplicateCorrespondencesStrategy,
-                      rerank_strategy: RerankCorrespondencesStrategy,
-                      write_detailed_report: bool,
-                      force: bool) -> None:
+def pyransaclib_localize(kapture_path: str,
+                         kapture_query_path: str,
+                         output_path: str,
+                         pairsfile_path: str,
+                         inlier_threshold: float,
+                         number_lo_steps: int,
+                         min_num_iterations: int,
+                         max_num_iterations: int,
+                         refine_poses: bool,
+                         keypoints_type: Optional[str],
+                         duplicate_strategy: DuplicateCorrespondencesStrategy,
+                         rerank_strategy: RerankCorrespondencesStrategy,
+                         write_detailed_report: bool,
+                         force: bool) -> None:
     """
-    Localize images using pycolmap.
+    Localize images using pyransaclib.
 
     :param kapture_path: path to the kapture to use
     :param kapture_query_path: path to the kapture to use (mapping and query images)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
-    :param max_error: RANSAC inlier threshold in pixel
+    :param inlier_threshold: RANSAC inlier threshold in pixel
+    :param number_lo_steps: number of local optimization iterations in LO-MSAC. Use 0 to use MSAC
+    :param min_num_iterations: minimum number of ransac loops
+    :param max_num_iterations: maximum number of ransac loops
+    :param refine_poses: refine poses with pycolmap
     :param keypoints_type: types of keypoints (and observations) to use
-    :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
-    :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
-    :param write_detailed_report: if True, write a json file with inliers, reprojection error for each query
     :param force: Silently overwrite kapture files if already exists
     """
     # Load input files first to make sure it is OK
@@ -76,39 +88,48 @@ def pycolmap_localize(kapture_path: str,
         kapture_query_data = kapture.io.csv.kapture_from_dir(kapture_query_path,
                                                              None,
                                                              [kapture.Keypoints,
-                                                                 kapture.Descriptors,
-                                                                 kapture.GlobalFeatures,
-                                                                 kapture.Matches,
-                                                                 kapture.Points3d,
-                                                                 kapture.Observations])
-        pycolmap_localize_from_loaded_data(kapture_data,
-                                           kapture_path,
-                                           tar_handlers,
-                                           kapture_query_data,
-                                           output_path,
-                                           pairsfile_path,
-                                           max_error,
-                                           keypoints_type,
-                                           duplicate_strategy,
-                                           rerank_strategy,
-                                           write_detailed_report,
-                                           force)
+                                                              kapture.Descriptors,
+                                                              kapture.GlobalFeatures,
+                                                              kapture.Matches,
+                                                              kapture.Points3d,
+                                                              kapture.Observations])
+
+        pyransaclib_localize_from_loaded_data(kapture_data,
+                                              kapture_path,
+                                              tar_handlers,
+                                              kapture_query_data,
+                                              output_path,
+                                              pairsfile_path,
+                                              inlier_threshold,
+                                              number_lo_steps,
+                                              min_num_iterations,
+                                              max_num_iterations,
+                                              refine_poses,
+                                              keypoints_type,
+                                              duplicate_strategy,
+                                              rerank_strategy,
+                                              write_detailed_report,
+                                              force)
 
 
-def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
-                                       kapture_path: str,
-                                       tar_handlers: TarCollection,
-                                       kapture_query_data: kapture.Kapture,
-                                       output_path: str,
-                                       pairsfile_path: str,
-                                       max_error: float,
-                                       keypoints_type: Optional[str],
-                                       duplicate_strategy: DuplicateCorrespondencesStrategy,
-                                       rerank_strategy: RerankCorrespondencesStrategy,
-                                       write_detailed_report: bool,
-                                       force: bool) -> None:
+def pyransaclib_localize_from_loaded_data(kapture_data: kapture.Kapture,
+                                          kapture_path: str,
+                                          tar_handlers: TarCollection,
+                                          kapture_query_data: kapture.Kapture,
+                                          output_path: str,
+                                          pairsfile_path: str,
+                                          inlier_threshold: float,
+                                          number_lo_steps: int,
+                                          min_num_iterations: int,
+                                          max_num_iterations: int,
+                                          refine_poses: bool,
+                                          keypoints_type: Optional[str],
+                                          duplicate_strategy: DuplicateCorrespondencesStrategy,
+                                          rerank_strategy: RerankCorrespondencesStrategy,
+                                          write_detailed_report: bool,
+                                          force: bool) -> None:
     """
-    Localize images using pycolmap.
+    Localize images using pyransaclib.
 
     :param kapture_data: loaded kapture data (incl. points3d)
     :param kapture_path: path to the kapture to use
@@ -116,14 +137,17 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param kapture_data: loaded kapture data (mapping and query images)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
-    :param max_error: RANSAC inlier threshold in pixel
+    :param inlier_threshold: RANSAC inlier threshold in pixel
+    :param number_lo_steps: number of local optimization iterations in LO-MSAC. Use 0 to use MSAC
+    :param min_num_iterations: minimum number of ransac loops
+    :param max_num_iterations: maximum number of ransac loops
+    :param refine_poses: refine poses with pycolmap
     :param keypoints_type: types of keypoints (and observations) to use
-    :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
-    :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
-    :param write_detailed_report: if True, write a json file with inliers, reprojection error for each query
-    :param force: Silently overwrite kapture files if already exists
+    :param force: Silently overwrite kapture files if already exists.
     """
-    assert has_pycolmap
+    assert has_pyransaclib
+    if refine_poses:
+        assert has_pycolmap
     if not (kapture_data.records_camera and kapture_data.sensors and kapture_data.keypoints and
             kapture_data.matches and kapture_data.points3d and kapture_data.observations):
         raise ValueError('records_camera, sensors, keypoints, matches, '
@@ -177,62 +201,84 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
 
     # kapture for localized images + pose
     trajectories = kapture.Trajectories()
-    for timestamp, sensor_id, image_name in tqdm(query_images,
-                                                 disable=logging.getLogger().level >= logging.CRITICAL):
+    progress_bar = tqdm(total=len(query_images), disable=logging.getLogger().level >= logging.CRITICAL)
+    for timestamp, sensor_id, image_name in query_images:
         if image_name not in pairs:
             continue
-        # N number of correspondences
-        # points2D - Nx2 array with pixel coordinates
-        # points3D - Nx3 array with world coordinates
-        points2D = []
-        points3D = []
         keypoints_filepath = keypoints_filepaths[image_name]
         kapture_keypoints_query = image_keypoints_from_file(filepath=keypoints_filepath,
                                                             dsize=kapture_data.keypoints[keypoints_type].dsize,
                                                             dtype=kapture_data.keypoints[keypoints_type].dtype)
         query_cam = kapture_query_data.sensors[sensor_id]
         assert isinstance(query_cam, kapture.Camera)
+        num_keypoints = kapture_keypoints_query.shape[0]
+        kapture_keypoints_query, K, distortion = get_camera_matrix_from_kapture(kapture_keypoints_query, query_cam)
+        kapture_keypoints_query = kapture_keypoints_query.reshape((num_keypoints, 2))
 
-        col_cam_id, width, height, params, _ = get_colmap_camera(query_cam)
-        cfg = {
-            'model': CAMERA_MODEL_NAME_ID[col_cam_id][0],
-            'width': int(width),
-            'height': int(height),
-            'params': params
-        }
+        cv2_keypoints_query = np.copy(kapture_keypoints_query)
+        if np.count_nonzero(distortion) > 0:
+            epsilon = np.finfo(np.float64).eps
+            stop_criteria = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 500, epsilon)
+            cv2_keypoints_query = cv2.undistortPointsIter(cv2_keypoints_query, K, distortion,
+                                                          R=None, P=K,
+                                                          criteria=stop_criteria)
+        cv2_keypoints_query = cv2_keypoints_query.reshape((num_keypoints, 2))
+        # center keypoints
+        for i in range(cv2_keypoints_query.shape[0]):
+            cv2_keypoints_query[i, 0] = cv2_keypoints_query[i, 0] - K[0, 2]
+            cv2_keypoints_query[i, 1] = cv2_keypoints_query[i, 1] - K[1, 2]
 
-        points2D, _, points3D, stats = get_correspondences(kapture_data, keypoints_type,
-                                                           kapture_path, tar_handlers,
-                                                           image_name, pairs[image_name],
-                                                           point_id_from_obs,
-                                                           kapture_keypoints_query, None,
-                                                           duplicate_strategy, rerank_strategy)
-
+        kpts_query = kapture_keypoints_query if (refine_poses or write_detailed_report) else None
+        points2D, points2D_undistorted, points3D, stats = get_correspondences(kapture_data, keypoints_type,
+                                                                              kapture_path, tar_handlers,
+                                                                              image_name, pairs[image_name],
+                                                                              point_id_from_obs,
+                                                                              kpts_query, cv2_keypoints_query,
+                                                                              duplicate_strategy, rerank_strategy)
         # compute absolute pose
         # inlier_threshold - RANSAC inlier threshold in pixels
         # answer - dictionary containing the RANSAC output
-        ret = pycolmap.absolute_pose_estimation(points2D, points3D, cfg, max_error)
+        ret = pyransaclib.ransaclib_localization(image_name, K[0, 0], K[1, 1],
+                                                 points2D_undistorted, points3D,
+                                                 inlier_threshold, number_lo_steps,
+                                                 min_num_iterations, max_num_iterations)
+
         # add pose to output kapture
         if ret['success'] and ret['num_inliers'] > 0:
             pose = kapture.PoseTransform(ret['qvec'], ret['tvec'])
+
+            if refine_poses:
+                inlier_mask = np.zeros((len(points2D),), dtype=bool)
+                inlier_mask[ret['inliers']] = True
+                inlier_mask = inlier_mask.tolist()
+                col_cam_id, width, height, params, _ = get_colmap_camera(query_cam)
+                cfg = {
+                    'model': CAMERA_MODEL_NAME_ID[col_cam_id][0],
+                    'width': int(width),
+                    'height': int(height),
+                    'params': params
+                }
+                ret_refine = pycolmap.pose_refinement(pose.t_raw, pose.r_raw, points2D, points3D, inlier_mask, cfg)
+                if ret_refine['success']:
+                    pose = kapture.PoseTransform(ret_refine['qvec'], ret_refine['tvec'])
+                    logger.debug(f'{image_name} refinement success, new pose: {pose}')
+
             if write_detailed_report:
-                num_2dpoints = len(points2D)
-                points2D_final, K, distortion = get_camera_matrix_from_kapture(
-                    np.array(points2D, dtype=np.float), query_cam)
-                points2D_final = list(points2D_final.reshape((num_2dpoints, 2)))
-                inliers = np.where(ret['inliers'])[0].tolist()
-                reprojection_error = compute_reprojection_error(pose, ret['num_inliers'], inliers,
-                                                                points2D_final, points3D, K, distortion)
+                reprojection_error = compute_reprojection_error(pose, ret['num_inliers'], ret['inliers'],
+                                                                points2D, points3D, K, distortion)
                 cache = {
                     "num_correspondences": len(points3D),
-                    "num_inliers": inliers,
+                    "num_inliers": ret['num_inliers'],
                     "inliers": ret['inliers'],
                     "reprojection_error": reprojection_error,
                     "stats": stats
                 }
-                cache_path = os.path.join(output_path, f'pycolmap_cache/{image_name}.json')
+                cache_path = os.path.join(output_path, f'pyransaclib_cache/{image_name}.json')
                 save_to_json(cache, cache_path)
             trajectories[timestamp, sensor_id] = pose
+
+        progress_bar.update(1)
+    progress_bar.close()
 
     kapture_data_localized = kapture.Kapture(sensors=kapture_query_data.sensors,
                                              trajectories=trajectories,
@@ -241,8 +287,8 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     kapture.io.csv.kapture_to_dir(output_path, kapture_data_localized)
 
 
-def get_pycolmap_localize_argparser():
-    parser = argparse.ArgumentParser(description=('localize images with pycolmap '
+def get_pyransaclib_localize_argparser():
+    parser = argparse.ArgumentParser(description=('localize images with pyransaclib '
                                                   'from data specified in kapture format.'))
     parser_verbosity = parser.add_mutually_exclusive_group()
     parser_verbosity.add_argument('-v', '--verbose', nargs='?', default=logging.WARNING, const=logging.INFO,
@@ -262,10 +308,17 @@ def get_pycolmap_localize_argparser():
                         type=str,
                         help=('text file in the csv format; where each line is image_name1, image_name2, score '
                               'which contains the image pairs to match, can be used to filter loaded matches'))
-    parser.add_argument('--max-error', type=float, default=8.0,
-                        help='RANSACOptions max_error, in pixels. Use about 1 percent of images diagonal')
+    parser.add_argument('--inlier-threshold', type=float, default=8.0,
+                        help='RANSAC inlier threshold in pixel')
+    parser.add_argument('--number-lo-steps', type=int, default=10,
+                        help='number of local optimization iterations in LO-MSAC. Use 0 to use MSAC.')
+    parser.add_argument('--min-num-iterations', type=int, default=200,
+                        help='min number ransac iterations.')
+    parser.add_argument('--max-num-iterations', type=int, default=100000,
+                        help='max number ransac iterations.')
+    parser.add_argument('--refine-poses', action='store_true', default=False,
+                        help='refine poses with pycolmap.')
     parser.add_argument('--keypoints-type', default=None,  help='keypoint type_name')
-
     parser.add_argument('--duplicate-strategy',
                         default=DuplicateCorrespondencesStrategy.ignore,
                         type=DuplicateCorrespondencesStrategy,
@@ -276,17 +329,17 @@ def get_pycolmap_localize_argparser():
                         default=RerankCorrespondencesStrategy.none,
                         type=RerankCorrespondencesStrategy,
                         choices=list(RerankCorrespondencesStrategy),
-                        help=('rerank strategy before ignore'))
+                        help=('reran strategy before ignore'))
     parser.add_argument('--write-detailed-report', action='store_true', default=False,
                         help='write inliers and reprojection error in a json for each query.')
     return parser
 
 
-def pycolmap_localize_command_line():
+def pyransaclib_localize_command_line():
     """
     Parse the command line arguments to localize images with pyransaclib using the given kapture data.
     """
-    parser = get_pycolmap_localize_argparser()
+    parser = get_pyransaclib_localize_argparser()
     args = parser.parse_args()
 
     logger.setLevel(args.verbose)
@@ -296,20 +349,24 @@ def pycolmap_localize_command_line():
         kapture.utils.logging.getLogger().setLevel(args.verbose)
 
     args_dict = vars(args)
-    logger.debug('kapture_pycolmap_localize.py \\\n' + '  \\\n'.join(
+    logger.debug('kapture_pyransaclib_localize.py \\\n' + '  \\\n'.join(
         '--{:20} {:100}'.format(k, str(v)) for k, v in args_dict.items()))
 
-    pycolmap_localize(args.input,
-                      args.query,
-                      args.output,
-                      args.pairsfile_path,
-                      args.max_error,
-                      args.keypoints_type,
-                      args.duplicate_strategy,
-                      args.rerank_strategy,
-                      args.write_detailed_report,
-                      args.force)
+    pyransaclib_localize(args.input,
+                         args.query,
+                         args.output,
+                         args.pairsfile_path,
+                         args.inlier_threshold,
+                         args.number_lo_steps,
+                         args.min_num_iterations,
+                         args.max_num_iterations,
+                         args.refine_poses,
+                         args.keypoints_type,
+                         args.duplicate_strategy,
+                         args.rerank_strategy,
+                         args.write_detailed_report,
+                         args.force)
 
 
 if __name__ == '__main__':
-    pycolmap_localize_command_line()
+    pyransaclib_localize_command_line()
