@@ -3,7 +3,6 @@
 
 """
 This script localize images on an existing COLMAP model (map) from kapture format
-images, cameras, trajectories: no features or matches!
 """
 
 import argparse
@@ -44,7 +43,7 @@ def colmap_localize(kapture_path: str,
                     skip_list: List[str],
                     force: bool) -> None:
     """
-    Localize images on a colmap model using default SIFT features with the kapture data.
+    Localize images on a colmap model with the kapture data.
 
     :param kapture_path: path to the kapture to use
     :param colmap_path: path to the colmap build
@@ -91,7 +90,7 @@ def colmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
                                      skip_list: List[str],
                                      force: bool) -> None:
     """
-    Localize images on a colmap model using default SIFT features with the kapture data.
+    Localize images on a colmap model with the kapture data.
 
     :param kapture_data: kapture data to use
     :param kapture_path: path to the kapture to use
