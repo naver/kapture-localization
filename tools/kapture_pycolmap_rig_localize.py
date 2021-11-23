@@ -47,6 +47,10 @@ def pycolmap_rig_localize(kapture_path: str,
                           rig_ids: List[str],
                           apply_rigs_remove: bool,
                           max_error: float,
+                          min_inlier_ratio: float,
+                          min_num_iterations: int,
+                          max_num_iterations: int,
+                          confidence: float,
                           keypoints_type: Optional[str],
                           duplicate_strategy: DuplicateCorrespondencesStrategy,
                           rerank_strategy: RerankCorrespondencesStrategy,
@@ -62,6 +66,10 @@ def pycolmap_rig_localize(kapture_path: str,
     :param rig_ids: list of rig ids that should be localized
     :param apply_rigs_remove: apply rigs remove before saving poses to disk
     :param max_error: RANSAC inlier threshold in pixel, shared between all cameras
+    :param min_inlier_ratio: abs_pose_options.ransac_options.min_inlier_ratio
+    :param min_num_iterations: abs_pose_options.ransac_options.min_num_trials
+    :param max_num_iterations: abs_pose_options.ransac_options.max_num_trials
+    :param confidence: abs_pose_options.ransac_options.confidence
     :param keypoints_type: types of keypoints (and observations) to use
     :param force: Silently overwrite kapture files if already exists.
     """
@@ -91,6 +99,10 @@ def pycolmap_rig_localize(kapture_path: str,
                                                rig_ids,
                                                apply_rigs_remove,
                                                max_error,
+                                               min_inlier_ratio,
+                                               min_num_iterations,
+                                               max_num_iterations,
+                                               confidence,
                                                keypoints_type,
                                                duplicate_strategy,
                                                rerank_strategy,
@@ -107,6 +119,10 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
                                            rig_ids: List[str],
                                            apply_rigs_remove: bool,
                                            max_error: float,
+                                           min_inlier_ratio: float,
+                                           min_num_iterations: int,
+                                           max_num_iterations: int,
+                                           confidence: float,
                                            keypoints_type: Optional[str],
                                            duplicate_strategy: DuplicateCorrespondencesStrategy,
                                            rerank_strategy: RerankCorrespondencesStrategy,
@@ -124,6 +140,10 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param rig_ids: list of rig ids that should be localized
     :param apply_rigs_remove: apply rigs remove before saving poses to disk
     :param max_error: RANSAC inlier threshold in pixel, shared between all cameras
+    :param min_inlier_ratio: abs_pose_options.ransac_options.min_inlier_ratio
+    :param min_num_iterations: abs_pose_options.ransac_options.min_num_trials
+    :param max_num_iterations: abs_pose_options.ransac_options.max_num_trials
+    :param confidence: abs_pose_options.ransac_options.confidence
     :param keypoints_type: types of keypoints (and observations) to use
     :param force: Silently overwrite kapture files if already exists.
     """
@@ -241,7 +261,9 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
             # compute absolute pose
             # inlier_threshold - RANSAC inlier threshold in pixels
             # answer - dictionary containing the RANSAC output
-            ret = pycolmap.rig_absolute_pose_estimation(points2D, points3D, cameras_dict, qvec, tvec, max_error)
+            ret = pycolmap.rig_absolute_pose_estimation(points2D, points3D, cameras_dict, qvec, tvec, max_error,
+                                                        min_inlier_ratio, min_num_iterations, max_num_iterations,
+                                                        confidence)
 
             # add pose to output kapture
             if ret['success'] and ret['num_inliers'] > 0:
@@ -331,11 +353,22 @@ def get_pycolmap_rig_localize_argparser():
                         type=str,
                         help=('text file in the csv format; where each line is image_name1, image_name2, score '
                               'which contains the image pairs to match, can be used to filter loaded matches'))
+
     parser.add_argument('--rig-ids', nargs='+', default=[], help='list of rigs to localize')
     parser.add_argument('--apply-rigs-remove', action='store_true', default=False,
                         help='apply rigs remove before saving poses to disk.')
+
     parser.add_argument('--max-error', type=float, default=12.0,
                         help='RANSAC inlier threshold in pixel, shared between all cameras')
+    parser.add_argument('--min-inlier-ratio', type=int, default=0.01,
+                        help='abs_pose_options.ransac_options.min_inlier_ratio')
+    parser.add_argument('--min-num-iterations', type=int, default=1000,
+                        help='abs_pose_options.ransac_options.min_num_trials')
+    parser.add_argument('--max-num-iterations', type=int, default=100000,
+                        help='abs_pose_options.ransac_options.max_num_trials')
+    parser.add_argument('--confidence', type=int, default=0.9999,
+                        help='abs_pose_options.ransac_options.confidence')
+
     parser.add_argument('--keypoints-type', default=None,  help='keypoint type_name')
     parser.add_argument('--duplicate-strategy',
                         default=DuplicateCorrespondencesStrategy.ignore,
@@ -378,6 +411,10 @@ def pycolmap_rig_localize_command_line():
                           args.rig_ids,
                           args.apply_rigs_remove,
                           args.max_error,
+                          args.min_inlier_ratio,
+                          args.min_num_iterations,
+                          args.max_num_iterations,
+                          args.confidence,
                           args.keypoints_type,
                           args.duplicate_strategy,
                           args.rerank_strategy,

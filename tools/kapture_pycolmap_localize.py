@@ -46,6 +46,10 @@ def pycolmap_localize(kapture_path: str,
                       output_path: str,
                       pairsfile_path: str,
                       max_error: float,
+                      min_inlier_ratio: float,
+                      min_num_iterations: int,
+                      max_num_iterations: int,
+                      confidence: float,
                       keypoints_type: Optional[str],
                       duplicate_strategy: DuplicateCorrespondencesStrategy,
                       rerank_strategy: RerankCorrespondencesStrategy,
@@ -59,6 +63,10 @@ def pycolmap_localize(kapture_path: str,
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
+    :param min_inlier_ratio: abs_pose_options.ransac_options.min_inlier_ratio
+    :param min_num_iterations: abs_pose_options.ransac_options.min_num_trials
+    :param max_num_iterations: abs_pose_options.ransac_options.max_num_trials
+    :param confidence: abs_pose_options.ransac_options.confidence
     :param keypoints_type: types of keypoints (and observations) to use
     :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
     :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
@@ -88,6 +96,10 @@ def pycolmap_localize(kapture_path: str,
                                            output_path,
                                            pairsfile_path,
                                            max_error,
+                                           min_inlier_ratio,
+                                           min_num_iterations,
+                                           max_num_iterations,
+                                           confidence,
                                            keypoints_type,
                                            duplicate_strategy,
                                            rerank_strategy,
@@ -102,6 +114,10 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
                                        output_path: str,
                                        pairsfile_path: str,
                                        max_error: float,
+                                       min_inlier_ratio: float,
+                                       min_num_iterations: int,
+                                       max_num_iterations: int,
+                                       confidence: float,
                                        keypoints_type: Optional[str],
                                        duplicate_strategy: DuplicateCorrespondencesStrategy,
                                        rerank_strategy: RerankCorrespondencesStrategy,
@@ -117,6 +133,10 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
+    :param min_inlier_ratio: abs_pose_options.ransac_options.min_inlier_ratio
+    :param min_num_iterations: abs_pose_options.ransac_options.min_num_trials
+    :param max_num_iterations: abs_pose_options.ransac_options.max_num_trials
+    :param confidence: abs_pose_options.ransac_options.confidence
     :param keypoints_type: types of keypoints (and observations) to use
     :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
     :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
@@ -211,7 +231,8 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
         # compute absolute pose
         # inlier_threshold - RANSAC inlier threshold in pixels
         # answer - dictionary containing the RANSAC output
-        ret = pycolmap.absolute_pose_estimation(points2D, points3D, cfg, max_error)
+        ret = pycolmap.absolute_pose_estimation(points2D, points3D, cfg, max_error,
+                                                min_inlier_ratio, min_num_iterations, max_num_iterations, confidence)
         # add pose to output kapture
         if ret['success'] and ret['num_inliers'] > 0:
             pose = kapture.PoseTransform(ret['qvec'], ret['tvec'])
@@ -262,10 +283,19 @@ def get_pycolmap_localize_argparser():
                         type=str,
                         help=('text file in the csv format; where each line is image_name1, image_name2, score '
                               'which contains the image pairs to match, can be used to filter loaded matches'))
+
     parser.add_argument('--max-error', type=float, default=8.0,
                         help='RANSACOptions max_error, in pixels. Use about 1 percent of images diagonal')
-    parser.add_argument('--keypoints-type', default=None,  help='keypoint type_name')
+    parser.add_argument('--min-inlier-ratio', type=int, default=0.01,
+                        help='abs_pose_options.ransac_options.min_inlier_ratio')
+    parser.add_argument('--min-num-iterations', type=int, default=1000,
+                        help='abs_pose_options.ransac_options.min_num_trials')
+    parser.add_argument('--max-num-iterations', type=int, default=100000,
+                        help='abs_pose_options.ransac_options.max_num_trials')
+    parser.add_argument('--confidence', type=int, default=0.9999,
+                        help='abs_pose_options.ransac_options.confidence')
 
+    parser.add_argument('--keypoints-type', default=None,  help='keypoint type_name')
     parser.add_argument('--duplicate-strategy',
                         default=DuplicateCorrespondencesStrategy.ignore,
                         type=DuplicateCorrespondencesStrategy,
@@ -304,6 +334,10 @@ def pycolmap_localize_command_line():
                       args.output,
                       args.pairsfile_path,
                       args.max_error,
+                      args.min_inlier_ratio,
+                      args.min_num_iterations,
+                      args.max_num_iterations,
+                      args.confidence,
                       args.keypoints_type,
                       args.duplicate_strategy,
                       args.rerank_strategy,
