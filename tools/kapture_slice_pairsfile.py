@@ -5,6 +5,7 @@ import argparse
 import os
 import logging
 import pathlib
+import math
 
 import path_to_kapture_localization  # noqa: F401
 import kapture_localization.utils.logging
@@ -38,7 +39,10 @@ def slice_pairsfile(pairsfile_path: str,
             if skip_if_na:
                 logger.debug(f'skipping {name_query}')
                 continue
-        paired_images_threshold = paired_images_threshold[startk:startk+topk]
+        if math.isinf(topk):
+            paired_images_threshold = paired_images_threshold[startk:]
+        else:
+            paired_images_threshold = paired_images_threshold[startk:startk+topk]
         for name_map, score in paired_images_threshold:
             image_pairs.append((name_query, name_map, score))
 
