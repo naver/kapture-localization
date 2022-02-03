@@ -47,7 +47,7 @@ def get_rotations_diff(imgs_query, imgs_map, device):
 
 
 def get_pairs_distance(kdata: kapture.Kapture,
-                       kdata_query: Optional[kapture.Kapture],
+                       kdata_query: kapture.Kapture,
                        topk: Optional[int],
                        min_distance: float,
                        max_distance: float,
