@@ -29,8 +29,7 @@ def compute_distance_pairs(mapping_path: str,
                            min_distance: float,
                            max_distance: float,
                            max_angle: float,
-                           keep_rejected: bool,
-                           max_number_of_threads: Optional[int] = None):
+                           keep_rejected: bool):
     """
     compute image pairs from distance, and write the result in a text file
     """
@@ -59,43 +58,37 @@ def compute_distance_pairs(mapping_path: str,
     os.makedirs(str(p.parent.resolve()), exist_ok=True)
 
     with open(output_path, 'w') as fid:
-        if block_size == float('inf'):
-            image_pairs = get_pairs_distance(kdata, kdata_query, topk,
+        if kdata_query is None:
+            kdata_query = kdata
+        if kdata_query.rigs is not None:
+            assert kdata_query.trajectories is not None  # for ide
+            kapture.rigs_remove_inplace(kdata_query.trajectories, kdata_query.rigs)
+        records_camera_list = [k
+                               for k in sorted(kapture.flatten(kdata_query.records_camera),
+                                               key=lambda x: x[2])]
+        number_of_iteration = math.ceil(len(records_camera_list) / block_size)
+        table_to_file(fid, [], header='# query_image, map_image, score')
+        for i in tqdm(range(number_of_iteration), disable=logging.getLogger().level >= logging.CRITICAL):
+            sliced_records = kapture.RecordsCamera()
+            for ts, sensor_id, img_name in records_camera_list[i * block_size:(i+1)*block_size]:
+                if (ts, sensor_id) not in kdata_query.trajectories:
+                    continue
+                sliced_records[(ts, sensor_id)] = img_name
+            kdata_slice_query = kapture.Kapture(
+                sensors=kdata_query.sensors,
+                records_camera=sliced_records,
+                trajectories=kdata_query.trajectories
+            )
+            image_pairs = get_pairs_distance(kdata, kdata_slice_query, topk,
                                              min_distance, max_distance, max_angle,
-                                             keep_rejected, max_number_of_threads)
-            table_to_file(fid, image_pairs, header='# query_image, map_image, score')
-        else:
-            if kdata_query is None:
-                kdata_query = kdata
-            if kdata_query.rigs is not None:
-                assert kdata_query.trajectories is not None  # for ide
-                kapture.rigs_remove_inplace(kdata_query.trajectories, kdata_query.rigs)
-            records_camera_list = [k
-                                   for k in sorted(kapture.flatten(kdata_query.records_camera),
-                                                   key=lambda x: x[2])]
-            number_of_iteration = math.ceil(len(records_camera_list) / block_size)
-            table_to_file(fid, [], header='# query_image, map_image, score')
-            for i in tqdm(range(number_of_iteration), disable=logging.getLogger().level >= logging.CRITICAL):
-                sliced_records = kapture.RecordsCamera()
-                for ts, sensor_id, img_name in records_camera_list[i * block_size:(i+1)*block_size]:
-                    if (ts, sensor_id) not in kdata_query.trajectories:
-                        continue
-                    sliced_records[(ts, sensor_id)] = img_name
-                kdata_slice_query = kapture.Kapture(
-                    sensors=kdata_query.sensors,
-                    records_camera=sliced_records,
-                    trajectories=kdata_query.trajectories
-                )
-                image_pairs = get_pairs_distance(kdata, kdata_slice_query, topk,
-                                                 min_distance, max_distance, max_angle,
-                                                 keep_rejected, max_number_of_threads)
-                table_to_file(fid, image_pairs)
+                                             keep_rejected)
+            table_to_file(fid, image_pairs)
     logger.info('all done')
 
 
 def compute_distance_pairs_command_line():
     parser = argparse.ArgumentParser(
-        description=('Create image pairs files from distance. '
+        description=('Create image pairs files from distance. Does not handle none poses'
                      'Pairs are computed between query <-> mapping or mapping <-> mapping'))
     parser_verbosity = parser.add_mutually_exclusive_group()
     parser_verbosity.add_argument('-v', '--verbose', nargs='?', default=logging.WARNING, const=logging.INFO,
@@ -119,14 +112,11 @@ def compute_distance_pairs_command_line():
     parser_dist.add_argument('--keep-rejected', action='store_true', default=False,
                              help='keep pairs that are not within the thresholds bounds')
 
-    parser.add_argument('--max-number-of-threads', default=None, type=int,
-                        help='By default, use as many as cpus. But you can set a limit.')
-    parser.add_argument('--block-size', default=float('inf'), type=int,
+    parser.add_argument('--block-size', default=1000, type=int,
                         help=('number of (query) images to process at once'))
 
     parser.add_argument('-o', '--output', required=True,
                         help='output path to pairsfile')
-
     parser.add_argument('--topk', default=None, type=int,
                         help='the max number of top retained images')
 
@@ -142,7 +132,7 @@ def compute_distance_pairs_command_line():
     compute_distance_pairs(args.mapping, args.query, args.output, args.topk,
                            args.block_size,
                            args.min_distance, args.max_distance, args.max_angle,
-                           args.keep_rejected, args.max_number_of_threads)
+                           args.keep_rejected)
 
 
 if __name__ == '__main__':
