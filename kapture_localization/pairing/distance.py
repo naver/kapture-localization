@@ -4,7 +4,7 @@ import numpy as np
 import quaternion
 import math
 
-import localization_lib.path_to_kapture  # noqa: F401
+import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
 
 
