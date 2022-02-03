@@ -25,7 +25,7 @@ def get_position_diff(imgs_query, imgs_map):
 
 def get_rotations_diff(imgs_query, imgs_map, device):
     rad_to_deg = 180.0 / math.pi
-    rotation_matrix = np.empty((3, 3), dtype=float)
+    rotation_matrix = np.empty((3, 3), dtype=np.float32)
 
     rotations_query = np.empty((len(imgs_query), 1, 3, 3), dtype=np.float32)
     for i, (_, pose) in enumerate(imgs_query):
