@@ -68,7 +68,6 @@ setuptools.setup(
         'cvxpy>=1.1.6',
         'torch>=1.4.0',
         'tabulate>=0.8.7',
-        'roma>=1.2.3',
         'opencv-python',
     ],
     extras_require={
