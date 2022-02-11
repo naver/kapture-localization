@@ -77,7 +77,7 @@ for SCENE in B1 B2; do
   # 5) mapping pipeline
   LOCAL=r2d2_WASF_N8_big
   GLOBAL=Resnet101-AP-GeM-LM18
-  ${PYTHONBIN} /tmp-network/user/mhumenbe/src/kapture-localization/pipeline/kapture_pipeline_mapping.py -v debug -f \
+  kapture_pipeline_mapping.py -v debug -f \
     -i ${WORKING_DIR}/${DATASET}/mapping \
     -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
     -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
@@ -88,7 +88,7 @@ for SCENE in B1 B2; do
     --topk ${TOPK}
 
   # 6) localization pipeline
-  ${PYTHONBIN} /tmp-network/user/mhumenbe/src/kapture-localization/pipeline/kapture_pipeline_localize.py -v debug -f \
+  kapture_pipeline_localize.py -v debug -f \
     -i ${WORKING_DIR}/${DATASET}/mapping \
     --query ${WORKING_DIR}/${DATASET}/test \
     -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
