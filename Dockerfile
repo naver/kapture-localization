@@ -16,9 +16,9 @@ RUN mkdir -p ${SOURCE_PREFIX}
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     git \
-    wget\
-    curl \
-    python3.6 python3-pip \
+    wget curl \
+    unzip openssh-client \
+    python3.6 python3-pip python3-dev \
     pandoc asciidoctor \
     cmake \
     build-essential \
@@ -78,9 +78,8 @@ RUN     cmake \
 
 # colmap
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b dev https://github.com/colmap/colmap.git 
+RUN     git clone -b 3.7 https://github.com/colmap/colmap.git
 WORKDIR ${SOURCE_PREFIX}/colmap
-RUN     git checkout 06a230fe9bea71170583dcd4e7acc14aac4ef2fb
 RUN     mkdir -p build
 WORKDIR ${SOURCE_PREFIX}/colmap/build
 RUN     cmake \
@@ -102,6 +101,20 @@ RUN     cd  ./PoseLib/_build && \
         cmake --build . --target install -j 8 &&\
         cmake --build . --target clean
 
+######### PYCOLMAP #############################################################
+WORKDIR ${SOURCE_PREFIX}
+RUN     git clone --recursive -b v0.1.0 https://github.com/mihaidusmanu/pycolmap.git
+WORKDIR ${SOURCE_PREFIX}/pycolmap
+RUN     python3 -m pip install ./
+
+######### PYRANSACLIB ##########################################################
+WORKDIR ${SOURCE_PREFIX}
+RUN     git clone --recursive https://github.com/tsattler/RansacLib.git
+WORKDIR ${SOURCE_PREFIX}/RansacLib
+RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113
+RUN     sed -i '4i set(CMAKE_CXX_STANDARD 17)' CMakeLists.txt
+RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib python3 -m pip install ./
+
 ########################################################################################################################
 # install kapture from pip.
 RUN      python3 -m pip install kapture
@@ -110,21 +123,8 @@ RUN      python3 -m pip install kapture
 ADD      . ${SOURCE_PREFIX}/kapture-localization
 WORKDIR  ${SOURCE_PREFIX}/kapture-localization
 RUN      python3 -m pip install "torch==1.4.0" "torchvision==0.5.0" "scikit_learn==0.20.2"
-RUN      python3 -m pip install -r requirements.txt --use-feature=2020-resolver
+RUN      python3 -m pip install -r requirements.txt
 RUN      python3 setup.py install
-
-######### PYCOLMAP #############################################################
-WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive https://github.com/mihaidusmanu/pycolmap.git
-WORKDIR ${SOURCE_PREFIX}/pycolmap
-RUN     python3 -m pip install ./
-
-######### PYRANSACLIB ##########################################################
-WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive https://github.com/tsattler/RansacLib.git
-WORKDIR ${SOURCE_PREFIX}/RansacLib
-RUN     sed -i '4i set(CMAKE_CXX_STANDARD 17)' CMakeLists.txt
-RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib python3 -m pip install ./
 
 ### FINALIZE ###################################################################
 # save space: purge apt-get
