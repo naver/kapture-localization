@@ -17,10 +17,9 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     git \
     wget curl \
-    unzip openssh-client \
+    unzip openssh-client libssl-dev \
     python3.6 python3-pip python3-dev \
     pandoc asciidoctor \
-    cmake \
     build-essential \
     libboost-all-dev \
     libsuitesparse-dev \
@@ -44,9 +43,15 @@ RUN apt-get update \
 ########################################################################################################################
 # PYTHON-PIP ###########################################################################################################
 # make sure pip 3 is >= 20.0 to enable use-feature=2020-resolver
-RUN python3 -m pip install --upgrade pip
-RUN python3 -m pip install --upgrade setuptools wheel twine
+RUN     python3 -m pip install --upgrade pip
+RUN     python3 -m pip install --upgrade setuptools wheel twine
 
+# force upgrade of cmake (more than apt get)
+## CMAKE version 3.23.0-rc1
+WORKDIR ${SOURCE_PREFIX}
+RUN     wget https://github.com/Kitware/CMake/releases/download/v3.23.0-rc1/cmake-3.23.0-rc1.tar.gz && \
+        tar -xf cmake-3.23.0-rc1.tar.gz
+RUN     cd cmake-3.23.0-rc1 && ./bootstrap && make install
 
 ########################################################################################################################
 # COLMAP ###############################################################################################################
@@ -89,33 +94,33 @@ RUN     cmake \
         make ${MAKE_OPTIONS} && make install && make clean
 
 ######### POSELIB ##############################################################
-# force upgrade of cmake
-RUN     apt-get -y remove cmake
-RUN     python3 -m pip install cmake --upgrade
-
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive https://github.com/vlarsson/PoseLib.git
-RUN     mkdir -p ./PoseLib/_build
-RUN     cd  ./PoseLib/_build && \
+RUN     git clone --recursive -n https://github.com/vlarsson/PoseLib.git
+WORKDIR ${SOURCE_PREFIX}/PoseLib
+RUN     git checkout 67dc757c619a320ae3cf4a4ffd4e4b7fc5daa692 && \
+        git submodule update --recursive # version required by PYRANSACLIB
+RUN     mkdir -p ${SOURCE_PREFIX}/PoseLib/_build
+RUN     cd ${SOURCE_PREFIX}/PoseLib/_build && \
         cmake -DCMAKE_INSTALL_PREFIX=../_install .. && \
-        cmake --build . --target install -j 8 &&\
+        cmake --build . --target install -j 8 && \
         cmake --build . --target clean
 
 ######### PYCOLMAP #############################################################
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive -b v0.1.0 https://github.com/mihaidusmanu/pycolmap.git
+RUN     git clone --recursive -b v0.1.0 https://github.com/colmap/pycolmap.git
 WORKDIR ${SOURCE_PREFIX}/pycolmap
 RUN     python3 -m pip install ./
 
 ######### PYRANSACLIB ##########################################################
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive https://github.com/tsattler/RansacLib.git
+RUN     git clone --recursive -n https://github.com/tsattler/RansacLib.git
 WORKDIR ${SOURCE_PREFIX}/RansacLib
-RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113
+RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113 && \
+        git submodule update --recursive
 RUN     sed -i '4i set(CMAKE_CXX_STANDARD 17)' CMakeLists.txt
-RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib python3 -m pip install ./
+RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib  python3 -m pip install ./
 
-########################################################################################################################
+#########################################################################################################################
 # install kapture from pip.
 RUN      python3 -m pip install kapture
 
