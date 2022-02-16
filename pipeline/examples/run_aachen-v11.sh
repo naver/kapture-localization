@@ -1,4 +1,4 @@
-# Run this script in docker,
+  # Run this script in docker,
 # but first pull the most recent version.
 
 # docker pull kapture/kapture-localization
