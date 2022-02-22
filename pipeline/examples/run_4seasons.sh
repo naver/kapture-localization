@@ -16,12 +16,11 @@
 SEASONS_DATASET_ROOT_URL="https://XXXXXXXXXXXXXXXXXXXX"
 ################################################
 
-# 0a) Define paths and params
-TOPK=20  # number of retrieved images for mapping and localization
-LOCAL_FEAT=r2d2_WASF_N8_big
-#LOCAL_FEAT_KPTS=20000 # number of local features to extract
-LOCAL_FEAT_KPTS=2000 # number of local features to extract
-GLOBAL_FEAT=Resnet101-AP-GeM-LM18
+# 0) Define paths and params
+LOCAL_FEAT_DESC=r2d2_WASF_N8_big
+LOCAL_FEAT_KPTS=20000 # number of local features to extract
+GLOBAL_FEAT_DESC=Resnet101-AP-GeM-LM18
+GLOBAL_FEAT_TOPK=20  # number of retrieved images for mapping and localization
 
 PYTHONBIN=python3.6
 WORKING_DIR=${PWD}
@@ -32,7 +31,18 @@ DATASET_MAPPING=("recording_2020-10-08_09-57-28" "recording_2021-02-25_13-25-15"
 DATASET_QUERY=("recording_2021-01-07_14-03-57" "recording_2021-05-10_18-26-26" "recording_2021-05-10_19-51-14")
 DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 
-#rm -rf ${DATASETS_PATH}/${DATASET}
+
+# override for fast
+LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
+LOCAL_FEAT_KPTS=200 # number of local features to extract
+#GLOBAL_FEAT_DESC=Resnet101-AP-GeM
+GLOBAL_FEAT_TOPK=5  # number of retrieved images for mapping and localization
+DATASET_NAMES=("countryside")
+DATASET_MAPPING=("recording_2020-10-08_09-57-28")
+DATASET_QUERY=("recording_2021-01-07_14-03-57")
+DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
+
+
 # 1) Download dataset
 # Note that you will be asked to accept or decline the license terms before download.
 if [ ! -d ${DATASETS_PATH} ]; then
@@ -66,11 +76,13 @@ if [ ! -d ${DATASETS_PATH} ]; then
   rm -rf ${TMP_DIR}
 fi
 
-# create aliases
+# 2) reorganize by place and mapping/query split
 if [ ! -d ${DATASETS_PATH}/places ]; then
   mkdir -p ${DATASETS_PATH}/places
   cd ${DATASETS_PATH}/places
 
+  # do not copy, but symlink sensors/
+  # DO NOT DELETE records/
   for i in "${!DATASET_NAMES[@]}"; do
     for PART in "mapping" "query"; do
       mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/$PART;
@@ -82,81 +94,84 @@ if [ ! -d ${DATASETS_PATH}/places ]; then
        ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/query \
     -o ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/mapping_plus_query \
     --image_transfer link_relative
-
-    # prepare a place to host local features common for mapping, query and mapping_plus_query
-    mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/global_features/${GLOBAL_FEAT}/global_features;
-    for PART in "mapping" "query" "mapping_plus_query"; do
-      mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/${PART}/reconstruction;
-      ln -s ../../global_features \
-            ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/${PART}/reconstruction/global_features;
-    done;
   done
 fi
 
-# 2) Create temporal mapping and query sets (they will be modified)
-# 4) Extract global features (we will use AP-GeM here)
+# 3) Extract global features (we will use AP-GeM here)
 # Deep Image retrieval - AP-GeM
-cd ${WORKING_DIR}
 if [ ! -d ${WORKING_DIR}/deep-image-retrieval ]; then
   pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
   cd ${WORKING_DIR}
   git clone https://github.com/naver/deep-image-retrieval.git
-  cd deep-image-retrieval
-  mkdir -p dirtorch/data/
-  cd dirtorch/data/
-  if [ ! -f ${GLOBAL_FEAT}.pt ]; then
-    gdown --id 1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I # downloads a pre-trained model of AP-GeM
-    unzip ${GLOBAL_FEAT}.pt.zip
-    rm -f ${GLOBAL_FEAT}.pt.zip
+  mkdir -p ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/
+  cd ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/
+   # downloads a pre-trained model of AP-GeM
+  if [ ! -f ${GLOBAL_FEAT_DESC}.pt ]; then
+    gdown --id 1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I
+    unzip ${GLOBAL_FEAT_DESC}.pt.zip
+    rm -f ${GLOBAL_FEAT_DESC}.pt.zip
   fi
 fi
 
 cd ${WORKING_DIR}/deep-image-retrieval
 for PLACE in ${DATASET_NAMES[*]}; do
-  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ --checkpoint dirtorch/data/${GLOBAL_FEAT}.pt --gpu 0
+  ${PYTHONBIN} -m ${WORKING_DIR}/deep-image-retrieval/dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
+  --checkpoint ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/${GLOBAL_FEAT_DESC}.pt --gpu 0
+
+  # move global features to right location
+  # see https://github.com/naver/kapture-localization/blob/main/doc/tutorial.adoc#recommended-dataset-structure
+  mkdir -p ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}/* \
+     ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features
+  rm -rf ${WORKING_DIR}/${DATASET}/mapping_plus_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}
 done
 
-exit 0
 ##################################################################
-##################################################################
-##################################################################
-# move to right location
-mkdir -p ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features
-mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/global_features/${GLOBAL}/* ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features/
-rm -rf ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/global_features/${GLOBAL}
-
-# 5) Extract local features (we will use R2D2 here)
+# 4) Extract local features (we will use R2D2 here)
 cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
-cd ${WORKING_DIR}/r2d2
-${PYTHONBIN} extract_kapture.py --model models/${LOCAL}.pt --kapture-root ${WORKING_DIR}/${DATASET}/map_plus_query/ --min-scale 0.3 --min-size 128 --max-size 9999 --top-k ${KPTS}
-# move to right location
-mkdir -p ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors
-mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/descriptors/${LOCAL}/* ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors/
-mkdir -p ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints
-mv ${WORKING_DIR}/${DATASET}/map_plus_query/reconstruction/keypoints/${LOCAL}/* ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints/
+for PLACE in ${DATASET_NAMES[*]}; do
+  ${PYTHONBIN} ${WORKING_DIR}/r2d2/extract_kapture.py --model ${WORKING_DIR}/r2d2/models/${LOCAL_FEAT_DESC}.pt \
+              --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
+              --min-scale 0.3 --min-size 128 --max-size 1000 --top-k ${LOCAL_FEAT_KPTS}  #< change max-size 9999
+
+  # move keypoints and descriptors to right location
+  # see https://github.com/naver/kapture-localization/blob/main/doc/tutorial.adoc#recommended-dataset-structure
+  mkdir -p ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}/* \
+     ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors
+  mkdir -p ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}/* \
+     ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints/
+  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}
+  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}
+done
 
 # 6) mapping pipeline
-kapture_pipeline_mapping.py -v debug -f \
-  -i ${WORKING_DIR}/${DATASET}/mapping \
-  -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
-  -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
-  -gfeat ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features \
-  -matches ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_no_gv/matches \
-  -matches-gv ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_colmap_gv/matches \
-  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/${GLOBAL} \
-  --topk ${TOPK}
+for PLACE in ${DATASET_NAMES[*]}; do
+  kapture_pipeline_mapping.py -v debug -f \
+    -i ${DATASETS_PATH}/places/${PLACE}/mapping \
+    -kpt ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints \
+    -desc ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors \
+    -gfeat ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features \
+    -matches ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_no_gv/matches \
+    -matches-gv ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_colmap_gv/matches \
+    --colmap-map ${DATASETS_PATH}/places/${PLACE}/colmap-sfm/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
+    --topk ${GLOBAL_FEAT_TOPK}
+done
 
 # 7) localization pipeline
-kapture_pipeline_localize.py -v debug -f \
-  -i ${WORKING_DIR}/${DATASET}/mapping \
-  --query ${WORKING_DIR}/${DATASET}/query \
-  -kpt ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/keypoints \
-  -desc ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/descriptors \
-  -gfeat ${WORKING_DIR}/${DATASET}/global_features/${GLOBAL}/global_features \
-  -matches ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_no_gv/matches \
-  -matches-gv ${WORKING_DIR}/${DATASET}/local_features/${LOCAL}/NN_colmap_gv/matches \
-  --colmap-map ${WORKING_DIR}/${DATASET}/colmap-sfm/${LOCAL}/${GLOBAL} \
-  -o ${WORKING_DIR}/${DATASET}/colmap-localize/${LOCAL}/${GLOBAL} \
-  --topk ${TOPK} \
-  --config 2
+for PLACE in ${DATASET_NAMES[*]}; do
+  kapture_pipeline_localize.py -v debug -f \
+    -i ${DATASETS_PATH}/places/${PLACE}/mapping \
+    --query ${DATASETS_PATH}/places/${PLACE}/query \
+    -kpt ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints \
+    -desc ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors \
+    -gfeat ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features \
+    -matches ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_no_gv/matches \
+    -matches-gv ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_colmap_gv/matches \
+    --colmap-map ${DATASETS_PATH}/places/${PLACE}/colmap-sfm/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
+    -o ${DATASETS_PATH}/places/${PLACE}/colmap-localize/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
+    --topk ${GLOBAL_FEAT_TOPK} \
+    --config 2
+done
