@@ -22,7 +22,7 @@ LOCAL_FEAT_KPTS=20000 # number of local features to extract
 GLOBAL_FEAT_DESC=Resnet101-AP-GeM-LM18
 GLOBAL_FEAT_TOPK=20  # number of retrieved images for mapping and localization
 
-PYTHONBIN=python3.6
+PYTHONBIN=python3
 WORKING_DIR=${PWD}
 TMP_DIR=/tmp/4seasons/
 DATASETS_PATH=${WORKING_DIR}/datasets/4seasons
@@ -32,7 +32,7 @@ DATASET_QUERY=("recording_2021-01-07_14-03-57" "recording_2021-05-10_18-26-26" "
 DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 
 
-# override for fast
+# override vars for fast test
 LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
 LOCAL_FEAT_KPTS=200 # number of local features to extract
 #GLOBAL_FEAT_DESC=Resnet101-AP-GeM
@@ -41,6 +41,9 @@ DATASET_NAMES=("countryside")
 DATASET_MAPPING=("recording_2020-10-08_09-57-28")
 DATASET_QUERY=("recording_2021-01-07_14-03-57")
 DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
+
+# 0) install required tools
+pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
 
 
 # 1) Download dataset
@@ -100,22 +103,22 @@ fi
 # 3) Extract global features (we will use AP-GeM here)
 # Deep Image retrieval - AP-GeM
 if [ ! -d ${WORKING_DIR}/deep-image-retrieval ]; then
-  pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
   cd ${WORKING_DIR}
   git clone https://github.com/naver/deep-image-retrieval.git
+fi
+
+# downloads a pre-trained model of AP-GeM
+if [ ! -f ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/${GLOBAL_FEAT_DESC}.pt ]; then
   mkdir -p ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/
   cd ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/
-   # downloads a pre-trained model of AP-GeM
-  if [ ! -f ${GLOBAL_FEAT_DESC}.pt ]; then
-    gdown --id 1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I
-    unzip ${GLOBAL_FEAT_DESC}.pt.zip
-    rm -f ${GLOBAL_FEAT_DESC}.pt.zip
-  fi
+  gdown --id 1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I
+  unzip ${GLOBAL_FEAT_DESC}.pt.zip
+  rm -f ${GLOBAL_FEAT_DESC}.pt.zip
 fi
 
 cd ${WORKING_DIR}/deep-image-retrieval
 for PLACE in ${DATASET_NAMES[*]}; do
-  ${PYTHONBIN} -m ${WORKING_DIR}/deep-image-retrieval/dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
+  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
   --checkpoint ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/${GLOBAL_FEAT_DESC}.pt --gpu 0
 
   # move global features to right location
