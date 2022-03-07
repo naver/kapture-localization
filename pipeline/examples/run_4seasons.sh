@@ -87,10 +87,9 @@ if [ ! -d ${DATASETS_PATH}/places ]; then
   # do not copy, but symlink sensors/
   # DO NOT DELETE records/
   for i in "${!DATASET_NAMES[@]}"; do
-    for PART in "mapping" "query"; do
-      mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/$PART;
-      ln -s ../../../records/${DATASET_MAPPING[i]}/sensors ${DATASET_NAMES[i]}/$PART/sensors;
-    done;
+    mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/{mapping,query};
+    ln -s ../../../records/${DATASET_MAPPING[i]}/sensors ${DATASET_NAMES[i]}/mapping/sensors;
+    ln -s ../../../records/${DATASET_QUERY[i]}/sensors ${DATASET_NAMES[i]}/query/sensors;
 
     kapture_merge.py -v info \
     -i ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/mapping \
