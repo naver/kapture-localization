@@ -33,9 +33,9 @@ DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 
 
 # override vars for fast test
+# comment the following to do all maps.
 LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
 LOCAL_FEAT_KPTS=200 # number of local features to extract
-#GLOBAL_FEAT_DESC=Resnet101-AP-GeM
 GLOBAL_FEAT_TOPK=5  # number of retrieved images for mapping and localization
 DATASET_NAMES=("countryside")
 DATASET_MAPPING=("recording_2020-10-08_09-57-28")
