@@ -127,10 +127,10 @@ def get_correspondences(kapture_data: kapture.Kapture, keypoints_type: str,
                     same_3d_multiple_2d_max = max(same_3d_multiple_2d_max, len(assigned_3d_points_ids[p3did]))
 
             if kpts_query is not None:
-                kp_query = kpts_query[int(kpid_query)]
+                kp_query = kpts_query[kpid_query]
                 points2D.append(kp_query[0:2])
             if kpts_query_undistorted is not None:
-                kp_query_undistorted = kpts_query_undistorted[int(kpid_query)]
+                kp_query_undistorted = kpts_query_undistorted[kpid_query]
                 points2D_undistorted.append(kp_query_undistorted[0:2])
             p3d_map = kapture_data.points3d[p3did]
             points3D.append(p3d_map[0:3])
