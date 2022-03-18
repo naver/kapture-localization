@@ -40,15 +40,16 @@ def get_correspondences(kapture_data: kapture.Kapture, keypoints_type: str,
 
         num_matches = matches.shape[0]
         corrs = []
-        for m in matches:
-            if img_query < img_map:
-                kpid_query = m[0]
-                kpid_map = m[1]
-            else:
-                kpid_query = m[1]
-                kpid_map = m[0]
-            # match_score = m[2]
-
+        if img_query < img_map:
+            i_query = 0
+            i_map = 1
+        else:
+            i_query = 1
+            i_map = 0
+        kpt_id_matches = matches[:, 0:2].astype(int)
+        for m in kpt_id_matches:
+            kpid_query = m[i_query].item()
+            kpid_map = m[i_map].item()
             if not (img_map, kpid_map) in point_id_from_obs:
                 continue
             # get 3D point
