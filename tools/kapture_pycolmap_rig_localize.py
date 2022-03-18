@@ -202,8 +202,7 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
 
     # kapture for localized images + pose
     trajectories = kapture.Trajectories()
-    progress_bar = tqdm(total=len(timestamps), disable=logging.getLogger().level >= logging.CRITICAL)
-    for timestamp in timestamps:
+    for timestamp in tqdm(timestamps, disable=logging.getLogger().level >= logging.CRITICAL):
         for rig_id in final_camera_list.keys():
             # with S number of sensors
             # N number of correspondences
@@ -255,7 +254,6 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
                 points3D.append(points3D_it)
 
             if len(cameras_dict) == 0:
-                progress_bar and progress_bar.update(1)
                 continue
 
             # compute absolute pose
@@ -323,8 +321,6 @@ def pycolmap_rig_localize_from_loaded_data(kapture_data: kapture.Kapture,
                     }
                     cache_path = os.path.join(output_path, f'pycolmap_rig_cache/{timestamp}.json')
                     save_to_json(cache, cache_path)
-        progress_bar and progress_bar.update(1)
-    progress_bar and progress_bar.close()
 
     # save output kapture
     if apply_rigs_remove:
