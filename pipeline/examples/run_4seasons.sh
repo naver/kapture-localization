@@ -13,10 +13,16 @@
 # fill password and get the links
 
 ###############################################
-SEASONS_DATASET_ROOT_URL="https://XXXXXXXXXXXXXXXXXXXX"
+SEASONS_DATASET_ROOT_URL=
 SEASONS_DATASET_RELOCATION_ROOT_URL="https://github.com/pmwenzel/mlad-iccv2021/raw/main/"
 ################################################
 
+if [ -z "$SEASONS_DATASET_ROOT_URL" ]; then
+  echo "Please fill in the root url for dataset (SEASONS_DATASET_ROOT_URL)."
+  echo "You may ask permission to dataset owner for that."
+  exit 0
+fi
+exit
 # 0) Define paths and params
 LOCAL_FEAT_DESC=r2d2_WASF_N8_big
 LOCAL_FEAT_KPTS=20000 # number of local features to extract
@@ -34,8 +40,7 @@ DATASET_QUERY=("recording_2021-01-07_14-03-57" "recording_2021-05-10_18-26-26" "
 DATASET_RELOCATION=("relocalizationFile_recording_2020-10-08_09-57-28_to_recording_2021-01-07_14-03-57.txt" \
                "relocalizationFile_recording_2021-02-25_13-25-15_to_recording_2021-05-10_18-26-26.txt" \
                "relocalizationFile_recording_2020-10-08_11-53-41_to_recording_2021-05-10_19-51-14.txt" )
-
-DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
+#DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 
 
 # override vars for fast test
@@ -48,7 +53,6 @@ DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 #DATASET_VALIDATION=("recording_2020-06-12_11-26-43")
 #DATASET_QUERY=("recording_2021-01-07_14-03-57")
 #DATASET_RELOCATION=("relocalizationFile_recording_2020-10-08_09-57-28_to_recording_2021-01-07_14-03-57.txt")
-
 DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_VALIDATION[@]}" "${DATASET_QUERY[@]}")
 
 # 0) install required tools
