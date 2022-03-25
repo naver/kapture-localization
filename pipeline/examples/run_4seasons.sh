@@ -14,6 +14,7 @@
 
 ###############################################
 SEASONS_DATASET_ROOT_URL="https://XXXXXXXXXXXXXXXXXXXX"
+SEASONS_DATASET_RELOCATION_ROOT_URL="https://github.com/pmwenzel/mlad-iccv2021/raw/main/"
 ################################################
 
 # 0) Define paths and params
@@ -28,19 +29,27 @@ TMP_DIR=/tmp/4seasons/
 DATASETS_PATH=${WORKING_DIR}/datasets/4seasons
 DATASET_NAMES=("countryside" "neighborhood" "old_town")
 DATASET_MAPPING=("recording_2020-10-08_09-57-28" "recording_2021-02-25_13-25-15" "recording_2020-10-08_11-53-41")
+DATASET_VALIDATION=("recording_2020-06-12_11-26-43" "recording_2020-12-22_11-54-24" "recording_2021-01-07_10-49-45")
 DATASET_QUERY=("recording_2021-01-07_14-03-57" "recording_2021-05-10_18-26-26" "recording_2021-05-10_19-51-14")
+DATASET_RELOCATION=("relocalizationFile_recording_2020-10-08_09-57-28_to_recording_2021-01-07_14-03-57.txt" \
+               "relocalizationFile_recording_2021-02-25_13-25-15_to_recording_2021-05-10_18-26-26.txt" \
+               "relocalizationFile_recording_2020-10-08_11-53-41_to_recording_2021-05-10_19-51-14.txt" )
+
 DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
 
 
 # override vars for fast test
-# comment the following to do all maps.
-LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
-LOCAL_FEAT_KPTS=200 # number of local features to extract
-GLOBAL_FEAT_TOPK=5  # number of retrieved images for mapping and localization
-DATASET_NAMES=("countryside")
-DATASET_MAPPING=("recording_2020-10-08_09-57-28")
-DATASET_QUERY=("recording_2021-01-07_14-03-57")
-DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_QUERY[@]}")
+# uncomment the following to do a fastest test on subset with low quality parameters.
+#LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
+#LOCAL_FEAT_KPTS=200 # number of local features to extract
+#GLOBAL_FEAT_TOPK=5  # number of retrieved images for mapping and localization
+#DATASET_NAMES=("countryside")
+#DATASET_MAPPING=("recording_2020-10-08_09-57-28")
+#DATASET_VALIDATION=("recording_2020-06-12_11-26-43")
+#DATASET_QUERY=("recording_2021-01-07_14-03-57")
+#DATASET_RELOCATION=("relocalizationFile_recording_2020-10-08_09-57-28_to_recording_2021-01-07_14-03-57.txt")
+
+DATASET_ALL=("${DATASET_MAPPING[@]}" "${DATASET_VALIDATION[@]}" "${DATASET_QUERY[@]}")
 
 # 0) install required tools
 pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
@@ -89,12 +98,14 @@ if [ ! -d ${DATASETS_PATH}/places ]; then
   for i in "${!DATASET_NAMES[@]}"; do
     mkdir -p ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/{mapping,query};
     ln -s ../../../records/${DATASET_MAPPING[i]}/sensors ${DATASET_NAMES[i]}/mapping/sensors;
+    ln -s ../../../records/${DATASET_VALIDATION[i]}/sensors ${DATASET_NAMES[i]}/validation/sensors;
     ln -s ../../../records/${DATASET_QUERY[i]}/sensors ${DATASET_NAMES[i]}/query/sensors;
 
     kapture_merge.py -v info \
     -i ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/mapping \
+       ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/validation \
        ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/query \
-    -o ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/mapping_plus_query \
+    -o ${DATASETS_PATH}/places/${DATASET_NAMES[i]}/mapping_validation_query \
     --image_transfer link_relative
   done
 fi
@@ -117,15 +128,15 @@ fi
 
 cd ${WORKING_DIR}/deep-image-retrieval
 for PLACE in ${DATASET_NAMES[*]}; do
-  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
+  ${PYTHONBIN} -m dirtorch.extract_kapture --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/ \
   --checkpoint ${WORKING_DIR}/deep-image-retrieval/dirtorch/data/${GLOBAL_FEAT_DESC}.pt --gpu 0
 
   # move global features to right location
   # see https://github.com/naver/kapture-localization/blob/main/doc/tutorial.adoc#recommended-dataset-structure
   mkdir -p ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features
-  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}/* \
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}/* \
      ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features
-  rm -rf ${WORKING_DIR}/${DATASET}/mapping_plus_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}
+  rm -rf ${WORKING_DIR}/${DATASET}/mapping_validation_query/reconstruction/global_features/${GLOBAL_FEAT_DESC}
 done
 
 ##################################################################
@@ -134,19 +145,19 @@ cd ${WORKING_DIR}
 git clone https://github.com/naver/r2d2.git
 for PLACE in ${DATASET_NAMES[*]}; do
   ${PYTHONBIN} ${WORKING_DIR}/r2d2/extract_kapture.py --model ${WORKING_DIR}/r2d2/models/${LOCAL_FEAT_DESC}.pt \
-              --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/ \
+              --kapture-root ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/ \
               --min-scale 0.3 --min-size 128 --max-size 1000 --top-k ${LOCAL_FEAT_KPTS}  #< change max-size 9999
 
   # move keypoints and descriptors to right location
   # see https://github.com/naver/kapture-localization/blob/main/doc/tutorial.adoc#recommended-dataset-structure
   mkdir -p ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors
-  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}/* \
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}/* \
      ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors
   mkdir -p ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints
-  mv ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}/* \
+  mv ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}/* \
      ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints/
-  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}
-  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_plus_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}
+  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/reconstruction/descriptors/${LOCAL_FEAT_DESC}
+  rm -rf ${DATASETS_PATH}/places/${PLACE}/mapping_validation_query/reconstruction/keypoints/${LOCAL_FEAT_DESC}
 done
 
 # 6) mapping pipeline
@@ -162,8 +173,28 @@ for PLACE in ${DATASET_NAMES[*]}; do
     --topk ${GLOBAL_FEAT_TOPK}
 done
 
-# 7) localization pipeline
+# 7) localization validation
 for PLACE in ${DATASET_NAMES[*]}; do
+  kapture_pipeline_localize.py -v debug -f \
+    -i ${DATASETS_PATH}/places/${PLACE}/mapping \
+    --query ${DATASETS_PATH}/places/${PLACE}/validation \
+    -kpt ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/keypoints \
+    -desc ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/descriptors \
+    -gfeat ${DATASETS_PATH}/places/${PLACE}/global_features/${GLOBAL_FEAT_DESC}/global_features \
+    -matches ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_no_gv/matches \
+    -matches-gv ${DATASETS_PATH}/places/${PLACE}/local_features/${LOCAL_FEAT_DESC}/NN_colmap_gv/matches \
+    --colmap-map ${DATASETS_PATH}/places/${PLACE}/colmap-sfm/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
+    -o ${DATASETS_PATH}/places/${PLACE}/colmap-localize/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
+    --topk ${GLOBAL_FEAT_TOPK} \
+    --config 2
+
+  # you may find results in:
+  cat ${DATASETS_PATH}/places/${PLACE}/colmap-localize/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC}/eval/stats.txt
+done
+
+# 8) localization query
+for i in "${!DATASET_NAMES[@]}"; do
+  PLACE=${DATASET_NAMES[i]}
   kapture_pipeline_localize.py -v debug -f \
     -i ${DATASETS_PATH}/places/${PLACE}/mapping \
     --query ${DATASETS_PATH}/places/${PLACE}/query \
@@ -176,4 +207,16 @@ for PLACE in ${DATASET_NAMES[*]}; do
     -o ${DATASETS_PATH}/places/${PLACE}/colmap-localize/${LOCAL_FEAT_DESC}/${GLOBAL_FEAT_DESC} \
     --topk ${GLOBAL_FEAT_TOPK} \
     --config 2
+
+  # download the pair files and format result for 4seasons benchmark
+  RELOCATION_FILE_URL=${SEASONS_DATASET_RELOCATION_ROOT_URL}/${DATASET_RELOCATION[i]}
+  wget ${SEASONS_DATASET_RELOCATION_ROOT_URL}/${DATASET_RELOCATION[i]} \
+      -O ${DATASETS_PATH}/places/${PLACES}/mapping/${DATASET_RELOCATION[i]}
+  kapture_export_4seasons_pairs.py -v debug -f \
+    -i ${DATASETS_PATH}/places/${PLACE}/mapping
+    -p ${DATASETS_PATH}/places/${PLACES}/mapping/${DATASET_RELOCATION[i]}
+    -o ${DATASETS_PATH}/places/${PLACES}/${DATASET_RELOCATION[i]}
+
+  # you may find relocation to send to dataset benchmark in:
+  echo ${DATASETS_PATH}/places/${PLACES}/${DATASET_RELOCATION[i]}
 done
