@@ -60,7 +60,6 @@ pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
 
 
 # 1) Download dataset
-# Note that you will be asked to accept or decline the license terms before download.
 if [ ! -d ${DATASETS_PATH} ]; then
   mkdir -p ${DATASETS_PATH};
   SEASONS_DATASET_ZIP_URLS=()
