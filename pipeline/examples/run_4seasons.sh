@@ -22,7 +22,7 @@ if [ -z "$SEASONS_DATASET_ROOT_URL" ]; then
   echo "You may ask permission to dataset owner for that."
   exit 0
 fi
-exit
+
 # 0) Define paths and params
 LOCAL_FEAT_DESC=r2d2_WASF_N8_big
 LOCAL_FEAT_KPTS=20000 # number of local features to extract
