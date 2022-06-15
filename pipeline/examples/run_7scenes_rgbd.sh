@@ -106,7 +106,7 @@ done
 rm -rf ${TMP_DIR}
 
 # 2) Extract global features (we will use AP-GeM here)
-Deep Image retrieval - AP-GeM
+# Deep Image retrieval - AP-GeM
 if [ ! -d ${WORKING_DIR}/deep-image-retrieval ]; then
   cd ${WORKING_DIR}
   git clone https://github.com/naver/deep-image-retrieval.git
@@ -133,7 +133,7 @@ done
 
 # 3) Extract local features (we will use R2D2 here)
 cd ${WORKING_DIR}
-# git clone https://github.com/naver/r2d2.git
+git clone https://github.com/naver/r2d2.git
 for SCENE in ${DATASET_NAMES[*]}; do
   EXP_PATH=${DATASETS_PATH}/${SCENE}/${GLOBAL_FEAT_DESC}/${LOCAL_FEAT_DIR}
 
