@@ -65,7 +65,7 @@ for SCENE in ${DATASET_NAMES[*]}; do
     -o ${DATASETS_PATH}/${SCENE}/mapping \
     --image_transfer copy \
     -p 'mapping'
-  kapture_import_7scenes.py -v info 
+  kapture_import_7scenes.py -v info \
     -i ${TMP_DIR}/${SCENE} \
     -o ${DATASETS_PATH}/${SCENE}/query \
     --image_transfer copy \
