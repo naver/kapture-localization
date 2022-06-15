@@ -7,14 +7,14 @@
 # and run this script from there (of course you can also change WORKING_DIR=${PWD} to something else and run the script from somewhere else)
 
 ###############################################
-SEASONS_DATASET_ROOT_URL="http://download.microsoft.com/download/2/8/5/28564B23-0828-408F-8631-23B1EFF1DAC8"
+SCENES_DATASET_ROOT_URL="http://download.microsoft.com/download/2/8/5/28564B23-0828-408F-8631-23B1EFF1DAC8"
 ################################################
 
 # 0) Define paths and params
 LOCAL_FEAT_DESC=r2d2_WASF_N8_big
 LOCAL_FEAT_KPTS=20000 # number of local features to extract
 GLOBAL_FEAT_DESC=Resnet101-AP-GeM-LM18
-GLOBAL_FEAT_TOPK=20  # number of retrieved images for mapping and localization
+RETRIEVAL_TOPK=20  # number of retrieved images for mapping and localization
 
 PYTHONBIN=python3
 # select a working directory of your choice
@@ -27,7 +27,7 @@ DATASET_NAMES=("chess" "fire" "heads" "office" "pumpkin" "redkitchen" "stairs")
 # uncomment the following to do a fastest test on subset with low quality parameters
 # LOCAL_FEAT_DESC=faster2d2_WASF_N8_big
 # LOCAL_FEAT_KPTS=5000 # number of local features to extract
-# GLOBAL_FEAT_TOPK=10  # number of retrieved images for mapping and localization
+# RETRIEVAL_TOPK=10  # number of retrieved images for mapping and localization
 # DATASET_NAMES=("office")
 
 LOCAL_FEAT_DIR=${LOCAL_FEAT_DESC}_${LOCAL_FEAT_KPTS}
@@ -37,14 +37,14 @@ pip3 install scikit-learn==0.22 torchvision==0.5.0 gdown tqdm
 
 # 1) Download, unzip, and convert dataset
 mkdir -p ${DATASETS_PATH};
-SEASONS_DATASET_ZIP_URLS=()
+SCENES_DATASET_ZIP_URLS=()
 for SCENE in ${DATASET_NAMES[*]}; do
-  SEASONS_DATASET_ZIP_URLS+=(${SEASONS_DATASET_ROOT_URL}/${SCENE}.zip);
+  SCENES_DATASET_ZIP_URLS+=(${SCENES_DATASET_ROOT_URL}/${SCENE}.zip);
 done
 
 mkdir -p ${TMP_DIR};
 cd ${TMP_DIR};
-for ZIP_URL in ${SEASONS_DATASET_ZIP_URLS[*]}; do
+for ZIP_URL in ${SCENES_DATASET_ZIP_URLS[*]}; do
   wget ${ZIP_URL}
   ZIP_NAME=$(basename -- "${ZIP_URL}")
   if [ -f ${ZIP_NAME} ]; then
@@ -178,7 +178,7 @@ for SCENE in ${DATASET_NAMES[*]}; do
     -matches ${DATASETS_PATH}/${SCENE}/local_features/${LOCAL_FEAT_DIR}/NN_no_gv/matches \
     -matches-gv ${DATASETS_PATH}/${SCENE}/local_features/${LOCAL_FEAT_DIR}/NN_colmap_gv/matches \
     --colmap-map ${EXP_PATH}/mapping_triangulation/colmap \
-    --topk ${GLOBAL_FEAT_TOPK} \
+    --topk ${RETRIEVAL_TOPK} \
     --keypoints-type ${LOCAL_FEAT_DESC} \
     --descriptors-type ${LOCAL_FEAT_DESC} \
     --global-features-type ${GLOBAL_FEAT_DESC}
@@ -199,9 +199,9 @@ for SCENE in ${DATASET_NAMES[*]}; do
   kapture_compute_image_pairs.py -v debug \
     --mapping ${EXP_PATH}/mapping \
     --query ${EXP_PATH}/query \
-    --topk ${GLOBAL_FEAT_TOPK} \
+    --topk ${RETRIEVAL_TOPK} \
     -gfeat ${GLOBAL_FEAT_DESC} \
-    -o ${EXP_PATH}/query_pairs_top${GLOBAL_FEAT_TOPK}.txt
+    -o ${EXP_PATH}/query_pairs_top${RETRIEVAL_TOPK}.txt
 
   # match query-mapping pairs
   kapture_merge.py -v debug \
@@ -232,13 +232,13 @@ for SCENE in ${DATASET_NAMES[*]}; do
 
   kapture_compute_matches.py -v debug \
     -i ${EXP_PATH}/mapping_plus_query_matches \
-    --pairsfile-path ${EXP_PATH}/query_pairs_top${GLOBAL_FEAT_TOPK}.txt \
+    --pairsfile-path ${EXP_PATH}/query_pairs_top${RETRIEVAL_TOPK}.txt \
     -desc ${LOCAL_FEAT_DESC}
 
   kapture_run_colmap_gv.py -v debug -f \
     -i ${EXP_PATH}/mapping_plus_query_matches \
     -o ${EXP_PATH}/mapping_plus_query_matches_gv \
-    --pairsfile-path ${EXP_PATH}/query_pairs_top${GLOBAL_FEAT_TOPK}.txt \
+    --pairsfile-path ${EXP_PATH}/query_pairs_top${RETRIEVAL_TOPK}.txt \
     -kpt ${LOCAL_FEAT_DESC}
 
   # localize using pycolmap
@@ -247,7 +247,7 @@ for SCENE in ${DATASET_NAMES[*]}; do
     -i ${EXP_PATH}/mapping_plus_query_matches_gv \
     --query ${DATASETS_PATH}/${SCENE}/query \
     -o ${EXP_PATH}/pycolmap-localize_rgbd \
-    --pairsfile-path ${EXP_PATH}/query_pairs_top${GLOBAL_FEAT_TOPK}.txt \
+    --pairsfile-path ${EXP_PATH}/query_pairs_top${RETRIEVAL_TOPK}.txt \
     --keypoints-type ${LOCAL_FEAT_DESC}
   rm ${EXP_PATH}/mapping_plus_query_matches_gv/reconstruction/*.txt
   cp ${EXP_PATH}/mapping_triangulation/reconstruction/*.txt ${EXP_PATH}/mapping_plus_query_matches_gv/reconstruction/
@@ -255,7 +255,7 @@ for SCENE in ${DATASET_NAMES[*]}; do
     -i ${EXP_PATH}/mapping_plus_query_matches_gv \
     --query ${DATASETS_PATH}/${SCENE}/query \
     -o ${EXP_PATH}/pycolmap-localize_triangulation \
-    --pairsfile-path ${EXP_PATH}/query_pairs_top${GLOBAL_FEAT_TOPK}.txt \
+    --pairsfile-path ${EXP_PATH}/query_pairs_top${RETRIEVAL_TOPK}.txt \
     --keypoints-type ${LOCAL_FEAT_DESC} 
 
   # evaluate results
