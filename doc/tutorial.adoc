@@ -298,6 +298,8 @@ image::../doc/colmap_localized.jpg[localized]
 
 This section presents examples of how to use the custom pipeline with some public datasets. To use these examples with other datasets that are available in kapture format, only very little adaptions are needed (some parameters need to be changed; please see the documentation of the source code of the functions used for more details).
 
+The example scripts can be found in link:https://github.com/naver/kapture-localization/tree/main/pipeline/examples[```kapture-localization/pipeline/examples```].
+
 We will use the pre-built docker container for these examples.
 ```
 docker pull kapture/kapture-localization
@@ -372,6 +374,18 @@ cd kapture-localization/pipeline/examples
 ```
 
 3) The evaluation of the localization results will be written to the ```${EXP_PATH}/eval``` folder.
+
+=== Cambridge Landmarks
+
+1) Point WORKING_DIR in the script to a location where you want the dataset to be downloaded and processed data to be stored.
+
+2) Execute the script.
+```
+cd kapture-localization/pipeline/examples
+./run_cambridge.sh
+```
+
+3) The evaluation of the localization results will be written to the ```${EXP_PATH}/colmap-localize/eval``` folder.
 
 == Kapture pipeline (COLMAP)
 
