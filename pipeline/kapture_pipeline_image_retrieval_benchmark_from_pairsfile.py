@@ -250,13 +250,11 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
     if 'local_sfm' not in skip_list:
         # kapture_colmap_localize_localsfm
         local_colmap_localize_localsfm_path = path.join(pipeline_import_paths.HERE_PATH,
-                                                        '../tools/kapture_colmap_localize_localsfm.py')
+                                                        '../tools/kapture_pycolmap_localsfm.py')
         colmap_localize_localsfm_args = ['-v', str(logger.level),
-                                         '--map_plus_query', proxy_kapture_map_plus_query_path,
-                                         '--map_plus_query_gv', proxy_kapture_map_plus_query_gv_path,
+                                         '--i', proxy_kapture_map_plus_query_gv_path,
                                          '--query', proxy_kapture_query_path,
                                          '-o', local_sfm_path,
-                                         '-colmap', colmap_binary,
                                          '--pairsfile-path', pairsfile_path]
         if force_overwrite_existing:
             colmap_localize_localsfm_args.append('-f')
