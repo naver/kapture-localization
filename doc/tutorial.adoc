@@ -455,7 +455,7 @@ If the dataset used is part of the https://www.visuallocalization.net/[online be
 = Image retrieval benchmark
 
 In this section, we will present our benchmark of image retrieval methods for visual localization.
-More details and analysis are presented in our 3DV https://europe.naverlabs.com/research/publications/benchmarking-image-retrieval-for-visual-localization/[paper].
+More details and analysis are presented in our 3DV20 https://europe.naverlabs.com/research/publications/benchmarking-image-retrieval-for-visual-localization/[paper] and IJCV2022 https://europe.naverlabs.com/research/publications/investigating-the-role-of-image-retrieval-for-visual-localization-an-exhaustive-benchmark/[paper] (https://arxiv.org/abs/2205.15761[arXiv]).
 
 As shown in Fig. <<fig_roles_ir>> image retrieval can play different roles in visual localization:
 
@@ -475,13 +475,21 @@ Since the image features are the only part that changes, this benchmark can be u
 
 In the 3DV paper, we evaluated 4 image representations (APGeM, DELG, NetVLAD, DenseVLAD) on 3 datasets (Aachen Day-Night v1.1, RobotCar Seasons, Baidu-Mall). All datasets are available through our https://github.com/naver/kapture#datasets[dataset downloader] (for Baidu-Mall, the images need to be downloaded separately).
 
-If you use this benchmark in research papers, please cite this paper:
+If you use this benchmark in your research, please cite these papers:
 ----
 @inproceedings{benchmarking_ir3DV2020,
       title={Benchmarking Image Retrieval for Visual Localization},
-      author={Noé Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
+      author={No{\'e} Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
       year={2020},
       booktitle={International Conference on 3D Vision}
+}
+
+@article{humenberger2022investigating,
+  title={Investigating the Role of Image Retrieval for Visual Localization},
+  author={Humenberger, Martin and Cabon, Yohann and Pion, No{\'e} and Weinzaepfel, Philippe and Lee, Donghwan and Gu{\'e}rin, Nicolas and Sattler, Torsten and Csurka, Gabriela},
+  journal={International Journal of Computer Vision},
+  year={2022},
+  publisher={Springer}
 }
 ----
 
