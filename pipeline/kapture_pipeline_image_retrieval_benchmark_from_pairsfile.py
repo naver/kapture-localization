@@ -94,7 +94,6 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
     # local sfm results
     local_sfm_path = path.join(localization_output_path, f'local_sfm')
     os.makedirs(local_sfm_path, exist_ok=True)
-    local_sfm_localize_path = path.join(local_sfm_path, f'localized')
     local_sfm_LTVL2020_output_path = path.join(localization_output_path, 'local_sfm_LTVL2020_style_result.txt')
 
     # pose approximation results
@@ -264,7 +263,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
         if 'export_LTVL2020' not in skip_list:
             export_LTVL2020_script_name, export_LTVL2020_args = get_benchmark_format_command(
                 benchmark_format_style,
-                local_sfm_localize_path,
+                local_sfm_path,
                 local_sfm_LTVL2020_output_path,
                 force_overwrite_existing,
                 logger
@@ -328,8 +327,8 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
         if os.path.isdir(global_sfm_kapture_localize_recover_path):
             input_list.append(global_sfm_kapture_localize_recover_path)
             label_list.append(f'global_sfm_config_{config}')
-        if os.path.isdir(local_sfm_localize_path):
-            input_list.append(local_sfm_localize_path)
+        if os.path.isdir(local_sfm_path):
+            input_list.append(local_sfm_path)
             label_list.append('local_sfm')
         if os.path.isdir(pose_approx_EWB_path):
             input_list.append(pose_approx_EWB_path)
