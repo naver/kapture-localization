@@ -15,9 +15,17 @@ If this benchmark is used in research, please cite this paper:
 ----
 @inproceedings{benchmarking_ir3DV2020,
       title={Benchmarking Image Retrieval for Visual Localization},
-      author={Noé Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
+      author={No{\'e} Pion, Martin Humenberger, Gabriela Csurka, Yohann Cabon, Torsten Sattler},
       year={2020},
       booktitle={International Conference on 3D Vision}
+}
+
+@article{humenberger2022investigating,
+  title={Investigating the Role of Image Retrieval for Visual Localization},
+  author={Humenberger, Martin and Cabon, Yohann and Pion, No{\'e} and Weinzaepfel, Philippe and Lee, Donghwan and Gu{\'e}rin, Nicolas and Sattler, Torsten and Csurka, Gabriela},
+  journal={International Journal of Computer Vision},
+  year={2022},
+  publisher={Springer}
 }
 ----
 
