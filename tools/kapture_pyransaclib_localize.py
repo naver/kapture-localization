@@ -65,8 +65,8 @@ def pyransaclib_localize(kapture_path: str,
     """
     Localize images using pyransaclib.
 
-    :param kapture_path: path to the kapture to use
-    :param kapture_query_path: path to the kapture to use (mapping and query images)
+    :param kapture_path: path to the kapture to use (mapping and query images)
+    :param kapture_query_path: path to the kapture to use  (query)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param inlier_threshold: RANSAC inlier threshold in pixel
@@ -75,6 +75,9 @@ def pyransaclib_localize(kapture_path: str,
     :param max_num_iterations: maximum number of ransac loops
     :param refine_poses: refine poses with pycolmap
     :param keypoints_type: types of keypoints (and observations) to use
+    :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
+    :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
+    :param write_detailed_report: if True, write a json file with inliers, reprojection error for each query
     :param force: Silently overwrite kapture files if already exists
     """
     # Load input files first to make sure it is OK
@@ -131,10 +134,10 @@ def pyransaclib_localize_from_loaded_data(kapture_data: kapture.Kapture,
     """
     Localize images using pyransaclib.
 
-    :param kapture_data: loaded kapture data (incl. points3d)
+    :param kapture_data: loaded kapture data (mapping and query images, incl. points3d)
     :param kapture_path: path to the kapture to use
     :param tar_handlers: collection of pre-opened tar archives
-    :param kapture_data: loaded kapture data (mapping and query images)
+    :param kapture_query_data: loaded kapture data (query images)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param inlier_threshold: RANSAC inlier threshold in pixel
@@ -143,6 +146,9 @@ def pyransaclib_localize_from_loaded_data(kapture_data: kapture.Kapture,
     :param max_num_iterations: maximum number of ransac loops
     :param refine_poses: refine poses with pycolmap
     :param keypoints_type: types of keypoints (and observations) to use
+    :param duplicate_strategy: strategy to handle duplicate correspondences (either kpt_id and/or pt3d_id)
+    :param rerank_strategy: strategy to reorder pairs before handling duplicate correspondences
+    :param write_detailed_report: if True, write a json file with inliers, reprojection error for each query
     :param force: Silently overwrite kapture files if already exists.
     """
     assert has_pyransaclib
