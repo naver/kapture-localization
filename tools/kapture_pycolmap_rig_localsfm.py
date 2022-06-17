@@ -245,7 +245,7 @@ def kapture_pycolmap_rig_localsfm_from_loaded_data(
                         kapture_query_data.sensors[sensor_id])
 
                     st_e = datetime.datetime.now() - st
-                    logger.debug(f'prep query: {st_e.total_seconds():.3f}')
+                    logger.debug(f'preparation of query: {st_e.total_seconds():.3f}')
                     st = datetime.datetime.now()
 
                     # gather kpid -> matches keypoints for all map images
@@ -256,7 +256,7 @@ def kapture_pycolmap_rig_localsfm_from_loaded_data(
                                                            kapture_path, tar_handlers)
 
                     st_e = datetime.datetime.now() - st
-                    logger.debug(f'match aggreg: {st_e.total_seconds():.3f}')
+                    logger.debug(f'aggregation of matches: {st_e.total_seconds():.3f}')
                     st = datetime.datetime.now()
 
                     # triangulate all points
