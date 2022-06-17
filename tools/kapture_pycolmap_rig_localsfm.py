@@ -138,7 +138,7 @@ def kapture_pycolmap_rig_localsfm_from_loaded_data(
     """
     Localize images from a multi camera rig using pycolmap
 
-    :param kapture_data: loaded kapture data (mapping and query images, incl. points3d)
+    :param kapture_data: loaded kapture data (mapping and query images, incl. matches)
     :param kapture_path: path to the kapture to use
     :param tar_handlers: collection of pre-opened tar archives
     :param kapture_query_data: loaded kapture data (query images)
