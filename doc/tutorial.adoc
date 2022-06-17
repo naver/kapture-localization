@@ -540,7 +540,7 @@ This script will execute the following commands:
  . `kapture_import_colmap.py` imports the COLMAP results into kapture
  . `kapture_export_LTVL2020.py` exports the global sfm results to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
- . `kapture_colmap_localize_localsfm.py` runs the camera pose estimation (Task 2a: local sfm)
+ . `kapture_pycolmap_localsfm.py` runs the camera pose estimation (Task 2a: local sfm)
  . `kapture_export_LTVL2020.py` exports the local sfm results to a format compatible with the
                                 https://www.visuallocalization.net/ benchmark
  . `kapture_pose_approximation.py` run 3 variants of camera pose approximation (Task 1)
