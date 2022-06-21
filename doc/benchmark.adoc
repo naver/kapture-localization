@@ -239,20 +239,20 @@ python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --max-size 9999
 ```
 
-The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse.
+The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse:
 
 ```
-mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
+mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors
 
-mkdir -p baidu-mall/local_features/r2d2_WASF_N8_20k
-mv baidu-mall/map_plus_query/reconstruction/keypoints baidu-mall/local_features/r2d2_WASF_N8_20k/
-mv baidu-mall/map_plus_query/reconstruction/descriptors baidu-mall/local_features/r2d2_WASF_N8_20k/
+mkdir -p baidu-mall/local_features/r2d2_WASF-N8_20k
+mv baidu-mall/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints
+mv baidu-mall/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors
 
-mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
+mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors
 ```
 
 In the paper, we also used two other local feature types:
@@ -268,7 +268,7 @@ Aachen-Day-Night-v1.1
 └─ local_features
    ├─ SIFT
    ├─ D2-Net
-   └─ r2d2_WASF_N8_20k
+   └─ r2d2_WASF-N8_20k
       ├─ keypoints
       ├─ descriptors
       ├─ NN_no_gv           # raw matches after cross-validation
@@ -282,7 +282,7 @@ The kapture pipelines will generate links to these folders.
 
 = Mapping
 
-NOTE: If you followed the dataset download instructions provided above, you will already have downloaded the maps we used for our benchmark. For Aachen, e.g., the downloaded map can be found at ```Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap```. If this is the case you can skip this part.
+NOTE: If you followed the dataset download instructions provided above, you will have downloaded the maps we used for our benchmark in the papers. However, in order to run your own benchmark, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
 
 You have to create a map on which you'll evaluate your global features.
 Different global features should be evaluated on the same map or the global sfm scores won't be comparable.
@@ -335,9 +335,6 @@ kapture_pipeline_mapping.py -v info \
 
 = Benchmark
 
-NOTE: We will use the downloaded maps here. If you created your own maps, please point the argument ```--colmap-map``` to their location (e.g. ```--colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap```).
-
-
 ```
 cd kapture_datasets
 # if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
@@ -353,7 +350,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat Aachen-Day-Night-v1.1/global_features/AP-GeM-LM18/global_features \
       -matches Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
+      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
       -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
@@ -367,7 +364,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
       -matches baidu-mall/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv baidu-mall/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
+      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
       -o baidu-mall/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
@@ -381,7 +378,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
       -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
       -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
       -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/frustum_thresh10_far50/colmap \
+      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
       -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2 \
