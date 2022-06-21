@@ -224,35 +224,41 @@ git clone https://github.com/naver/r2d2.git
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root Aachen-Day-Night-v1.1/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999 # max image size
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 
 # Baidu Mall
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root baidu-mall/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 
 # RobotCar Seasons
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root RobotCar_Seasons-v1/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 ```
 
 The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse:
 
 ```
 mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors
 
 mkdir -p baidu-mall/local_features/r2d2_WASF-N8_20k
-mv baidu-mall/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints
-mv baidu-mall/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors
+mv baidu-mall/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints
+mv baidu-mall/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors
 
 mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints/r2d2_WASF_N8_big RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors/r2d2_WASF_N8_big RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors
 ```
 
 In the paper, we also used two other local feature types:
