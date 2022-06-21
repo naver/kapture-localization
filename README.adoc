@@ -100,4 +100,12 @@ If you use this work for your research, please cite the respective paper(s):
       year={2020},
       booktitle={International Conference on 3D Vision}
 }
+
+@article{humenberger2022investigating,
+  title={Investigating the Role of Image Retrieval for Visual Localization},
+  author={Humenberger, Martin and Cabon, Yohann and Pion, No{\'e} and Weinzaepfel, Philippe and Lee, Donghwan and Gu{\'e}rin, Nicolas and Sattler, Torsten and Csurka, Gabriela},
+  journal={International Journal of Computer Vision},
+  year={2022},
+  publisher={Springer}
+}
 ----
