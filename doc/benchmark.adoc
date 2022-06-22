@@ -364,7 +364,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 # Baidu Mall
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i baidu-mall/mapping \
-      --query baidu-mall/query_all \
+      --query baidu-mall/query \
       -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
       -desc baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors \
       -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
@@ -378,7 +378,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 # RobotCar Seasons
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i RobotCar_Seasons-v1/mapping \
-      --query RobotCar_Seasons-v1/query_all \
+      --query RobotCar_Seasons-v1/query \
       -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
       -desc RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors \
       -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
