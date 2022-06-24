@@ -134,20 +134,20 @@ class EvaluationStatistics:
         rotation_errors = [rotation_error
                            for _, _, rotation_error in result if not math.isnan(rotation_error)]
 
-        mean_localized_positions = mean(positions_errors)
-        mean_localized_rotations = mean(rotation_errors)
+        mean_localized_positions = mean(positions_errors) if len(positions_errors) > 0 else float('inf')
+        mean_localized_rotations = mean(rotation_errors) if len(rotation_errors) > 0 else float('inf')
 
-        median_localized_positions = median(positions_errors)
-        median_localized_rotations = median(rotation_errors)
+        median_localized_positions = median(positions_errors) if len(positions_errors) > 0 else float('inf')
+        median_localized_rotations = median(rotation_errors) if len(rotation_errors) > 0 else float('inf')
 
-        median_all_positions = median(positions_errors_all)
-        median_all_rotations = median(rotation_errors_all)
+        median_all_positions = median(positions_errors_all) if len(positions_errors_all) > 0 else float('inf')
+        median_all_rotations = median(rotation_errors_all) if len(rotation_errors_all) > 0 else float('inf')
 
-        min_position_error = min(positions_errors)
-        min_rotation_error = min(rotation_errors)
+        min_position_error = min(positions_errors) if len(positions_errors) > 0 else float('inf')
+        min_rotation_error = min(rotation_errors) if len(rotation_errors) > 0 else float('inf')
 
-        max_position_error = max(positions_errors)
-        max_rotation_error = max(rotation_errors)
+        max_position_error = max(positions_errors) if len(positions_errors) > 0 else float('inf')
+        max_rotation_error = max(rotation_errors) if len(rotation_errors) > 0 else float('inf')
 
         filled_bins = fill_bins(result, bins)
 
