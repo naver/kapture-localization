@@ -100,7 +100,6 @@ def image_retrieval_benchmark(kapture_map_path: str,
 
     # local sfm results
     local_sfm_path = path.join(localization_output_path, f'local_sfm')
-    os.makedirs(local_sfm_path, exist_ok=True)
     local_sfm_LTVL2020_output_path = path.join(localization_output_path, 'local_sfm_LTVL2020_style_result.txt')
 
     # pose approximation results
