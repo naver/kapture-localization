@@ -224,35 +224,41 @@ git clone https://github.com/naver/r2d2.git
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root Aachen-Day-Night-v1.1/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999 # max image size
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 
 # Baidu Mall
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root baidu-mall/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 
 # RobotCar Seasons
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root RobotCar_Seasons-v1/map_plus_query \
                                --top-k 20000 \
-                               --max-size 9999
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
 ```
 
-The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse.
+The extracted features can either stay were they are (in folder `map_plus_query/reconstruction`) or, better, moved to a dedicated location for easy reuse:
 
 ```
-mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
-mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors Aachen-Day-Night-v1.1/local_features/r2d2_WASF_N8_20k/
+mkdir -p Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints
+mv Aachen-Day-Night-v1.1/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors
 
-mkdir -p baidu-mall/local_features/r2d2_WASF_N8_20k
-mv baidu-mall/map_plus_query/reconstruction/keypoints baidu-mall/local_features/r2d2_WASF_N8_20k/
-mv baidu-mall/map_plus_query/reconstruction/descriptors baidu-mall/local_features/r2d2_WASF_N8_20k/
+mkdir -p baidu-mall/local_features/r2d2_WASF-N8_20k
+mv baidu-mall/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints
+mv baidu-mall/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors
 
-mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
-mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors RobotCar_Seasons-v1/local_features/r2d2_WASF_N8_20k/
+mkdir -p RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/keypoints/r2d2_WASF-N8_20k RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints
+mv RobotCar_Seasons-v1/map_plus_query/reconstruction/descriptors/r2d2_WASF-N8_20k RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors
 ```
 
 In the paper, we also used two other local feature types:
@@ -268,7 +274,7 @@ Aachen-Day-Night-v1.1
 └─ local_features
    ├─ SIFT
    ├─ D2-Net
-   └─ r2d2_WASF_N8_20k
+   └─ r2d2_WASF-N8_20k
       ├─ keypoints
       ├─ descriptors
       ├─ NN_no_gv           # raw matches after cross-validation
@@ -281,6 +287,8 @@ However, for easy reuse we recommend to store them somewhere else (as done in th
 The kapture pipelines will generate links to these folders.
 
 = Mapping
+
+NOTE: If you followed the dataset download instructions provided above, you will have downloaded the maps we used for our benchmark in the papers. However, in order to run your own benchmark, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
 
 You have to create a map on which you'll evaluate your global features.
 Different global features should be evaluated on the same map or the global sfm scores won't be comparable.
@@ -356,7 +364,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 # Baidu Mall
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i baidu-mall/mapping \
-      --query baidu-mall/query_all \
+      --query baidu-mall/query \
       -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
       -desc baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors \
       -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
@@ -370,7 +378,7 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 # RobotCar Seasons
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i RobotCar_Seasons-v1/mapping \
-      --query RobotCar_Seasons-v1/query_all \
+      --query RobotCar_Seasons-v1/query \
       -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
       -desc RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors \
       -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
