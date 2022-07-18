@@ -64,7 +64,7 @@ def aggregate_matches(image_name, pairs, map_name_to_tuple_key, keypoints_filepa
             i_map = 0
         kpt_id_matches = matches[:, 0:2].astype(int)
         useful_kpts_map = kapture_keypoints_map[kpt_id_matches[:, i_map]]
-        if np.count_nonzero(distortionMap) > 0:
+        if useful_kpts_map.shape[0] > 0 and np.count_nonzero(distortionMap) > 0:
             epsilon = np.finfo(np.float64).eps
             stop_criteria = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 500, epsilon)
             useful_kpts_map = cv2.undistortPointsIter(useful_kpts_map, KMap, distortionMap,
