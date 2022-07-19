@@ -21,6 +21,7 @@ from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
+from kapture.utils.paths import safe_remove_any_path
 
 logger = logging.getLogger('image_retrieval_benchmark_from_pairsfile_pipeline')
 
@@ -42,7 +43,8 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
                                              config: int,
                                              benchmark_format_style: BenchmarkFormatStyle,
                                              skip_list: List[str],
-                                             force_overwrite_existing: bool) -> None:
+                                             force_overwrite_existing: bool,
+                                             remove_intermediate: bool) -> None:
     """
     Image retrieval benchmark from pairsfile instead of global features (BDI not included)
 
@@ -77,10 +79,13 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
     :type skip_list: List[str]
     :param force_overwrite_existing: silently overwrite files if already exists
     :type force_overwrite_existing: bool
+    :param remove_intermediate: remove global_sfm/colmap_localized, global_sfm/kapture_localized 
+                                and kapture_inputs at the end.
+    :type remove_intermediate: bool
     """
     os.makedirs(localization_output_path, exist_ok=True)
-    map_plus_query_path = path.join(localization_output_path,
-                                    'kapture_inputs/map_plus_query') if merge_path is None else merge_path
+    kapture_proxy_inputs_path = path.join(localization_output_path, 'kapture_inputs')
+    map_plus_query_path = path.join(kapture_proxy_inputs_path, 'map_plus_query') if merge_path is None else merge_path
     eval_path = path.join(localization_output_path, f'eval')
 
     # global sfm results
@@ -109,7 +114,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
         os.makedirs(matches_gv_path)
 
     # build proxy kapture map in output folder
-    proxy_kapture_map_path = path.join(localization_output_path, 'kapture_inputs/proxy_mapping')
+    proxy_kapture_map_path = path.join(kapture_proxy_inputs_path, 'proxy_mapping')
     create_kapture_proxy_single_features(proxy_kapture_map_path,
                                          kapture_map_path,
                                          keypoints_path,
@@ -122,7 +127,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
                                          force_overwrite_existing)
 
     # build proxy kapture query in output folder
-    proxy_kapture_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_query')
+    proxy_kapture_query_path = path.join(kapture_proxy_inputs_path, 'proxy_query')
     create_kapture_proxy_single_features(proxy_kapture_query_path,
                                          kapture_query_path,
                                          keypoints_path,
@@ -147,7 +152,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
         run_python_command(local_merge_path, merge_args, python_binary)
 
     # build proxy kapture map+query in output folder
-    proxy_kapture_map_plus_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query')
+    proxy_kapture_map_plus_query_path = path.join(kapture_proxy_inputs_path, 'proxy_map_plus_query')
     create_kapture_proxy_single_features(proxy_kapture_map_plus_query_path,
                                          map_plus_query_path,
                                          keypoints_path,
@@ -168,7 +173,7 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
         run_python_command(local_compute_matches_path, compute_matches_args, python_binary)
 
     # build proxy gv kapture in output folder
-    proxy_kapture_map_plus_query_gv_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query_gv')
+    proxy_kapture_map_plus_query_gv_path = path.join(kapture_proxy_inputs_path, 'proxy_map_plus_query_gv')
     create_kapture_proxy_single_features(proxy_kapture_map_plus_query_gv_path,
                                          map_plus_query_path,
                                          keypoints_path,
@@ -342,6 +347,11 @@ def image_retrieval_benchmark_from_pairsfile(kapture_map_path: str,
             evaluate_args.append('-f')
         run_python_command(local_evaluate_path, evaluate_args, python_binary)
 
+    if remove_intermediate:
+        safe_remove_any_path(global_sfm_colmap_localize_path, force=True)
+        safe_remove_any_path(global_sfm_kapture_localize_import_path, force=True)
+        safe_remove_any_path(kapture_proxy_inputs_path, force=True)
+
 
 def image_retrieval_benchmark_from_pairsfile_get_parser():
     """
@@ -413,6 +423,9 @@ def image_retrieval_benchmark_from_pairsfile_get_parser():
                         help='steps to skip')
     parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
+    parser.add_argument('--remove-intermediate', action='store_true', default=False,
+                        help=('remove global_sfm/colmap_localized, global_sfm/kapture_localized'
+                              ' and kapture_inputs at the end.'))
     return parser
 
 
@@ -454,7 +467,8 @@ def image_retrieval_benchmark_from_pairsfile_command_line():
                                                  args.config,
                                                  args.benchmark_style,
                                                  args.skip,
-                                                 args.force)
+                                                 args.force,
+                                                 args.remove_intermediate)
     else:
         raise EnvironmentError('Please restart this command as admin, it is required for os.symlink'
                                'see https://docs.python.org/3.6/library/os.html#os.symlink')

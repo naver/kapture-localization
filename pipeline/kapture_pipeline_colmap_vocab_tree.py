@@ -20,6 +20,7 @@ from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
+from kapture.utils.paths import safe_remove_any_path
 
 logger = logging.getLogger('colmap_vocab_tree_pipeline')
 
@@ -36,7 +37,8 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                benchmark_format_style: BenchmarkFormatStyle,
                                bins_as_str: List[str],
                                skip_list: List[str],
-                               force_overwrite_existing: bool) -> None:
+                               force_overwrite_existing: bool,
+                               remove_intermediate: bool) -> None:
     """
     Build a colmap model using sift features and vocab tree matching features with the kapture data.
 
@@ -65,6 +67,8 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
     :type skip_list: List[str]
     :param force_overwrite_existing: silently overwrite files if already exists
     :type force_overwrite_existing: bool
+    :param remove_intermediate: remove colmap_localized and kapture_localized at the end.
+    :type remove_intermediate: bool
     """
     if colmap_map_path is None:
         colmap_map_path = path.join(localization_output_path, 'colmap_map')
@@ -164,6 +168,10 @@ def colmap_vocab_tree_pipeline(kapture_map_path: str,
                                                f'../../kapture/tools/{export_LTVL2020_script_name}')
         run_python_command(local_export_LTVL2020_path, export_LTVL2020_args, python_binary)
 
+    if remove_intermediate:
+        safe_remove_any_path(colmap_localize_path, force=True)
+        safe_remove_any_path(kapture_localize_import_path, force=True)
+
 
 def colmap_vocab_tree_pipeline_get_parser():
     """
@@ -226,6 +234,8 @@ def colmap_vocab_tree_pipeline_get_parser():
                                                  'export_LTVL2020'],
                         nargs='+', default=[],
                         help='steps to skip')
+    parser.add_argument('--remove-intermediate', action='store_true', default=False,
+                        help='remove colmap_localized and kapture-localized at the end.')
     return parser
 
 
@@ -261,7 +271,8 @@ def colmap_vocab_tree_pipeline_command_line():
                                args.benchmark_style,
                                args.bins,
                                args.skip,
-                               args.force)
+                               args.force,
+                               args.remove_intermediate)
 
 
 if __name__ == '__main__':

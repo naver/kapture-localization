@@ -21,7 +21,7 @@ from kapture_localization.colmap.colmap_command import CONFIGS
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
-from kapture.utils.paths import safe_remove_file
+from kapture.utils.paths import safe_remove_file, safe_remove_any_path
 
 logger = logging.getLogger('mapping_pipeline')
 DEFAULT_TOPK = 20
@@ -43,7 +43,8 @@ def mapping_pipeline(kapture_path: str,
                      topk: int,
                      config: int,
                      skip_list: List[str],
-                     force_overwrite_existing: bool) -> None:
+                     force_overwrite_existing: bool,
+                     remove_intermediate: bool) -> None:
     """
     Build a colmap model using pre computed features with the kapture data.
 
@@ -61,6 +62,7 @@ def mapping_pipeline(kapture_path: str,
     :param config: index of the config parameters to use for point triangulator
     :param skip_list: list of steps to ignore
     :param force_overwrite_existing: silently overwrite files if already exists
+    :param remove_intermediate: remove kapture_inputs at the end.
     """
     os.makedirs(colmap_map_path, exist_ok=True)
     if input_pairsfile_path is None:
@@ -74,7 +76,8 @@ def mapping_pipeline(kapture_path: str,
         os.makedirs(matches_gv_path)
 
     # build proxy kapture in output folder
-    proxy_kapture_path = path.join(colmap_map_path, 'kapture_inputs/proxy_mapping')
+    kapture_proxy_inputs_path = path.join(colmap_map_path, 'kapture_inputs')
+    proxy_kapture_path = path.join(kapture_proxy_inputs_path, 'proxy_mapping')
     create_kapture_proxy_single_features(proxy_kapture_path,
                                          kapture_path,
                                          keypoints_path,
@@ -108,7 +111,7 @@ def mapping_pipeline(kapture_path: str,
         run_python_command(local_compute_matches_path, compute_matches_args, python_binary)
 
     # build proxy gv kapture in output folder
-    proxy_kapture_gv_path = path.join(colmap_map_path, 'kapture_inputs/proxy_mapping_gv')
+    proxy_kapture_gv_path = path.join(kapture_proxy_inputs_path, 'proxy_mapping_gv')
     create_kapture_proxy_single_features(proxy_kapture_gv_path,
                                          kapture_path,
                                          keypoints_path,
@@ -144,6 +147,9 @@ def mapping_pipeline(kapture_path: str,
             build_map_args.append('-f')
         build_map_args += CONFIGS[config]
         run_python_command(local_build_map_path, build_map_args, python_binary)
+
+    if remove_intermediate:
+        safe_remove_any_path(kapture_proxy_inputs_path, force=True)
 
 
 def mapping_pipeline_get_parser():
@@ -208,6 +214,8 @@ def mapping_pipeline_get_parser():
     parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
     parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
+    parser.add_argument('--remove-intermediate', action='store_true', default=False,
+                        help='remove kapture_inputs at the end.')
     return parser
 
 
@@ -253,7 +261,8 @@ def mapping_pipeline_command_line():
                          args.topk,
                          args.config,
                          args.skip,
-                         args.force)
+                         args.force,
+                         args.remove_intermediate)
     else:
         raise EnvironmentError('Please restart this command as admin, it is required for os.symlink'
                                'see https://docs.python.org/3.6/library/os.html#os.symlink')
