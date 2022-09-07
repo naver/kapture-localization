@@ -210,7 +210,12 @@ kapture_datasets
 === Gangnam Station B2
 
 ```
-cd kapture_datasets/GangnamStation/B2/release
+cd kapture_datasets/
+
+kapture_download_dataset.py install  "GangnamStation_B2*"
+# read license terms and type y [enter] to agree
+
+cd GangnamStation/B2/release
 
 kapture_merge.py -v info \
                  -i test validation  \
