@@ -458,7 +458,7 @@ kapture_pipeline_mapping.py -v info \
 
 = Benchmark
 
-See our results for feather2d2_dim32_20k and r2d2_WASF-N8_20k in link:doc/tutorial.adoc[../doc/benchmark_results]
+See our results for feather2d2_dim32_20k and r2d2_WASF-N8_20k in link:../doc/tutorial.adoc[benchmark_results]
 
 ```
 # here it is assumed that you want to use feather2d2 features
