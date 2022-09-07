@@ -74,13 +74,13 @@ TODO add references
 
 |===
 
-image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_0_25m_2_0deg.png[aachen_eval_day_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_0_5m_5_0deg.png[aachen_eval_day_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_5_0m_10_0deg.png[aachen_eval_day_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_0_25m_2_0deg.jpg[aachen_eval_day_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_0_5m_5_0deg.jpg[aachen_eval_day_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_5_0m_10_0deg.jpg[aachen_eval_day_global_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_0_25m_2_0deg.png[aachen_eval_night_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_0_5m_5_0deg.png[aachen_eval_night_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_5_0m_10_0deg.png[aachen_eval_night_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_0_25m_2_0deg.jpg[aachen_eval_night_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_0_5m_5_0deg.jpg[aachen_eval_night_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_5_0m_10_0deg.jpg[aachen_eval_night_global_sfm_5_0m_10_0deg]
 
 ==== local_sfm
 
@@ -133,13 +133,13 @@ image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_5_0m_10_0deg.png[aac
 |===
 
 
-image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_0_25m_2_0deg.png[aachen_eval_day_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_0_5m_5_0deg.png[aachen_eval_day_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_5_0m_10_0deg.png[aachen_eval_day_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_0_25m_2_0deg.jpg[aachen_eval_day_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_0_5m_5_0deg.jpg[aachen_eval_day_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_local_sfm_5_0m_10_0deg.jpg[aachen_eval_day_local_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_0_25m_2_0deg.png[aachen_eval_night_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_0_5m_5_0deg.png[aachen_eval_night_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_5_0m_10_0deg.png[aachen_eval_night_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_0_25m_2_0deg.jpg[aachen_eval_night_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_0_5m_5_0deg.jpg[aachen_eval_night_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_5_0m_10_0deg.jpg[aachen_eval_night_local_sfm_5_0m_10_0deg]
 
 ==== EWB
 
@@ -204,8 +204,8 @@ image::../doc/plots/feather2d2/aachen_eval_night_local_sfm_5_0m_10_0deg.png[aach
 |netvlad_vd16pitts|50|4.10%|1.10%
 |===
 
-image::../doc/plots/feather2d2/aachen_eval_day_ewb_5_0m_10_0deg.png[aachen_eval_day_ewb_5_0m_10_0deg]
-image::../doc/plots/feather2d2/aachen_eval_night_ewb_5_0m_10_0deg.png[aachen_eval_night_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_day_ewb_5_0m_10_0deg.jpg[aachen_eval_day_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/aachen_eval_night_ewb_5_0m_10_0deg.jpg[aachen_eval_night_ewb_5_0m_10_0deg]
 
 === Baidu-mall
 
@@ -273,9 +273,9 @@ netvlad_vd16pitts;50;60.03%;75.17%;83.33%;0.1771;0.8933
 
 |===
 
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_25m_2_0deg.png[baidu-mall_eval_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_5m_5_0deg.png[baidu-mall_eval_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_5_0m_10_0deg.png[baidu-mall_eval_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_25m_2_0deg.jpg[baidu-mall_eval_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_5m_5_0deg.jpg[baidu-mall_eval_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_5_0m_10_0deg.jpg[baidu-mall_eval_global_sfm_5_0m_10_0deg]
 
 ==== local_sfm
 
@@ -326,9 +326,9 @@ netvlad_vd16pitts;50;26.70%;38.09%;51.48%;1.662;6.651
 
 |===
 
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_25m_2_0deg.png[baidu-mall_eval_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_5m_5_0deg.png[baidu-mall_eval_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_5_0m_10_0deg.png[baidu-mall_eval_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_25m_2_0deg.jpg[baidu-mall_eval_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_5m_5_0deg.jpg[baidu-mall_eval_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_5_0m_10_0deg.jpg[baidu-mall_eval_local_sfm_5_0m_10_0deg]
 
 ==== EWB
 
@@ -393,7 +393,7 @@ netvlad_vd16pitts;50;0.22%;46.5507;36.354
 
 |===
 
-image::../doc/plots/feather2d2/baidu-baidu-mall_eval_ewb_5_0m_10_0deg.png[baidu-baidu-mall_eval_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-baidu-mall_eval_ewb_5_0m_10_0deg]
 
 === RobotCar Seasons
 
@@ -461,13 +461,13 @@ image::../doc/plots/feather2d2/baidu-baidu-mall_eval_ewb_5_0m_10_0deg.png[baidu-
 |netvlad_vd16pitts|50|52.7%|81.1%|96.2%|15.3%|30.0%|42.7%
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_25m_2_0deg.png[robotcar_eval_day_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_5m_5_0deg.png[robotcar_eval_day_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_5_0m_10_0deg.png[robotcar_eval_day_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_25m_2_0deg.jpg[robotcar_eval_day_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_5m_5_0deg.jpg[robotcar_eval_day_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_5_0m_10_0deg.jpg[robotcar_eval_day_global_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_25m_2_0deg.png[robotcar_eval_night_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_5m_5_0deg.png[robotcar_eval_night_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.png[robotcar_eval_night_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_25m_2_0deg.jpg[robotcar_eval_night_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_5m_5_0deg.jpg[robotcar_eval_night_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[robotcar_eval_night_global_sfm_5_0m_10_0deg]
 
 ==== local_sfm
 
@@ -519,13 +519,13 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.png[r
 
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_25m_2_0deg.png[robotcar_eval_day_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_5m_5_0deg.png[robotcar_eval_day_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_5_0m_10_0deg.png[robotcar_eval_day_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_25m_2_0deg.jpg[robotcar_eval_day_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_5m_5_0deg.jpg[robotcar_eval_day_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_5_0m_10_0deg.jpg[robotcar_eval_day_local_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_25m_2_0deg.png[robotcar_eval_night_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_5m_5_0deg.png[robotcar_eval_night_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.png[robotcar_eval_night_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_25m_2_0deg.jpg[robotcar_eval_night_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_5m_5_0deg.jpg[robotcar_eval_night_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[robotcar_eval_night_local_sfm_5_0m_10_0deg]
 
 ==== EWB
 
@@ -590,8 +590,8 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.png[ro
 |netvlad_vd16pitts|50|9.00%|0.00%
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_ewb_5_0m_10_0deg.png[robotcar_eval_day_ewb_5_0m_10_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.png[robotcar_eval_night_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_ewb_5_0m_10_0deg.jpg[robotcar_eval_day_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.jpg[robotcar_eval_night_ewb_5_0m_10_0deg]
 
 === Gangnam Station B2
 
@@ -659,13 +659,13 @@ image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.png[robotcar
 
 |===
 
-image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_0_1m_1_0deg.png[gangnam_eval_test_global_sfm_0_1m_1_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_0_25m_2_0deg.png[gangnam_eval_test_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_1_0m_5_0deg.png[gangnam_eval_test_global_sfm_1_0m_5_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_0_1m_1_0deg.jpg[gangnam_eval_test_global_sfm_0_1m_1_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_0_25m_2_0deg.jpg[gangnam_eval_test_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_global_sfm_1_0m_5_0deg.jpg[gangnam_eval_test_global_sfm_1_0m_5_0deg]
 
-image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_0_1m_1_0deg.png[gangnam_eval_validation_global_sfm_0_1m_1_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_0_25m_2_0deg.png[gangnam_eval_validation_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_1_0m_5_0deg.png[gangnam_eval_validation_global_sfm_1_0m_5_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_0_1m_1_0deg.jpg[gangnam_eval_validation_global_sfm_0_1m_1_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_0_25m_2_0deg.jpg[gangnam_eval_validation_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_1_0m_5_0deg.jpg[gangnam_eval_validation_global_sfm_1_0m_5_0deg]
 
 ==== local_sfm
 
@@ -716,13 +716,13 @@ image::../doc/plots/feather2d2/gangnam_eval_validation_global_sfm_1_0m_5_0deg.pn
 |r101delg_gldv2clean|50|25.0%|39.1%|45.0%|19.43%|31.66%|36.68%|50.048|60.5858
 |===
 
-image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_0_1m_1_0deg.png[gangnam_eval_test_local_sfm_0_1m_1_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_0_25m_2_0deg.png[gangnam_eval_test_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_1_0m_5_0deg.png[gangnam_eval_test_local_sfm_1_0m_5_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_0_1m_1_0deg.jpg[gangnam_eval_test_local_sfm_0_1m_1_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_0_25m_2_0deg.jpg[gangnam_eval_test_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_local_sfm_1_0m_5_0deg.jpg[gangnam_eval_test_local_sfm_1_0m_5_0deg]
 
-image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_0_1m_1_0deg.png[gangnam_eval_validation_local_sfm_0_1m_1_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_0_25m_2_0deg.png[gangnam_eval_validation_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_1_0m_5_0deg.png[gangnam_eval_validation_local_sfm_1_0m_5_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_0_1m_1_0deg.jpg[gangnam_eval_validation_local_sfm_0_1m_1_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_0_25m_2_0deg.jpg[gangnam_eval_validation_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_1_0m_5_0deg.jpg[gangnam_eval_validation_local_sfm_1_0m_5_0deg]
 
 ==== EWB
 
@@ -787,8 +787,8 @@ image::../doc/plots/feather2d2/gangnam_eval_validation_local_sfm_1_0m_5_0deg.png
 |r101delg_gldv2clean|50|0.8%|0.00%|60.8332|62.0772
 |===
 
-image::../doc/plots/feather2d2/gangnam_eval_test_ewb_5_0m_10_0deg.png[gangnam_eval_test_ewb_5_0m_10_0deg]
-image::../doc/plots/feather2d2/gangnam_eval_validation_ewb_5_0m_10_0deg.png[gangnam_eval_validation_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_test_ewb_5_0m_10_0deg.jpg[gangnam_eval_test_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/gangnam_eval_validation_ewb_5_0m_10_0deg.jpg[gangnam_eval_validation_ewb_5_0m_10_0deg]
 
 == r2d2_WASF_N8_big 20k Results
 
@@ -858,13 +858,13 @@ image::../doc/plots/feather2d2/gangnam_eval_validation_ewb_5_0m_10_0deg.png[gang
 
 |===
 
-image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_0.png[aachen_day_r2d2_global_sfm_0]
-image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_1.png[aachen_day_r2d2_global_sfm_1]
-image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_2.png[aachen_day_r2d2_global_sfm_2]
+image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_0.jpg[aachen_day_r2d2_global_sfm_0]
+image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_1.jpg[aachen_day_r2d2_global_sfm_1]
+image::../doc/plots/r2d2/aachen_day_r2d2_global_sfm_2.jpg[aachen_day_r2d2_global_sfm_2]
 
-image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_0.png[aachen_night_r2d2_global_sfm_0]
-image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_1.png[aachen_night_r2d2_global_sfm_1]
-image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_2.png[aachen_night_r2d2_global_sfm_2]
+image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_0.jpg[aachen_night_r2d2_global_sfm_0]
+image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_1.jpg[aachen_night_r2d2_global_sfm_1]
+image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_2.jpg[aachen_night_r2d2_global_sfm_2]
 
 ==== local_sfm
 
@@ -915,13 +915,13 @@ image::../doc/plots/r2d2/aachen_night_r2d2_global_sfm_2.png[aachen_night_r2d2_gl
 |netvlad_vd16pitts|50  |84.5%|92.8%|97.3%|63.4%|78.5%|91.1%
 |===
 
-image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_0.png[aachen_day_r2d2_local_sfm_0]
-image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_1.png[aachen_day_r2d2_local_sfm_1]
-image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_2.png[aachen_day_r2d2_local_sfm_2]
+image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_0.jpg[aachen_day_r2d2_local_sfm_0]
+image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_1.jpg[aachen_day_r2d2_local_sfm_1]
+image::../doc/plots/r2d2/aachen_day_r2d2_local_sfm_2.jpg[aachen_day_r2d2_local_sfm_2]
 
-image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_0.png[aachen_night_r2d2_local_sfm_0]
-image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_1.png[aachen_night_r2d2_local_sfm_1]
-image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_2.png[aachen_night_r2d2_local_sfm_2]
+image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_0.jpg[aachen_night_r2d2_local_sfm_0]
+image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_1.jpg[aachen_night_r2d2_local_sfm_1]
+image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_2.jpg[aachen_night_r2d2_local_sfm_2]
 
 ==== EWB
 
@@ -986,8 +986,8 @@ image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_2.png[aachen_night_r2d2_loc
 |netvlad_vd16pitts|50  |4.1%|1.1%
 |===
 
-image::../doc/plots/r2d2/aachen_day_r2d2_ewb.png[aachen_day_r2d2_ewb]
-image::../doc/plots/r2d2/aachen_night_r2d2_ewb.png[aachen_night_r2d2_ewb]
+image::../doc/plots/r2d2/aachen_day_r2d2_ewb.jpg[aachen_day_r2d2_ewb]
+image::../doc/plots/r2d2/aachen_night_r2d2_ewb.jpg[aachen_night_r2d2_ewb]
 
 === baidu-mall
 
@@ -1054,9 +1054,9 @@ netvlad_vd16pitts;50  ;65.45%;80.32%;87.35%;0.1581;0.7838
 
 |===
 
-image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_0.png[baidu_mall_r2d2_global_sfm_0]
-image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_1.png[baidu_mall_r2d2_global_sfm_1]
-image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_2.png[baidu_mall_r2d2_global_sfm_2]
+image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_0.jpg[baidu_mall_r2d2_global_sfm_0]
+image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_1.jpg[baidu_mall_r2d2_global_sfm_1]
+image::../doc/plots/r2d2/baidu_mall_r2d2_global_sfm_2.jpg[baidu_mall_r2d2_global_sfm_2]
 
 
 ==== local_sfm
@@ -1108,9 +1108,9 @@ netvlad_vd16pitts;50;36.26%;49.74%;62.00%;0.4981;2.0799
 
 |===
 
-image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_0.png[baidu_mall_r2d2_local_sfm_0]
-image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_1.png[baidu_mall_r2d2_local_sfm_1]
-image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_2.png[baidu_mall_r2d2_local_sfm_2]
+image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_0.jpg[baidu_mall_r2d2_local_sfm_0]
+image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_1.jpg[baidu_mall_r2d2_local_sfm_1]
+image::../doc/plots/r2d2/baidu_mall_r2d2_local_sfm_2.jpg[baidu_mall_r2d2_local_sfm_2]
 
 ==== EWB
 
@@ -1175,7 +1175,7 @@ netvlad_vd16pitts;50;0.22%;46.5507;36.354
 
 |===
 
-image::../doc/plots/r2d2/baidu_mall_r2d2_ewb.png[baidu_mall_r2d2_ewb]
+image::../doc/plots/r2d2/baidu_mall_r2d2_ewb.jpg[baidu_mall_r2d2_ewb]
 
 === Gangnam Station B2
 
@@ -1242,13 +1242,13 @@ image::../doc/plots/r2d2/baidu_mall_r2d2_ewb.png[baidu_mall_r2d2_ewb]
 |r101delg_gldv2clean|50  |47.0%|65.9%|71.1%|38.43%|59.17%|64.30%|0.0675|1.2269
 |===
 
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_0.png[gangnam_b2_test_r2d2_global_sfm_0]
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_1.png[gangnam_b2_test_r2d2_global_sfm_1]
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_2.png[gangnam_b2_test_r2d2_global_sfm_2]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_0.jpg[gangnam_b2_test_r2d2_global_sfm_0]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_1.jpg[gangnam_b2_test_r2d2_global_sfm_1]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_global_sfm_2.jpg[gangnam_b2_test_r2d2_global_sfm_2]
 
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_0.png[gangnam_b2_val_r2d2_global_sfm_0]
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_1.png[gangnam_b2_val_r2d2_global_sfm_1]
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_2.png[gangnam_b2_val_r2d2_global_sfm_2]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_0.jpg[gangnam_b2_val_r2d2_global_sfm_0]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_1.jpg[gangnam_b2_val_r2d2_global_sfm_1]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_2.jpg[gangnam_b2_val_r2d2_global_sfm_2]
 
 ==== local_sfm
 
@@ -1299,13 +1299,13 @@ image::../doc/plots/r2d2/gangnam_b2_val_r2d2_global_sfm_2.png[gangnam_b2_val_r2d
 |r101delg_gldv2clean|50  |28.7%|44.4%|49.9%|21.94%|33.95%|39.08%|18.7617|4.3711
 |===
 
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_0.png[gangnam_b2_test_r2d2_local_sfm_0]
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_1.png[gangnam_b2_test_r2d2_local_sfm_1]
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_2.png[gangnam_b2_test_r2d2_local_sfm_2]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_0.jpg[gangnam_b2_test_r2d2_local_sfm_0]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_1.jpg[gangnam_b2_test_r2d2_local_sfm_1]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_local_sfm_2.jpg[gangnam_b2_test_r2d2_local_sfm_2]
 
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_0.png[gangnam_b2_val_r2d2_local_sfm_0]
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_1.png[gangnam_b2_val_r2d2_local_sfm_1]
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_2.png[gangnam_b2_val_r2d2_local_sfm_2]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_0.jpg[gangnam_b2_val_r2d2_local_sfm_0]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_1.jpg[gangnam_b2_val_r2d2_local_sfm_1]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_2.jpg[gangnam_b2_val_r2d2_local_sfm_2]
 
 ==== EWB
 
@@ -1370,5 +1370,5 @@ image::../doc/plots/r2d2/gangnam_b2_val_r2d2_local_sfm_2.png[gangnam_b2_val_r2d2
 |r101delg_gldv2clean|50  |0.8%|0.00%|60.8332|62.0772
 |===
 
-image::../doc/plots/r2d2/gangnam_b2_test_r2d2_ewb.png[gangnam_b2_test_r2d2_ewb]
-image::../doc/plots/r2d2/gangnam_b2_val_r2d2_ewb.png[gangnam_b2_val_r2d2_ewb]
+image::../doc/plots/r2d2/gangnam_b2_test_r2d2_ewb.jpg[gangnam_b2_test_r2d2_ewb]
+image::../doc/plots/r2d2/gangnam_b2_val_r2d2_ewb.jpg[gangnam_b2_val_r2d2_ewb]
