@@ -393,7 +393,7 @@ netvlad_vd16pitts;50;0.22%;46.5507;36.354
 
 |===
 
-image::../doc/plots/feather2d2/baidu-baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-baidu-mall_eval_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_eval_ewb_5_0m_10_0deg]
 
 === RobotCar Seasons
 
