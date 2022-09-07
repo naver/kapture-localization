@@ -29,6 +29,9 @@ If this benchmark is used in research, please cite this paper:
 }
 ----
 
+
+WARNING: The image-retrieval benchmark script now runs kapture_pycolmap_localsfm, whereas we used the script kapture_colmap_localize_localsfm in the papers and they are not equivalent. We decided to change it because kapture_colmap_localize_localsfm was too slow to be practical (and it created too many matches files). localsfm results are therefore not comparable. We provide updated numbers and the local features we used for feather2d2 20k (a slightly altered version of fast r2d2 with dsize=32)
+
 = Datasets
 
 In order to download the 3 datasets used in the paper, we recommend using the kapture dataset downloader.
@@ -181,7 +184,7 @@ kapture_merge.py -v info \
                  --image_transfer link_relative
 ```
 
-Finally, the kapture_datasets folder should look like this (not all subfolders are shown here):
+The kapture_datasets folder should look like this (not all subfolders are shown here):
 
 ```
 kapture_datasets
@@ -204,17 +207,107 @@ kapture_datasets
     └─ mapping
 ```
 
+=== Gangnam Station B2
+
+```
+cd kapture_datasets/GangnamStation/B2/release
+
+kapture_merge.py -v info \
+                 -i test validation  \
+                 -o query_all \
+                 --image_transfer link_relative
+kapture_merge.py -v info \
+                 -i mapping query_all \
+                 -o map_plus_query \
+                 --image_transfer link_relative
+
+cd ../../../..
+```
+
+
+Finally, the kapture_datasets folder should look like this (not all subfolders are shown here):
+
+```
+kapture_datasets
+├─ Aachen-Day-Night-v1.1
+├─ baidu-mall
+├─ RobotCar_Seasons-v2
+├─ RobotCar_Seasons-v1
+└─ GangnamStation/B2/release
+    ├─ global_features
+    │  ├─ AP-GeM-LM18
+    │  ├─ DELG
+    │  ├─ densevlad_multi
+    │  └─ netvlad_vd16pitts
+    │     └─ global_features
+    ├─ colmap-sfm
+    ├─ map_plus_query
+    ├─ test
+    ├─ validation
+    ├─ query_all
+    ├─ mapping
+    └─ mapping_lidar_only
+```
+
 = Image Features
 
 === Global features
 
 As can be seen above, in order to reproduce the 3DV2020 paper results we provide the global features in our dataset downloader and up to this point, they should already be downloaded.
 
+=== Pairsfile
+
+For https://github.com/gtolias/how[HOW] and https://github.com/naver/fire[FIRe], we provide precomputed pairs for all the datasets for use with https://github.com/naver/kapture-localization/blob/main/pipeline/kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py[kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py].
+
+```
+# Aachen Day-Night v1.1
+mkdir -p Aachen-Day-Night-v1.1/pairsfile/query
+wget -O Aachen-Day-Night-v1.1/pairsfile/query/fire_top50.txt http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_fire_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_fire_top50_query_pairs.txt.sha256sum
+wget -O Aachen-Day-Night-v1.1/pairsfile/query/how_top50.txt http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_how_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/Aachen_Day_Night_1_1_how_top50_query_pairs.txt.sha256sum
+
+# Baidu Mall
+mkdir -p baidu-mall/pairsfile/query
+wget -O baidu-mall/pairsfile/query/fire_top50.txt http://download.europe.naverlabs.com/kapture/baidu_mall_fire_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/baidu_mall_fire_top50_query_pairs.txt.sha256sum
+wget -O baidu-mall/pairsfile/query/how_top50.txt http://download.europe.naverlabs.com/kapture/baidu_mall_how_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/baidu_mall_how_top50_query_pairs.txt.sha256sum
+
+# RobotCar_Seasons-v1
+mkdir -p RobotCar_Seasons-v1/pairsfile/query
+wget -O RobotCar_Seasons-v1/pairsfile/query/fire_top50.txt http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_fire_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_fire_top50_query_pairs.txt.sha256sum
+wget -O RobotCar_Seasons-v1/pairsfile/query/how_top50.txt http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_how_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_how_top50_query_pairs.txt.sha256sum
+
+
+# Gangnam Station B2
+mkdir -p GangnamStation/B2/release/pairsfile/query
+wget -O GangnamStation/B2/release/pairsfile/query/fire_top50.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_fire_top50_query_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/GangnamStation_B2_fire_top50_query_pairs.txt.sha256sum
+wget -O GangnamStation/B2/release/pairsfile/query/how_top50.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_how_top50_query_pairstxt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/GangnamStation_B2_how_top50_query_pairs.txt.sha256sum
+
+# slicing
+for DATASET in Aachen-Day-Night-v1.1 baidu-mall RobotCar_Seasons-v1 GangnamStation/B2/release; do
+   for METHOD in how fire; do
+      for TOPK in 20 10 5 4 3 2 1; do
+         kapture_slice_pairsfile.py -v info \
+                                    -i ${DATASET}/pairfiles/query/${METHOD}_top50.txt \
+                                    -o ${DATASET}/pairfiles/query/${METHOD}_top${TOPK}.txt \
+                                    --topk ${TOPK}
+      done
+   done
+done
+```
+
 === Local features
 
 Any local features in https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture format] can be used.
-For this tutorial, we suggest to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]).
+For this tutorial, we suggest to use our preextracted feather2d2 lightweight features (TODO instructions).
 
+To reproduce the numbers that we reported in the publications, you would have to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]), instructions below.
 
 ```
 cd kapture_datasets
@@ -239,6 +332,14 @@ python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
 # RobotCar Seasons
 python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
                                --kapture-root RobotCar_Seasons-v1/map_plus_query \
+                               --top-k 20000 \
+                               --max-size 9999 \
+                               --keypoints-type r2d2_WASF-N8_20k \
+                               --descriptors-type r2d2_WASF-N8_20k
+
+# Gangnam Station B2
+python r2d2/extract_kapture.py --model r2d2/models/r2d2_WASF_N8_big.pt \
+                               --kapture-root GangnamStation/B2/release/map_plus_query \
                                --top-k 20000 \
                                --max-size 9999 \
                                --keypoints-type r2d2_WASF-N8_20k \
@@ -288,7 +389,9 @@ The kapture pipelines will generate links to these folders.
 
 = Mapping
 
-NOTE: If you followed the dataset download instructions provided above, you will have downloaded the maps we used for our benchmark in the papers. However, in order to run your own benchmark, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
+NOTE: If you use feather2d2, you can download the exact map that we used, and can skip this section
+
+NOTE: For other features, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
 
 You have to create a map on which you'll evaluate your global features.
 Different global features should be evaluated on the same map or the global sfm scores won't be comparable.
@@ -337,27 +440,46 @@ kapture_pipeline_mapping.py -v info \
     -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
     -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
     --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap
+
+# Gangnam Station B2
+mkdir -p GangnamStation/B2/release/pairsfile/mapping
+TODO wget -O GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt
+# sha256sum available at http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt.sha256sum
+kapture_pipeline_mapping.py -v info \
+    -i GangnamStation/B2/release/mapping \
+    -kpt GangnamStation/B2/release/local_features/r2d2_WASF-N8_20k/keypoints \
+    -desc GangnamStation/B2/release/local_features/r2d2_WASF-N8_20k/descriptors \
+    --pairsfile-path GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt \
+    -matches GangnamStation/B2/release/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
+    -matches-gv GangnamStation/B2/release/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
+    --colmap-map GangnamStation/B2/release/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap
+
 ```
 
 = Benchmark
 
+See our results for feather2d2_dim32_20k and r2d2_WASF-N8_20k in link:doc/tutorial.adoc[../doc/benchmark_results]
+
 ```
+# here it is assumed that you want to use feather2d2 features
+export LFEAT=feather2d2_dim32_20k
+
 cd kapture_datasets
 # if the COLMAP executable is not available from PATH, the parameter -colmap needs to be set
 #   example: -colmap C:/Workspace/dev/colmap/colmap.bat
 
-# run full benchmark (all 3 tasks) on
+# run full benchmark (all 3 tasks) for AP-GeM-LM18_top20 on
 # Aachen Day-Night v1.1
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i Aachen-Day-Night-v1.1/mapping \
       --query Aachen-Day-Night-v1.1/query_all \
-      -kpt Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/keypoints \
-      -desc Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/descriptors \
+      -kpt Aachen-Day-Night-v1.1/local_features/${LFEAT}/keypoints \
+      -desc Aachen-Day-Night-v1.1/local_features/${LFEAT}/descriptors \
       -gfeat Aachen-Day-Night-v1.1/global_features/AP-GeM-LM18/global_features \
-      -matches Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
-      -matches-gv Aachen-Day-Night-v1.1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
-      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
+      -matches Aachen-Day-Night-v1.1/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv Aachen-Day-Night-v1.1/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/${LFEAT}/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
 
@@ -365,13 +487,13 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i baidu-mall/mapping \
       --query baidu-mall/query \
-      -kpt baidu-mall/local_features/r2d2_WASF-N8_20k/keypoints \
-      -desc baidu-mall/local_features/r2d2_WASF-N8_20k/descriptors \
+      -kpt baidu-mall/local_features/${LFEAT}/keypoints \
+      -desc baidu-mall/local_features/${LFEAT}/descriptors \
       -gfeat baidu-mall/global_features/AP-GeM-LM18/global_features \
-      -matches baidu-mall/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
-      -matches-gv baidu-mall/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map baidu-mall/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
-      -o baidu-mall/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
+      -matches baidu-mall/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv baidu-mall/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map baidu-mall/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o baidu-mall/image_retrieval_benchmark/${LFEAT}/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2
 
@@ -379,16 +501,31 @@ kapture_pipeline_image_retrieval_benchmark.py -v info \
 kapture_pipeline_image_retrieval_benchmark.py -v info \
       -i RobotCar_Seasons-v1/mapping \
       --query RobotCar_Seasons-v1/query \
-      -kpt RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/keypoints \
-      -desc RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/descriptors \
+      -kpt RobotCar_Seasons-v1/local_features/${LFEAT}/keypoints \
+      -desc RobotCar_Seasons-v1/local_features/${LFEAT}/descriptors \
       -gfeat RobotCar_Seasons-v1/global_features/AP-GeM-LM18/global_features \
-      -matches RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_no_gv/matches \
-      -matches-gv RobotCar_Seasons-v1/local_features/r2d2_WASF-N8_20k/NN_colmap_gv/matches \
-      --colmap-map RobotCar_Seasons-v1/colmap-sfm/r2d2_WASF-N8_20k/ir_benchmark/colmap \
-      -o RobotCar_Seasons-v1/image_retrieval_benchmark/r2d2_WASF-N8_20k/ir_benchmark/AP-GeM-LM18_top20 \
+      -matches RobotCar_Seasons-v1/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv RobotCar_Seasons-v1/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map RobotCar_Seasons-v1/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o RobotCar_Seasons-v1/image_retrieval_benchmark/${LFEAT}/ir_benchmark/AP-GeM-LM18_top20 \
       --topk 20 \
       --config 2 \
       --benchmark-style RobotCar_Seasons # important for RobotCar (needed for visuallocalization.net)
+
+# Gangnam Station B2
+kapture_pipeline_image_retrieval_benchmark.py -v info \
+      -i GangnamStation/B2/release/mapping \
+      --query GangnamStation/B2/release/query_all \
+      -kpt GangnamStation/B2/release/local_features/${LFEAT}/keypoints \
+      -desc GangnamStation/B2/release/local_features/${LFEAT}/descriptors \
+      -gfeat GangnamStation/B2/release/global_features/AP-GeM-LM18/global_features \
+      -matches GangnamStation/B2/release/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv GangnamStation/B2/release/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map GangnamStation/B2/release/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o GangnamStation/B2/release/image_retrieval_benchmark/${LFEAT}/ir_benchmark/AP-GeM-LM18_top20 \
+      --topk 20 \
+      --config 2 \
+      --benchmark-style Gangnam_Station # important for Gangnam Station B2 (needed for visuallocalization.net)
 ```
 
 The benchmark script will execute the following commands:
@@ -415,4 +552,64 @@ The parameters are described in link:../kapture_localization/colmap/colmap_comma
 The benchmark script also has a parameter `--skip` which can be used to skip parts of the benchmark.
 For example, if you want to evaluate your global features only on global SFM, you could use `--skip local_sfm pose_approximation`.
 
-The folder `image_retrieval_benchmark/r2d2_WASF-N8_20k/frustum_thresh10_far50/AP-GeM-LM18_top20` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results for each dataset.
+The folder `image_retrieval_benchmark/feather2d2_dim32_20k/frustum_thresh10_far50/AP-GeM-LM18_top20` contains the pairs file as well as the LTVL-style results and kapture-style `eval` results for each dataset.
+
+```
+
+# run full benchmark (all 3 tasks) for fire_top20 on
+# Aachen Day-Night v1.1
+kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py -v info \
+      -i Aachen-Day-Night-v1.1/mapping \
+      --query Aachen-Day-Night-v1.1/query_all \
+      -kpt Aachen-Day-Night-v1.1/local_features/${LFEAT}/keypoints \
+      -desc Aachen-Day-Night-v1.1/local_features/${LFEAT}/descriptors \
+      --pairsfile-path Aachen-Day-Night-v1.1/pairsfile/query/fire_top20.txt \
+      -matches Aachen-Day-Night-v1.1/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv Aachen-Day-Night-v1.1/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map Aachen-Day-Night-v1.1/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o Aachen-Day-Night-v1.1/image_retrieval_benchmark/${LFEAT}/ir_benchmark/fire_top20 \
+      --config 2
+
+# Baidu Mall
+kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py -v info \
+      -i baidu-mall/mapping \
+      --query baidu-mall/query \
+      -kpt baidu-mall/local_features/${LFEAT}/keypoints \
+      -desc baidu-mall/local_features/${LFEAT}/descriptors \
+      --pairsfile-path baidu-mall/pairsfile/query/fire_top20.txt \
+      -matches baidu-mall/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv baidu-mall/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map baidu-mall/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o baidu-mall/image_retrieval_benchmark/${LFEAT}/ir_benchmark/fire_top20 \
+      --config 2
+
+# RobotCar Seasons
+kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py -v info \
+      -i RobotCar_Seasons-v1/mapping \
+      --query RobotCar_Seasons-v1/query \
+      -kpt RobotCar_Seasons-v1/local_features/${LFEAT}/keypoints \
+      -desc RobotCar_Seasons-v1/local_features/${LFEAT}/descriptors \
+      --pairsfile-path RobotCar_Seasons-v1/pairsfile/query/fire_top20.txt \
+      -matches RobotCar_Seasons-v1/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv RobotCar_Seasons-v1/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map RobotCar_Seasons-v1/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o RobotCar_Seasons-v1/image_retrieval_benchmark/${LFEAT}/ir_benchmark/fire_top20 \
+      --config 2 \
+      --benchmark-style RobotCar_Seasons # important for RobotCar (needed for visuallocalization.net)
+
+# Gangnam Station B2
+kapture_pipeline_image_retrieval_benchmark_from_pairsfile.py -v info \
+      -i GangnamStation/B2/release/mapping \
+      --query GangnamStation/B2/release/query_all \
+      -kpt GangnamStation/B2/release/local_features/${LFEAT}/keypoints \
+      -desc GangnamStation/B2/release/local_features/${LFEAT}/descriptors \
+      --pairsfile-path GangnamStation/B2/release/pairsfile/query/fire_top20.txt \
+      -matches GangnamStation/B2/release/local_features/${LFEAT}/NN_no_gv/matches \
+      -matches-gv GangnamStation/B2/release/local_features/${LFEAT}/NN_colmap_gv/matches \
+      --colmap-map GangnamStation/B2/release/colmap-sfm/${LFEAT}/ir_benchmark/colmap \
+      -o GangnamStation/B2/release/image_retrieval_benchmark/${LFEAT}/ir_benchmark/fire_top20 \
+      --config 2 \
+      --benchmark-style Gangnam_Station # important for Gangnam Station B2 (needed for visuallocalization.net)
+```
+
+The folder `image_retrieval_benchmark/feather2d2_dim32_20k/frustum_thresh10_far50/fire_top20` contains the LTVL-style results and kapture-style `eval` results for each dataset.
