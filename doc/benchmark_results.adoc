@@ -989,7 +989,7 @@ image::../doc/plots/r2d2/aachen_night_r2d2_local_sfm_2.jpg[aachen_night_r2d2_loc
 image::../doc/plots/r2d2/aachen_day_r2d2_ewb.jpg[aachen_day_r2d2_ewb]
 image::../doc/plots/r2d2/aachen_night_r2d2_ewb.jpg[aachen_night_r2d2_ewb]
 
-=== baidu-mall
+=== Baidu-mall
 
 ==== global_sfm
 
