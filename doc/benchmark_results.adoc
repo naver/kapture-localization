@@ -2,7 +2,7 @@
 :sectnums:
 :sectnumlevels: 0
 :toc:
-:toclevels: 2
+:toclevels: 3
 
 TODO add references
 
