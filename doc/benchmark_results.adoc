@@ -5,7 +5,7 @@
 :toclevels: 3
 
 = Introduction
-Here we present additional results computed with our image retrieval for visual localization benchmark presented in these two papers: https://arxiv.org/abs/2011.11946[3DV20], https://arxiv.org/abs/2205.15761[IJCV21]. We use a novel version of https://github.com/naver/fire[R2D2] which is not yet publicly available. However, we provide the local features for all datasets via our https://github.com/naver/kapture/blob/main/doc/tutorial.adoc#2-download-a-dataset[dataset downloader].
+Here we present additional results computed with our image retrieval for visual localization benchmark presented in these two papers: https://arxiv.org/abs/2011.11946[3DV20], https://arxiv.org/abs/2205.15761[IJCV21]. We use two versions of https://github.com/naver/r2d2[R2D2]: (i) the same as in the papers and (ii) a novel version which is not yet publicly available. However, we provide the local features for all datasets via our https://github.com/naver/kapture/blob/main/doc/tutorial.adoc#2-download-a-dataset[dataset downloader].
 
 If you use these results in your own work, please cite one of our papers:
 
@@ -26,21 +26,25 @@ If you use these results in your own work, please cite one of our papers:
 }
 ----
 
-= Image retrieval models used
+= Image retrieval models
 
 AP-GeM-LM18:
 https://drive.google.com/open?id=1r76NLHtJsH-Ybfda4aLkUIoW3EEsi25I[model],
 https://github.com/naver/deep-image-retrieval[code]
 
-DELG: https://github.com/tensorflow/models/blob/master/research/delf/delf/python/delg/r101delg_gldv2clean_config.pbtxt[model]
+DELG: https://github.com/tensorflow/models/tree/afdf2599b37a199821772f0d6eea9d9300cf9f8d/research/delf/delf/python/delg[code and model]
 
-densevlad_multi: link
+r101delg_gldv2clean: https://github.com/tensorflow/models/blob/master/research/delf/delf/python/delg/r101delg_gldv2clean_config.pbtxt[model]
+
+densevlad_multi: https://openaccess.thecvf.com/content_cvpr_2015/papers/Torii_247_Place_Recognition_2015_CVPR_paper.pdf[paper], https://drive.google.com/file/d/1BMaMe1qzOD36Wa-9c0MOwPpDvrftD5zy/view?usp=sharing[code]
 
 fire: http://download.europe.naverlabs.com/ComputerVision/FIRe/official/fire.pth[model], https://github.com/naver/fire[code]
 
 how: https://github.com/gtolias/how[original code], https://github.com/naver/fire[we used this code]
 
-netvlad_vd16pitts: link
+netvlad_vd16pitts: https://github.com/Relja/netvlad[code], https://www.di.ens.fr/willow/research/netvlad/data/models/vd16_pitts30k_conv5_3_vlad_preL2_intra_white.mat[model]
+
+openibl_vgg16_netvlad: https://github.com/yxgeee/OpenIBL[code], https://github.com/yxgeee/OpenIBL/releases/download/v0.1.0-beta/vgg16_netvlad.pth[model]
 
 == Feather2d2 20k Results
 
