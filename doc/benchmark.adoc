@@ -464,7 +464,7 @@ kapture_pipeline_mapping.py -v info \
 
 # Gangnam Station B2
 mkdir -p GangnamStation/B2/release/pairsfile/mapping
-TODO wget -O GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt
+wget -O GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt
 # sha256sum available at http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt.sha256sum
 kapture_pipeline_mapping.py -v info \
     -i GangnamStation/B2/release/mapping \
