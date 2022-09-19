@@ -72,6 +72,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query_all
@@ -139,6 +143,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query
@@ -198,6 +206,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query
@@ -241,10 +253,14 @@ kapture_datasets
 └─ GangnamStation/B2/release
     ├─ global_features
     │  ├─ AP-GeM-LM18
-    │  ├─ DELG
+    │  ├─ r101delg_gldv2clean
     │  ├─ densevlad_multi
-    │  └─ netvlad_vd16pitts
+    │  └─ openibl_vgg16_netvlad
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ test
@@ -310,7 +326,7 @@ done
 === Local features
 
 Any local features in https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture format] can be used.
-For this tutorial, we suggest to use our preextracted feather2d2 lightweight features (TODO instructions).
+For this tutorial, we suggest to use our preextracted feather2d2 lightweight features. If you followed the instructions above to download and install the datasets, then you should have them in the local_features subfolders.
 
 To reproduce the numbers that we reported in the publications, you would have to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]), instructions below.
 
@@ -394,7 +410,7 @@ The kapture pipelines will generate links to these folders.
 
 = Mapping
 
-NOTE: If you use feather2d2, you can download the exact map that we used, and can skip this section
+NOTE: If you use feather2d2, you can download (or have already downloaded it if you followed the dataset instructions above) the exact map that we used, and can skip this section
 
 NOTE: For other features, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
 
@@ -448,7 +464,7 @@ kapture_pipeline_mapping.py -v info \
 
 # Gangnam Station B2
 mkdir -p GangnamStation/B2/release/pairsfile/mapping
-TODO wget -O GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt
+wget -O GangnamStation/B2/release/pairsfile/mapping/GangnamStation_B2_ir_benchmark_pairs.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt
 # sha256sum available at http://download.europe.naverlabs.com/kapture/GangnamStation_B2_ir_benchmark_pairs.txt.sha256sum
 kapture_pipeline_mapping.py -v info \
     -i GangnamStation/B2/release/mapping \
