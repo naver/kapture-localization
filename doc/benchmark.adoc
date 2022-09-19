@@ -310,7 +310,7 @@ done
 === Local features
 
 Any local features in https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture format] can be used.
-For this tutorial, we suggest to use our preextracted feather2d2 lightweight features (TODO instructions).
+For this tutorial, we suggest to use our preextracted feather2d2 lightweight features. If you followed the instructions above to download and install the datasets, then you should have them in the local_features subfolders.
 
 To reproduce the numbers that we reported in the publications, you would have to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]), instructions below.
 
