@@ -72,6 +72,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query_all
@@ -139,6 +143,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query
@@ -198,6 +206,10 @@ kapture_datasets
     │  ├─ densevlad_multi
     │  └─ netvlad_vd16pitts
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query
@@ -241,10 +253,14 @@ kapture_datasets
 └─ GangnamStation/B2/release
     ├─ global_features
     │  ├─ AP-GeM-LM18
-    │  ├─ DELG
+    │  ├─ r101delg_gldv2clean
     │  ├─ densevlad_multi
-    │  └─ netvlad_vd16pitts
+    │  └─ openibl_vgg16_netvlad
     │     └─ global_features
+    ├─ local_features
+    │  └─ feather2d2_dim32_20k
+    │     ├─ keypoints
+    │     └─ descriptors
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ test
