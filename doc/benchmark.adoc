@@ -410,7 +410,7 @@ The kapture pipelines will generate links to these folders.
 
 = Mapping
 
-NOTE: If you use feather2d2, you can download the exact map that we used, and can skip this section
+NOTE: If you use feather2d2, you can download (or have already downloaded it if you followed the dataset instructions above) the exact map that we used, and can skip this section
 
 NOTE: For other features, you have to compute your own maps (our map cannot be used because there is no guarantee that your local features correspond to our keypoints in the map).
 
