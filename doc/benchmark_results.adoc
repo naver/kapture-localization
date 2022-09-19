@@ -7,6 +7,8 @@
 = Introduction
 Here we present additional results computed with our image retrieval for visual localization benchmark presented in these two papers: https://arxiv.org/abs/2011.11946[3DV20], https://arxiv.org/abs/2205.15761[IJCV21]. We use two versions of https://github.com/naver/r2d2[R2D2]: (i) the same as in the papers and (ii) a novel version which is not yet publicly available. However, we provide the local features for all datasets via our https://github.com/naver/kapture/blob/main/doc/tutorial.adoc#2-download-a-dataset[dataset downloader].
 
+Furthermore, we used a new implementation of the link:../tools/kapture_pycolmap_localsfm.py[local_sfm] (paradigm 2a in the papers) method. This version is much faster and provides similar performance.
+
 If you use these results in your own work, please cite one of our papers:
 
 ----
