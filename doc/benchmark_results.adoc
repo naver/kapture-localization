@@ -5,7 +5,7 @@
 :toclevels: 3
 
 = Introduction
-Here we present additional results computed with our image retrieval for visual localization benchmark presented in these two papers: https://arxiv.org/abs/2011.11946[3DV20], https://arxiv.org/abs/2205.15761[IJCV21]. We use two versions of https://github.com/naver/r2d2[R2D2]: (i) the same as in the papers and (ii) a novel version which is not yet publicly available. However, we provide the local features for all datasets via our https://github.com/naver/kapture/blob/main/doc/tutorial.adoc#2-download-a-dataset[dataset downloader].
+Here we present *additional results (more global features, different local features)* computed to our image retrieval for visual localization benchmark presented in these two papers: https://arxiv.org/abs/2011.11946[3DV20], https://arxiv.org/abs/2205.15761[IJCV21]. Wrt local features, we use two versions of https://github.com/naver/r2d2[R2D2]: (i) the same as in the papers and (ii) a novel version which is not yet publicly available. However, we provide the local features for all datasets via our https://github.com/naver/kapture/blob/main/doc/tutorial.adoc#2-download-a-dataset[dataset downloader].
 
 Furthermore, we used a new implementation of the link:../tools/kapture_pycolmap_localsfm.py[local_sfm] (paradigm 2a in the papers) method. This version is much faster and provides similar performance.
 
@@ -121,7 +121,6 @@ openibl_vgg16_netvlad: https://github.com/yxgeee/OpenIBL[code], https://github.c
 |how|50|89.3%|96.0%|99.3%|69.6%|84.8%|96.3%
 |netvlad_vd16pitts|50|89.1%|95.0%|97.8%|68.1%|82.7%|94.2%
 |r101delg_gldv2clean|50|88.1%|94.7%|98.9%|67.5%|85.9%|95.8%
-
 |===
 
 image::../doc/plots/feather2d2/aachen_eval_day_global_sfm_0_25m_2_0deg.png[aachen_eval_day_global_sfm_0_25m_2_0deg]
@@ -185,7 +184,6 @@ image::../doc/plots/feather2d2/aachen_eval_night_global_sfm_5_0m_10_0deg.png[aac
 |how|50|83.7%|92.0%|97.9%|57.1%|72.3%|90.1%
 |netvlad_vd16pitts|50|81.3%|89.3%|95.3%|52.4%|65.5%|77.0%
 |r101delg_gldv2clean|50|81.3%|90.4%|97.1%|55.0%|72.3%|86.4%
-
 |===
 
 
@@ -281,10 +279,11 @@ image::../doc/plots/feather2d2/aachen_eval_night_ewb_5_0m_10_0deg.png[aachen_eva
 feature type;topk;(0.25m_2.0deg);(0.5m_5.0deg);(5.0m_10.0deg);median distance (m);median angle (deg)
 AP-GeM-LM18;1;41.49%;52.97%;61.04%;0.3991;1.6483
 DELG;1;39.88%;50.79%;59.29%;0.4515;1.8499
-densevlad_multi;1;43.06%;53.93%;61.08%;0.362;1.5849
+densevlad_multi;1;43.06%;53.93%;61.08%;0.3620;1.5849
 fire;1;48.65%;63.61%;72.29%;0.2539;1.1739
 how;1;51.40%;66.27%;76.22%;0.2308;1.1269
 netvlad_vd16pitts;1;42.10%;52.27%;59.55%;0.3983;1.7977
+r101delg_gldv2clean;1;40.36%;51.83%;60.08%;0.4113;1.8627
 ;;;;;;
 AP-GeM-LM18;2;45.99%;58.55%;67.32%;0.2867;1.2706
 DELG;2;45.72%;57.94%;65.62%;0.2937;1.2847
@@ -292,20 +291,23 @@ densevlad_multi;2;47.38%;59.42%;66.58%;0.2684;1.2062
 fire;2;55.24%;69.98%;78.84%;0.2087;0.9831
 how;2;58.03%;73.43%;82.68%;0.1906;0.9223
 netvlad_vd16pitts;2;47.64%;58.64%;66.67%;0.2733;1.2313
+r101delg_gldv2clean;2;46.82%;59.73%;67.67%;0.2741;1.2638
 ;;;;;;
-AP-GeM-LM18;3;49.13%;62.13%;70.81%;0.247;1.117
+AP-GeM-LM18;3;49.13%;62.13%;70.81%;0.2470;1.1170
 DELG;3;48.39%;61.26%;68.98%;0.2594;1.1736
 densevlad_multi;3;49.56%;61.61%;69.24%;0.2423;1.1299
 fire;3;56.72%;71.99%;80.98%;0.1969;0.9265
 how;3;60.78%;76.66%;84.99%;0.1792;0.8848
 netvlad_vd16pitts;3;49.35%;61.30%;69.33%;0.2468;1.1575
+r101delg_gldv2clean;3;49.39%;62.70%;70.42%;0.2458;1.1694
 ;;;;;;
 AP-GeM-LM18;4;50.92%;63.48%;72.77%;0.2306;1.0552
 DELG;4;49.91%;63.00%;71.07%;0.2428;1.0829
 densevlad_multi;4;51.44%;63.87%;71.38%;0.2256;1.0703
-fire;4;58.60%;73.43%;81.59%;0.1845;0.903
+fire;4;58.60%;73.43%;81.59%;0.1845;0.9030
 how;4;61.61%;77.31%;85.56%;0.1727;0.8701
 netvlad_vd16pitts;4;50.96%;63.39%;71.47%;0.2331;1.0867
+r101delg_gldv2clean;4;50.35%;64.18%;72.29%;0.2383;1.0790
 ;;;;;;
 AP-GeM-LM18;5;51.27%;64.62%;74.04%;0.2278;1.0318
 DELG;5;51.40%;64.40%;72.77%;0.2271;1.0535
@@ -313,6 +315,7 @@ densevlad_multi;5;52.53%;65.45%;73.04%;0.2186;1.0229
 fire;5;59.95%;74.65%;82.77%;0.1804;0.8775
 how;5;62.91%;78.88%;86.61%;0.1673;0.8419
 netvlad_vd16pitts;5;51.96%;64.49%;72.99%;0.2227;1.0418
+r101delg_gldv2clean;5;52.14%;65.58%;73.82%;0.2237;1.0594
 ;;;;;;
 AP-GeM-LM18;10;54.23%;68.19%;76.92%;0.2075;0.9539
 DELG;10;55.15%;68.11%;76.09%;0.2041;0.9479
@@ -320,6 +323,7 @@ densevlad_multi;10;54.84%;69.59%;77.09%;0.2007;0.9355
 fire;10;62.13%;76.40%;83.99%;0.1714;0.8559
 how;10;64.79%;80.72%;88.31%;0.1636;0.8137
 netvlad_vd16pitts;10;55.15%;68.54%;76.88%;0.2056;0.9586
+r101delg_gldv2clean;10;55.19%;69.37%;77.01%;0.2026;0.9327
 ;;;;;;
 AP-GeM-LM18;20;56.24%;70.72%;80.02%;0.1953;0.9077
 DELG;20;57.98%;70.68%;79.54%;0.1899;0.9006
@@ -327,31 +331,49 @@ densevlad_multi;20;58.12%;72.64%;80.41%;0.1827;0.8944
 fire;20;63.22%;79.14%;86.52%;0.1674;0.8469
 how;20;65.27%;81.68%;89.40%;0.1599;0.8228
 netvlad_vd16pitts;20;58.29%;71.60%;80.10%;0.1891;0.9201
+r101delg_gldv2clean;20;57.98%;72.25%;80.24%;0.1894;0.9102
 ;;;;;;
-AP-GeM-LM18;50;57.98%;72.91%;82.37%;0.187;0.8748
+AP-GeM-LM18;50;57.98%;72.91%;82.37%;0.1870;0.8748
 DELG;50;59.03%;74.13%;82.16%;0.1822;0.8789
 densevlad_multi;50;61.43%;76.83%;84.69%;0.1734;0.8705
 fire;50;63.57%;79.71%;87.57%;0.1653;0.8428
-how;50;65.58%;81.72%;88.92%;0.16;0.8302
+how;50;65.58%;81.72%;88.92%;0.1600;0.8302
 netvlad_vd16pitts;50;60.03%;75.17%;83.33%;0.1771;0.8933
-
+r101delg_gldv2clean;50;61.21%;76.09%;83.90%;0.1715;0.8458
 |===
 
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_25m_2_0deg.jpg[baidu-mall_eval_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_5m_5_0deg.jpg[baidu-mall_eval_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_5_0m_10_0deg.jpg[baidu-mall_eval_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_25m_2_0deg.png[baidu-mall_eval_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_0_5m_5_0deg.png[baidu-mall_eval_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_5_0m_10_0deg.png[baidu-mall_eval_global_sfm_5_0m_10_0deg]
 
 ==== local_sfm
 
 [%header,format=csv,separator=;]
 |===       
 feature type;topk;(0.25m_2.0deg);(0.5m_5.0deg);(5.0m_10.0deg);median distance (m);median angle (deg)
+AP-GeM-LM18;1;0.00%;0.00%;0.00%;inf;inf
+DELG;1;0.00%;0.00%;0.00%;inf;inf
+densevlad_multi;1;0.00%;0.00%;0.00%;inf;inf
+fire;1;0.00%;0.00%;0.00%;inf;inf
+how;1;0.00%;0.00%;0.00%;inf;inf
+netvlad_vd16pitts;1;0.00%;0.00%;0.00%;inf;inf
+r101delg_gldv2clean;1;0.00%;0.00%;0.00%;inf;inf
+;;;;;;
+AP-GeM-LM18;2;0.00%;0.00%;0.00%;inf;inf
+DELG;2;0.00%;0.00%;0.00%;inf;inf
+densevlad_multi;2;0.00%;0.00%;0.00%;inf;inf
+fire;2;0.00%;0.00%;0.00%;inf;inf
+how;2;0.00%;0.00%;0.00%;inf;inf
+netvlad_vd16pitts;2;0.00%;0.00%;0.00%;inf;inf
+r101delg_gldv2clean;2;0.00%;0.00%;0.00%;inf;inf
+;;;;;;
 AP-GeM-LM18;3;2.71%;4.01%;5.89%;inf;inf
 DELG;3;2.66%;4.23%;5.98%;inf;inf
 densevlad_multi;3;3.10%;4.71%;6.72%;inf;inf
 fire;3;3.45%;5.80%;9.12%;inf;inf
 how;3;3.62%;5.72%;9.60%;inf;inf
 netvlad_vd16pitts;3;2.44%;3.88%;5.67%;inf;inf
+r101delg_gldv2clean;3;2.75%;4.49%;6.11%;inf;inf
 ;;;;;;
 AP-GeM-LM18;4;7.64%;12.26%;16.71%;inf;inf
 DELG;4;6.76%;10.99%;15.14%;inf;inf
@@ -359,6 +381,7 @@ densevlad_multi;4;7.72%;11.82%;15.84%;inf;inf
 fire;4;9.69%;15.36%;22.16%;inf;inf
 how;4;9.86%;16.58%;23.04%;inf;inf
 netvlad_vd16pitts;4;6.54%;10.38%;14.27%;inf;inf
+r101delg_gldv2clean;4;6.76%;10.95%;15.05%;inf;inf
 ;;;;;;
 AP-GeM-LM18;5;12.00%;18.41%;24.30%;inf;inf
 DELG;5;10.82%;16.36%;21.47%;inf;inf
@@ -366,6 +389,7 @@ densevlad_multi;5;11.78%;17.15%;22.25%;inf;inf
 fire;5;14.88%;22.86%;30.89%;inf;inf
 how;5;15.40%;24.30%;32.64%;inf;inf
 netvlad_vd16pitts;5;10.03%;15.58%;20.20%;inf;inf
+r101delg_gldv2clean;5;10.73%;16.14%;21.51%;inf;inf
 ;;;;;;
 AP-GeM-LM18;10;19.28%;27.53%;37.83%;inf;inf
 DELG;10;17.93%;25.09%;33.99%;inf;inf
@@ -373,26 +397,28 @@ densevlad_multi;10;19.11%;26.66%;35.60%;inf;inf
 fire;10;26.35%;37.52%;48.60%;2.6673;11.6364
 how;10;27.36%;40.01%;53.62%;1.1763;5.4334
 netvlad_vd16pitts;10;17.84%;26.70%;34.47%;inf;inf
+r101delg_gldv2clean;10;19.02%;26.70%;35.56%;inf;inf
 ;;;;;;
-AP-GeM-LM18;20;23.69%;34.16%;45.33%;6.1982;23.359
+AP-GeM-LM18;20;23.69%;34.16%;45.33%;6.1982;23.3590
 DELG;20;22.21%;31.11%;42.45%;inf;inf
 densevlad_multi;20;23.12%;31.89%;42.41%;157.3505;178.8039
 fire;20;29.93%;42.58%;55.58%;0.9282;3.9254
 how;20;31.76%;45.38%;60.65%;0.6982;3.1201
 netvlad_vd16pitts;20;22.21%;32.77%;42.54%;39.8295;148.5412
+r101delg_gldv2clean;20;23.82%;33.07%;44.02%;11.5205;47.1031
 ;;;;;;
 AP-GeM-LM18;50;26.61%;37.57%;51.66%;1.6433;6.1614
 DELG;50;26.96%;37.70%;50.48%;1.9979;6.9691
 densevlad_multi;50;26.96%;37.87%;50.79%;1.8145;6.5525
 fire;50;32.02%;46.42%;59.86%;0.6654;2.7916
 how;50;33.42%;47.95%;62.17%;0.5579;2.5338
-netvlad_vd16pitts;50;26.70%;38.09%;51.48%;1.662;6.651
-
+netvlad_vd16pitts;50;26.70%;38.09%;51.48%;1.6620;6.6510
+r101delg_gldv2clean;50;27.36%;39.09%;52.01%;1.6470;5.6029
 |===
 
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_25m_2_0deg.jpg[baidu-mall_eval_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_5m_5_0deg.jpg[baidu-mall_eval_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_5_0m_10_0deg.jpg[baidu-mall_eval_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_25m_2_0deg.png[baidu-mall_eval_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_0_5m_5_0deg.png[baidu-mall_eval_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_local_sfm_5_0m_10_0deg.png[baidu-mall_eval_local_sfm_5_0m_10_0deg]
 
 ==== EWB
 
@@ -405,6 +431,7 @@ densevlad_multi;1;12.00%;6.673;23.697
 fire;1;12.35%;5.575;25.5125
 how;1;12.52%;5.2578;25.1081
 netvlad_vd16pitts;1;11.26%;6.47;26.5437
+r101delg_gldv2clean;1;11.04%;6.6522;27.7751
 ;;;;
 AP-GeM-LM18;2;10.43%;7.542;27.8744
 DELG;2;11.17%;6.6436;27.7308
@@ -412,6 +439,7 @@ densevlad_multi;2;11.56%;7.5993;24.4993
 fire;2;13.31%;5.5801;25.5571
 how;2;13.66%;5.2997;23.9257
 netvlad_vd16pitts;2;11.26%;6.6716;28.1548
+r101delg_gldv2clean;2;11.30%;6.9504;28.1256
 ;;;;
 AP-GeM-LM18;3;9.60%;8.4706;26.1011
 DELG;3;10.73%;7.1468;26.7348
@@ -419,6 +447,7 @@ densevlad_multi;3;11.26%;9.1667;23.4016
 fire;3;12.61%;5.6782;24.9604
 how;3;13.31%;5.5141;23.6242
 netvlad_vd16pitts;3;10.60%;7.497;25.9385
+r101delg_gldv2clean;3;10.56%;7.442;26.7351
 ;;;;
 AP-GeM-LM18;4;8.07%;9.2447;26.9744
 DELG;4;9.95%;8.0939;27.3394
@@ -426,6 +455,7 @@ densevlad_multi;4;10.03%;11.8928;23.8444
 fire;4;12.00%;5.9515;25.1414
 how;4;12.83%;5.6813;23.9538
 netvlad_vd16pitts;4;9.77%;8.8262;27.6777
+r101delg_gldv2clean;4;10.12%;8.1706;27.776
 ;;;;
 AP-GeM-LM18;5;7.33%;10.4991;26.6251
 DELG;5;9.12%;9.4026;26.9786
@@ -433,6 +463,7 @@ densevlad_multi;5;8.77%;15.1397;24.2678
 fire;5;11.39%;6.2185;24.6712
 how;5;12.13%;5.8031;24.0752
 netvlad_vd16pitts;5;9.21%;10.8028;26.4875
+r101delg_gldv2clean;5;9.38%;9.2596;27.9494
 ;;;;
 AP-GeM-LM18;10;3.93%;18.6119;28.2682
 DELG;10;3.75%;21.9131;28.5106
@@ -440,6 +471,7 @@ densevlad_multi;10;3.84%;26.7983;25.3009
 fire;10;7.11%;11.7412;24.1158
 how;10;8.90%;8.7749;23.7837
 netvlad_vd16pitts;10;3.97%;21.292;27.0966
+r101delg_gldv2clean;10;4.36%;18.4918;28.9858
 ;;;;
 AP-GeM-LM18;20;0.87%;31.5298;33.336
 DELG;20;1.44%;35.3734;32.2189
@@ -447,6 +479,7 @@ densevlad_multi;20;1.44%;38.8395;27.4481
 fire;20;2.53%;24.6811;25.3815
 how;20;3.58%;16.4386;25.1866
 netvlad_vd16pitts;20;1.18%;33.7681;30.084
+r101delg_gldv2clean;20;1.31%;30.379;32.3773
 ;;;;
 AP-GeM-LM18;50;0.13%;47.8105;43.4094
 DELG;50;0.22%;49.1835;41.8617
@@ -454,10 +487,10 @@ densevlad_multi;50;0.09%;51.9908;34.0089
 fire;50;0.26%;44.6016;33.2701
 how;50;0.57%;38.4978;34.0702
 netvlad_vd16pitts;50;0.22%;46.5507;36.354
-
+r101delg_gldv2clean;50;0.13%;45.203;44.9521
 |===
 
-image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_eval_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.png[baidu-mall_eval_ewb_5_0m_10_0deg]
 
 === RobotCar Seasons
 
@@ -474,6 +507,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|1|49.9%|78.5%|93.8%|8.4%|18.5%|29.0%
 |how|1|48.7%|77.2%|92.3%|11.3%|22.1%|34.4%
 |netvlad_vd16pitts|1|48.7%|77.5%|93.1%|6.6%|12.3%|18.2%
+|r101delg_gldv2clean|1|47.6%|75.2%|91.2%|7.0%|16.9%|29.6%
 ||||||||
 |AP-GeM-LM18|2|49.5%|78.3%|93.4%|12.3%|26.1%|40.4%
 |DELG|2|49.0%|76.2%|91.0%|8.4%|17.1%|28.8%
@@ -481,6 +515,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|2|51.0%|79.4%|94.5%|11.4%|21.4%|32.7%
 |how|2|50.0%|78.1%|93.1%|12.0%|25.3%|38.4%
 |netvlad_vd16pitts|2|49.8%|78.6%|93.9%|9.9%|16.0%|23.9%
+|r101delg_gldv2clean|2|49.1%|76.7%|92.6%|9.9%|20.8%|34.4%
 ||||||||
 |AP-GeM-LM18|3|49.9%|78.8%|94.0%|13.9%|29.0%|45.6%
 |DELG|3|49.5%|76.9%|91.9%|9.5%|19.3%|30.6%
@@ -488,6 +523,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|3|51.3%|79.7%|94.9%|12.2%|23.0%|36.0%
 |how|3|50.6%|78.7%|93.5%|13.6%|26.5%|40.3%
 |netvlad_vd16pitts|3|50.7%|79.0%|94.6%|10.3%|17.3%|27.8%
+|r101delg_gldv2clean|3|49.8%|77.8%|93.4%|11.4%|23.8%|36.7%
 ||||||||
 |AP-GeM-LM18|4|50.4%|79.2%|94.2%|15.5%|31.3%|47.7%
 |DELG|4|50.2%|77.8%|92.6%|9.6%|20.3%|31.7%
@@ -495,6 +531,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|4|51.7%|80.0%|95.2%|14.0%|25.5%|37.5%
 |how|4|50.7%|78.9%|93.9%|13.9%|28.0%|41.3%
 |netvlad_vd16pitts|4|51.1%|79.5%|94.9%|11.3%|19.6%|29.3%
+|r101delg_gldv2clean|4|50.2%|78.1%|93.6%|12.6%|26.0%|39.1%
 ||||||||
 |AP-GeM-LM18|5|50.8%|79.6%|94.4%|16.0%|32.1%|49.2%
 |DELG|5|50.3%|78.0%|93.0%|9.5%|20.7%|33.6%
@@ -502,6 +539,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|5|51.6%|80.1%|95.3%|14.6%|26.9%|39.3%
 |how|5|51.2%|79.1%|94.2%|14.1%|29.6%|41.9%
 |netvlad_vd16pitts|5|51.0%|79.7%|95.0%|12.0%|21.4%|30.9%
+|r101delg_gldv2clean|5|50.4%|78.7%|93.9%|12.8%|27.6%|40.4%
 ||||||||
 |AP-GeM-LM18|10|51.5%|80.0%|94.9%|19.8%|36.7%|54.3%
 |DELG|10|51.0%|78.9%|93.7%|11.1%|23.8%|36.8%
@@ -509,6 +547,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|10|52.3%|80.7%|96.1%|16.4%|30.1%|44.5%
 |how|10|51.8%|80.0%|95.2%|15.3%|32.9%|46.9%
 |netvlad_vd16pitts|10|52.1%|80.6%|95.7%|13.0%|24.5%|35.9%
+|r101delg_gldv2clean|10|52.1%|79.7%|94.9%|15.6%|32.2%|46.2%
 ||||||||
 |AP-GeM-LM18|20|52.2%|80.4%|95.6%|20.7%|39.9%|57.6%
 |DELG|20|51.6%|79.4%|94.7%|13.1%|27.2%|40.8%
@@ -516,6 +555,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|20|52.4%|80.9%|96.7%|19.5%|32.9%|47.6%
 |how|20|52.3%|80.7%|95.8%|17.4%|33.6%|48.4%
 |netvlad_vd16pitts|20|52.4%|80.8%|95.9%|13.9%|27.8%|39.8%
+|r101delg_gldv2clean|20|52.2%|80.4%|95.5%|17.4%|35.5%|51.5%
 ||||||||
 |AP-GeM-LM18|50|52.6%|80.8%|96.2%|22.6%|41.9%|57.7%
 |DELG|50|52.3%|80.4%|95.7%|15.4%|31.1%|45.4%
@@ -523,15 +563,16 @@ image::../doc/plots/feather2d2/baidu-mall_eval_ewb_5_0m_10_0deg.jpg[baidu-mall_e
 |fire|50|52.7%|81.1%|96.8%|18.6%|31.6%|46.9%
 |how|50|52.7%|81.1%|96.3%|17.4%|35.0%|49.4%
 |netvlad_vd16pitts|50|52.7%|81.1%|96.2%|15.3%|30.0%|42.7%
+|r101delg_gldv2clean|50|52.4%|80.9%|95.9%|20.8%|38.7%|52.2%
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_25m_2_0deg.jpg[robotcar_eval_day_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_5m_5_0deg.jpg[robotcar_eval_day_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_5_0m_10_0deg.jpg[robotcar_eval_day_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_25m_2_0deg.png[robotcar_eval_day_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_0_5m_5_0deg.png[robotcar_eval_day_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_global_sfm_5_0m_10_0deg.png[robotcar_eval_day_global_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_25m_2_0deg.jpg[robotcar_eval_night_global_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_5m_5_0deg.jpg[robotcar_eval_night_global_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[robotcar_eval_night_global_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_25m_2_0deg.png[robotcar_eval_night_global_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_0_5m_5_0deg.png[robotcar_eval_night_global_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.png[robotcar_eval_night_global_sfm_5_0m_10_0deg]
 
 ==== local_sfm
 
@@ -545,6 +586,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|3|26.6%|50.7%|72.3%|0.5%|1.3%|3.4%
 |how|3|26.7%|50.4%|71.4%|0.6%|2.2%|5.6%
 |netvlad_vd16pitts|3|25.2%|48.7%|70.3%|0.0%|0.6%|2.2%
+|r101delg_gldv2clean|3|24.0%|46.6%|67.1%|0.0%|0.9%|3.3%
 ||||||||
 |AP-GeM-LM18|4|34.7%|63.5%|85.9%|1.7%|4.8%|10.0%
 |DELG|4|34.3%|61.9%|82.5%|1.4%|3.8%|7.7%
@@ -552,6 +594,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|4|36.9%|66.9%|87.4%|0.9%|4.9%|10.8%
 |how|4|37.3%|66.3%|86.2%|2.2%|7.1%|14.7%
 |netvlad_vd16pitts|4|34.9%|64.1%|84.7%|0.6%|2.7%|6.0%
+|r101delg_gldv2clean|4|33.8%|61.7%|82.7%|1.4%|4.4%|10.3%
 ||||||||
 |AP-GeM-LM18|5|39.2%|68.5%|89.1%|2.4%|7.2%|17.2%
 |DELG|5|38.1%|67.1%|86.4%|1.1%|5.6%|11.1%
@@ -559,6 +602,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|5|41.7%|71.8%|90.7%|2.1%|8.7%|14.6%
 |how|5|40.7%|70.7%|88.7%|3.0%|10.5%|20.6%
 |netvlad_vd16pitts|5|39.5%|68.7%|88.6%|1.5%|4.4%|8.0%
+|r101delg_gldv2clean|5|38.5%|66.7%|87.3%|2.1%|8.3%|14.8%
 ||||||||
 |AP-GeM-LM18|10|45.3%|76.3%|92.8%|5.9%|16.0%|27.8%
 |DELG|10|44.6%|73.5%|90.7%|4.2%|12.8%|21.4%
@@ -566,6 +610,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|10|45.6%|76.6%|93.7%|4.4%|14.4%|22.6%
 |how|10|45.0%|75.5%|91.7%|6.6%|17.4%|29.2%
 |netvlad_vd16pitts|10|44.2%|74.7%|92.2%|3.6%|8.8%|13.1%
+|r101delg_gldv2clean|10|44.5%|74.6%|92.5%|4.8%|14.8%|23.7%
 ||||||||
 |AP-GeM-LM18|20|47.1%|77.9%|93.9%|9.0%|23.1%|36.3%
 |DELG|20|47.0%|76.8%|93.1%|7.9%|18.3%|27.3%
@@ -573,6 +618,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|20|48.4%|79.1%|94.9%|7.3%|18.2%|27.7%
 |how|20|47.3%|77.6%|93.3%|11.1%|22.4%|34.9%
 |netvlad_vd16pitts|20|46.4%|77.6%|94.0%|5.4%|12.6%|19.0%
+|r101delg_gldv2clean|20|46.9%|77.1%|94.0%|8.5%|19.9%|30.3%
 ||||||||
 |AP-GeM-LM18|50|48.2%|79.3%|95.0%|13.1%|29.0%|45.4%
 |DELG|50|48.6%|78.7%|94.6%|9.9%|21.9%|35.7%
@@ -580,16 +626,16 @@ image::../doc/plots/feather2d2/robotcar_eval_night_global_sfm_5_0m_10_0deg.jpg[r
 |fire|50|48.7%|80.1%|95.7%|9.1%|20.8%|33.8%
 |how|50|48.7%|79.2%|94.8%|11.7%|26.9%|39.9%
 |netvlad_vd16pitts|50|48.0%|79.5%|95.6%|7.3%|16.0%|26.4%
-
+|r101delg_gldv2clean|50|48.7%|79.6%|95.6%|10.7%|25.1%|40.9%
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_25m_2_0deg.jpg[robotcar_eval_day_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_5m_5_0deg.jpg[robotcar_eval_day_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_5_0m_10_0deg.jpg[robotcar_eval_day_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_25m_2_0deg.png[robotcar_eval_day_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_0_5m_5_0deg.png[robotcar_eval_day_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_local_sfm_5_0m_10_0deg.png[robotcar_eval_day_local_sfm_5_0m_10_0deg]
 
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_25m_2_0deg.jpg[robotcar_eval_night_local_sfm_0_25m_2_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_5m_5_0deg.jpg[robotcar_eval_night_local_sfm_0_5m_5_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[robotcar_eval_night_local_sfm_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_25m_2_0deg.png[robotcar_eval_night_local_sfm_0_25m_2_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_0_5m_5_0deg.png[robotcar_eval_night_local_sfm_0_5m_5_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.png[robotcar_eval_night_local_sfm_5_0m_10_0deg]
 
 ==== EWB
 
@@ -603,6 +649,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|1|92.1%|25.9%
 |how|1|91.0%|31.7%
 |netvlad_vd16pitts|1|91.5%|16.1%
+|r101delg_gldv2clean|1|86.7%|26.5%
 ||||
 |AP-GeM-LM18|2|90.3%|27.2%
 |DELG|2|85.1%|20.1%
@@ -610,6 +657,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|2|91.6%|22.4%
 |how|2|90.1%|28.7%
 |netvlad_vd16pitts|2|90.2%|12.9%
+|r101delg_gldv2clean|2|86.2%|25.2%
 ||||
 |AP-GeM-LM18|3|89.7%|24.6%
 |DELG|3|85.2%|18.7%
@@ -617,6 +665,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|3|91.4%|21.2%
 |how|3|89.1%|26.7%
 |netvlad_vd16pitts|3|89.7%|10.6%
+|r101delg_gldv2clean|3|86.1%|23.0%
 ||||
 |AP-GeM-LM18|4|88.5%|23.9%
 |DELG|4|84.5%|17.1%
@@ -624,6 +673,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|4|90.7%|18.7%
 |how|4|88.3%|24.4%
 |netvlad_vd16pitts|4|88.8%|8.1%
+|r101delg_gldv2clean|4|85.8%|22.9%
 ||||
 |AP-GeM-LM18|5|88.0%|21.5%
 |DELG|5|83.5%|16.1%
@@ -631,6 +681,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|5|90.2%|17.7%
 |how|5|87.7%|24.0%
 |netvlad_vd16pitts|5|87.1%|6.7%
+|r101delg_gldv2clean|5|85.4%|19.7%
 ||||
 |AP-GeM-LM18|10|81.5%|14.0%
 |DELG|10|78.8%|14.4%
@@ -638,6 +689,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|10|84.8%|12.1%
 |how|10|81.3%|16.0%
 |netvlad_vd16pitts|10|77.3%|2.1%
+|r101delg_gldv2clean|10|79.5%|13.7%
 ||||
 |AP-GeM-LM18|20|55.1%|4.0%
 |DELG|20|58.7%|6.2%
@@ -645,17 +697,19 @@ image::../doc/plots/feather2d2/robotcar_eval_night_local_sfm_5_0m_10_0deg.jpg[ro
 |fire|20|62.5%|4.6%
 |how|20|61.4%|6.8%
 |netvlad_vd16pitts|20|42.1%|0.2%
+|r101delg_gldv2clean|20|58.7%|4.3%
 ||||
-|AP-GeM-LM18|50|9.9%|0.%
+|AP-GeM-LM18|50|9.9%|0.0%
 |DELG|50|12.3%|0.1%
 |densevlad_multi|50|6.3%|0.0%
 |fire|50|12.0%|0.0%
 |how|50|9.8%|0.0%
 |netvlad_vd16pitts|50|9.0%|0.0%
+|r101delg_gldv2clean|50|15.7%|0.2%
 |===
 
-image::../doc/plots/feather2d2/robotcar_eval_day_ewb_5_0m_10_0deg.jpg[robotcar_eval_day_ewb_5_0m_10_0deg]
-image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.jpg[robotcar_eval_night_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_day_ewb_5_0m_10_0deg.png[robotcar_eval_day_ewb_5_0m_10_0deg]
+image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.png[robotcar_eval_night_ewb_5_0m_10_0deg]
 
 === Gangnam Station B2
 
