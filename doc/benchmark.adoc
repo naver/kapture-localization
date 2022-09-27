@@ -30,7 +30,7 @@ If this benchmark is used in research, please cite this paper:
 ----
 
 
-WARNING: The image-retrieval benchmark script now runs kapture_pycolmap_localsfm, whereas we used the script kapture_colmap_localize_localsfm in the papers and they are not equivalent. We decided to change it because kapture_colmap_localize_localsfm was too slow to be practical (and it created too many matches files). localsfm results are therefore not comparable. We provide updated numbers and the local features we used for feather2d2 20k (a slightly altered version of fast r2d2 with dsize=32)
+WARNING: The image-retrieval benchmark script now runs kapture_pycolmap_localsfm, whereas we used the script kapture_colmap_localize_localsfm in the papers and they are *not equivalent*. We decided to change it because kapture_colmap_localize_localsfm was too slow to be practical (and it created too many matches files). localsfm results are therefore not comparable. We provide updated numbers as well as the local features we used to produce them (feather2d2, 20k, a slightly altered version of fast r2d2 with dsize=32) link:benchmark_results.adoc[here].
 
 = Datasets
 
@@ -146,7 +146,9 @@ kapture_datasets
     ├─ local_features
     │  └─ feather2d2_dim32_20k
     │     ├─ keypoints
-    │     └─ descriptors
+    │     ├─ descriptors
+    │     ├─ NN_no_gv
+    │     └─ NN_colmap_gv
     ├─ colmap-sfm
     ├─ map_plus_query
     ├─ query
@@ -154,6 +156,8 @@ kapture_datasets
     ├─ readme.txt
     └─ mapping
 ```
+
+Note that we also provide *local feature matches* for this dataset. This will enable you to even quicker run your own experiments.
 
 === RobotCar Seasons
 
@@ -274,7 +278,7 @@ kapture_datasets
 
 === Global features
 
-As can be seen above, in order to reproduce the 3DV2020 paper results we provide the global features in our dataset downloader and up to this point, they should already be downloaded.
+As can be seen above, we provide some global features in our dataset downloader and up to this point, they should already be downloaded.
 
 === Pairsfile
 
@@ -302,7 +306,6 @@ wget -O RobotCar_Seasons-v1/pairsfile/query/fire_top50.txt http://download.europ
 wget -O RobotCar_Seasons-v1/pairsfile/query/how_top50.txt http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_how_top50_query_pairs.txt
 # sha256sum available at http://download.europe.naverlabs.com/kapture/RobotCar_Seasons-v1_how_top50_query_pairs.txt.sha256sum
 
-
 # Gangnam Station B2
 mkdir -p GangnamStation/B2/release/pairsfile/query
 wget -O GangnamStation/B2/release/pairsfile/query/fire_top50.txt http://download.europe.naverlabs.com/kapture/GangnamStation_B2_fire_top50_query_pairs.txt
@@ -326,9 +329,11 @@ done
 === Local features
 
 Any local features in https://github.com/naver/kapture/blob/main/kapture_format.adoc[kapture format] can be used.
-For this tutorial, we suggest to use our preextracted feather2d2 lightweight features. If you followed the instructions above to download and install the datasets, then you should have them in the local_features subfolders.
+For this tutorial, we suggest to use our pre-extracted feather2d2 lightweight features. If you followed the instructions above to download and install the datasets, then you should have them in the local_features subfolders.
 
-To reproduce the numbers that we reported in the publications, you would have to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]), instructions below.
+For baidu-mall, we also provide local feature matches (feather2d2). If you test your own global features or pair files, and some feature matches are missing, the pipeline will automatically compute the missing matches and skip the existing ones.
+
+To reproduce the numbers that we reported in the publications, you would have to use https://arxiv.org/abs/1906.06195[R2D2] (https://proceedings.neurips.cc/paper/2019/hash/3198dfd0aef271d22f7bcddd6f12f5cb-Abstract.html[NeurIPS paper]) following these instructions:
 
 ```
 cd kapture_datasets
