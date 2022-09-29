@@ -21,7 +21,7 @@ from kapture_localization.utils.BenchmarkFormatStyle import BenchmarkFormatStyle
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture.utils.logging
-from kapture.utils.paths import safe_remove_file
+from kapture.utils.paths import safe_remove_file, safe_remove_any_path
 
 logger = logging.getLogger('image_retrieval_benchmark_pipeline')
 
@@ -45,7 +45,8 @@ def image_retrieval_benchmark(kapture_map_path: str,
                               config: int,
                               benchmark_format_style: BenchmarkFormatStyle,
                               skip_list: List[str],
-                              force_overwrite_existing: bool) -> None:
+                              force_overwrite_existing: bool,
+                              remove_intermediate: bool) -> None:
     """
     Image retrieval benchmark
 
@@ -83,11 +84,14 @@ def image_retrieval_benchmark(kapture_map_path: str,
     :type skip_list: List[str]
     :param force_overwrite_existing: silently overwrite files if already exists
     :type force_overwrite_existing: bool
+    :param remove_intermediate: remove global_sfm/colmap_localized, global_sfm/kapture_localized 
+                                and kapture_inputs at the end.
+    :type remove_intermediate: bool
     """
     os.makedirs(localization_output_path, exist_ok=True)
     pairfile_path = path.join(localization_output_path, f'pairs_localization_{topk}.txt')
-    map_plus_query_path = path.join(localization_output_path,
-                                    'kapture_inputs/map_plus_query') if merge_path is None else merge_path
+    kapture_proxy_inputs_path = path.join(localization_output_path, 'kapture_inputs')
+    map_plus_query_path = path.join(kapture_proxy_inputs_path, 'map_plus_query') if merge_path is None else merge_path
     eval_path = path.join(localization_output_path, f'eval')
 
     # global sfm results
@@ -100,8 +104,6 @@ def image_retrieval_benchmark(kapture_map_path: str,
 
     # local sfm results
     local_sfm_path = path.join(localization_output_path, f'local_sfm')
-    os.makedirs(local_sfm_path, exist_ok=True)
-    local_sfm_localize_path = path.join(local_sfm_path, f'localized')
     local_sfm_LTVL2020_output_path = path.join(localization_output_path, 'local_sfm_LTVL2020_style_result.txt')
 
     # pose approximation results
@@ -120,7 +122,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         os.makedirs(matches_gv_path)
 
     # build proxy kapture map in output folder
-    proxy_kapture_map_path = path.join(localization_output_path, 'kapture_inputs/proxy_mapping')
+    proxy_kapture_map_path = path.join(kapture_proxy_inputs_path, 'proxy_mapping')
     create_kapture_proxy_single_features(proxy_kapture_map_path,
                                          kapture_map_path,
                                          keypoints_path,
@@ -133,7 +135,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
                                          force_overwrite_existing)
 
     # build proxy kapture query in output folder
-    proxy_kapture_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_query')
+    proxy_kapture_query_path = path.join(kapture_proxy_inputs_path, 'proxy_query')
     create_kapture_proxy_single_features(proxy_kapture_query_path,
                                          kapture_query_path,
                                          keypoints_path,
@@ -170,7 +172,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         run_python_command(local_merge_path, merge_args, python_binary)
 
     # build proxy kapture map+query in output folder
-    proxy_kapture_map_plus_query_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query')
+    proxy_kapture_map_plus_query_path = path.join(kapture_proxy_inputs_path, 'proxy_map_plus_query')
     create_kapture_proxy_single_features(proxy_kapture_map_plus_query_path,
                                          map_plus_query_path,
                                          keypoints_path,
@@ -191,7 +193,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         run_python_command(local_compute_matches_path, compute_matches_args, python_binary)
 
     # build proxy gv kapture in output folder
-    proxy_kapture_map_plus_query_gv_path = path.join(localization_output_path, 'kapture_inputs/proxy_map_plus_query_gv')
+    proxy_kapture_map_plus_query_gv_path = path.join(kapture_proxy_inputs_path, 'proxy_map_plus_query_gv')
     create_kapture_proxy_single_features(proxy_kapture_map_plus_query_gv_path,
                                          map_plus_query_path,
                                          keypoints_path,
@@ -271,13 +273,11 @@ def image_retrieval_benchmark(kapture_map_path: str,
     if 'local_sfm' not in skip_list:
         # kapture_colmap_localize_localsfm
         local_colmap_localize_localsfm_path = path.join(pipeline_import_paths.HERE_PATH,
-                                                        '../tools/kapture_colmap_localize_localsfm.py')
+                                                        '../tools/kapture_pycolmap_localsfm.py')
         colmap_localize_localsfm_args = ['-v', str(logger.level),
-                                         '--map_plus_query', proxy_kapture_map_plus_query_path,
-                                         '--map_plus_query_gv', proxy_kapture_map_plus_query_gv_path,
+                                         '--i', proxy_kapture_map_plus_query_gv_path,
                                          '--query', proxy_kapture_query_path,
                                          '-o', local_sfm_path,
-                                         '-colmap', colmap_binary,
                                          '--pairsfile-path', pairfile_path]
         if force_overwrite_existing:
             colmap_localize_localsfm_args.append('-f')
@@ -287,7 +287,7 @@ def image_retrieval_benchmark(kapture_map_path: str,
         if 'export_LTVL2020' not in skip_list:
             export_LTVL2020_script_name, export_LTVL2020_args = get_benchmark_format_command(
                 benchmark_format_style,
-                local_sfm_localize_path,
+                local_sfm_path,
                 local_sfm_LTVL2020_output_path,
                 force_overwrite_existing,
                 logger
@@ -367,8 +367,8 @@ def image_retrieval_benchmark(kapture_map_path: str,
         if os.path.isdir(global_sfm_kapture_localize_recover_path):
             input_list.append(global_sfm_kapture_localize_recover_path)
             label_list.append(f'global_sfm_config_{config}')
-        if os.path.isdir(local_sfm_localize_path):
-            input_list.append(local_sfm_localize_path)
+        if os.path.isdir(local_sfm_path):
+            input_list.append(local_sfm_path)
             label_list.append('local_sfm')
         if os.path.isdir(pose_approx_EWB_path):
             input_list.append(pose_approx_EWB_path)
@@ -385,6 +385,11 @@ def image_retrieval_benchmark(kapture_map_path: str,
         if force_overwrite_existing:
             evaluate_args.append('-f')
         run_python_command(local_evaluate_path, evaluate_args, python_binary)
+
+    if remove_intermediate:
+        safe_remove_any_path(global_sfm_colmap_localize_path, force=True)
+        safe_remove_any_path(global_sfm_kapture_localize_import_path, force=True)
+        safe_remove_any_path(kapture_proxy_inputs_path, force=True)
 
 
 def image_retrieval_benchmark_get_parser():
@@ -463,6 +468,9 @@ def image_retrieval_benchmark_get_parser():
     parser.add_argument('--keypoints-type', default=None, help='kapture keypoints type.')
     parser.add_argument('--descriptors-type', default=None, help='kapture descriptors type.')
     parser.add_argument('--global-features-type', default=None, help='kapture global features type.')
+    parser.add_argument('--remove-intermediate', action='store_true', default=False,
+                        help=('remove global_sfm/colmap_localized, global_sfm/kapture_localized'
+                              ' and kapture_inputs at the end.'))
     return parser
 
 
@@ -506,7 +514,8 @@ def image_retrieval_benchmark_command_line():
                                   args.config,
                                   args.benchmark_style,
                                   args.skip,
-                                  args.force)
+                                  args.force,
+                                  args.remove_intermediate)
     else:
         raise EnvironmentError('Please restart this command as admin, it is required for os.symlink'
                                'see https://docs.python.org/3.6/library/os.html#os.symlink')

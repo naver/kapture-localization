@@ -58,8 +58,8 @@ def pycolmap_localize(kapture_path: str,
     """
     Localize images using pycolmap.
 
-    :param kapture_path: path to the kapture to use
-    :param kapture_query_path: path to the kapture to use (mapping and query images)
+    :param kapture_path: path to the kapture to use (mapping and query images)
+    :param kapture_query_path: path to the kapture to use (query images)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
@@ -126,10 +126,10 @@ def pycolmap_localize_from_loaded_data(kapture_data: kapture.Kapture,
     """
     Localize images using pycolmap.
 
-    :param kapture_data: loaded kapture data (incl. points3d)
+    :param kapture_data: loaded kapture data (mapping and query images, incl. points3d)
     :param kapture_path: path to the kapture to use
     :param tar_handlers: collection of pre-opened tar archives
-    :param kapture_data: loaded kapture data (mapping and query images)
+    :param kapture_query_data: loaded kapture data (query images)
     :param output_path: path to the write the localization results
     :param pairsfile_path: pairs to use
     :param max_error: RANSAC inlier threshold in pixel
