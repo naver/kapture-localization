@@ -318,8 +318,8 @@ for DATASET in Aachen-Day-Night-v1.1 baidu-mall RobotCar_Seasons-v1 GangnamStati
    for METHOD in how fire; do
       for TOPK in 20 10 5 4 3 2 1; do
          kapture_slice_pairsfile.py -v info \
-                                    -i ${DATASET}/pairfiles/query/${METHOD}_top50.txt \
-                                    -o ${DATASET}/pairfiles/query/${METHOD}_top${TOPK}.txt \
+                                    -i ${DATASET}/pairsfile/query/${METHOD}_top50.txt \
+                                    -o ${DATASET}/pairsfile/query/${METHOD}_top${TOPK}.txt \
                                     --topk ${TOPK}
       done
    done
