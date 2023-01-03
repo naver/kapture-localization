@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy_pip:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
         twine upload --verbose --skip-existing dist/*
 
   deploy_docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
