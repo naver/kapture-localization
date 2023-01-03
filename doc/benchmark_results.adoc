@@ -718,7 +718,7 @@ image::../doc/plots/feather2d2/robotcar_eval_night_ewb_5_0m_10_0deg.png[robotcar
 [%header]
 |===
 |feature type|topk 3+|test 5+|validation
-|||(0.25m_2.0deg)|(0.5m_5.0deg)|(5.0m_10.0deg)|(0.25m_2.0deg)|(0.5m_5.0deg)|(5.0m_10.0deg)|median distance (m)|median angle (deg)
+|||(0.1m_1.0deg)|(0.25m_2.0deg)|(1.0m_5.0deg)|(0.1m_1.0deg)|(0.25m_2.0deg)|(1.0m_5.0deg)|median distance (m)|median angle (deg)
 |AP-GeM-LM18|1|26.8%|37.2%|41.2%|20.74%|33.52%|38.54%|21.2516|18.8292
 |densevlad_multi|1|30.6%|42.0%|46.5%|27.73%|44.10%|49.34%|0.5458|1.7576
 |fire|1|37.0%|51.7%|57.5%|34.61%|56.88%|64.30%|0.0703|1.3495
