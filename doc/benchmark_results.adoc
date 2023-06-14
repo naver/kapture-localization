@@ -349,7 +349,7 @@ image::../doc/plots/feather2d2/baidu-mall_eval_global_sfm_5_0m_10_0deg.png[baidu
 ==== local_sfm
 
 [%header,format=csv,separator=;]
-|===       
+|===
 feature type;topk;(0.25m_2.0deg);(0.5m_5.0deg);(5.0m_10.0deg);median distance (m);median angle (deg)
 AP-GeM-LM18;1;0.00%;0.00%;0.00%;inf;inf
 DELG;1;0.00%;0.00%;0.00%;inf;inf
