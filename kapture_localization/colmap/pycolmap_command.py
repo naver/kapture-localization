@@ -7,7 +7,6 @@ try:
     else:
         compatibility_mode = False
     has_pycolmap = True
-    print("toto has pylmap")
 except Exception as e:  # ModuleNotFoundError:
     print(e)
     has_pycolmap = False
