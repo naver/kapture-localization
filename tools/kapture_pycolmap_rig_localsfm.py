@@ -10,11 +10,6 @@ import logging
 import os
 from tqdm import tqdm
 from typing import Optional, List
-try:
-    import pycolmap
-    has_pycolmap = True
-except ModuleNotFoundError:
-    has_pycolmap = False
 
 import datetime
 import numpy as np
@@ -27,6 +22,7 @@ from kapture_localization.utils.cv_camera_matrix import get_camera_matrix_from_k
 from kapture_localization.utils.rigs_extension import get_top_level_rig_ids, get_all_cameras_from_rig_ids
 from kapture_localization.triangulation.integration import aggregate_matches, triangulate_all_points
 from kapture_localization.triangulation.integration import convert_correspondences
+from kapture_localization.colmap.pycolmap_command import rig_absolute_pose_estimation, has_pycolmap
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -296,9 +292,9 @@ def kapture_pycolmap_rig_localsfm_from_loaded_data(
                 # compute absolute pose
                 # inlier_threshold - RANSAC inlier threshold in pixels
                 # answer - dictionary containing the RANSAC output
-                ret = pycolmap.rig_absolute_pose_estimation(points2D, points3D, cameras_dict, qvec, tvec, max_error,
-                                                            min_inlier_ratio, min_num_iterations, max_num_iterations,
-                                                            confidence)
+                ret = rig_absolute_pose_estimation(points2D, points3D, cameras_dict, qvec, tvec, max_error,
+                                                   min_inlier_ratio, min_num_iterations, max_num_iterations,
+                                                   confidence)
 
                 # add pose to output kapture
                 if ret['success'] and ret['num_inliers'] > 0:

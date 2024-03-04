@@ -15,11 +15,6 @@ try:
     has_pyransaclib = True
 except ModuleNotFoundError:
     has_pyransaclib = False
-try:
-    import pycolmap
-    has_pycolmap = True
-except ModuleNotFoundError:
-    has_pycolmap = False
 
 import datetime
 import cv2
@@ -32,6 +27,7 @@ from kapture_localization.localization.reprojection_error import compute_reproje
 from kapture_localization.utils.cv_camera_matrix import get_camera_matrix_from_kapture
 from kapture_localization.triangulation.integration import aggregate_matches, triangulate_all_points
 from kapture_localization.triangulation.integration import convert_correspondences
+from kapture_localization.colmap.pycolmap_command import pose_refinement, has_pycolmap
 
 import kapture_localization.utils.path_to_kapture  # noqa: F401
 import kapture
@@ -296,7 +292,7 @@ def kapture_pyransaclib_localsfm_from_loaded_data(kapture_data: kapture.Kapture,
                         'height': int(height),
                         'params': params
                     }
-                    ret_refine = pycolmap.pose_refinement(pose.t_raw, pose.r_raw, points2D, points3D, inlier_mask, cfg)
+                    ret_refine = pose_refinement(pose.t_raw, pose.r_raw, points2D, points3D, inlier_mask, cfg)
                     if ret_refine['success']:
                         pose = kapture.PoseTransform(ret_refine['qvec'], ret_refine['tvec'])
                         logger.debug(f'{image_name} refinement success, new pose: {pose}')
