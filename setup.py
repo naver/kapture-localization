@@ -45,7 +45,7 @@ long_description = read_doc(readme_filepath)
 setuptools.setup(
     # description
     name='kapture-localization',
-    version="0.1.8",
+    version="1.1.9",
     author="naverlabs",
     author_email="kapture@naverlabs.com",
     description="kapture-localization: localization pipelines based on kapture.",
@@ -59,7 +59,7 @@ setuptools.setup(
     ],
 
     # dependencies
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     install_requires=[
         'kapture>=1.1.8,<1.2.0',
         'numpy>=1.16',
@@ -69,12 +69,14 @@ setuptools.setup(
         'torch>=1.4.0',
         'tabulate>=0.8.7',
         'opencv-python',
+        'build>=1.0.3',
     ],
     extras_require={
         'dev': ['pytest'],
     },
     # sources
     packages=setuptools.find_packages(),
+    data_files=[(".", ["README.adoc"])],
     scripts=[file
              for dir in ["tools", 'pipeline']
              for file in glob(os.path.join(HERE, dir, '*.py'))],
