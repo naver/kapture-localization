@@ -47,7 +47,7 @@ There are 3 pipelines available:
 == Installation
 
 It can be installed using docker, pip or from manually from source code.
-After installing python (>=3.6) and COLMAP (>=3.6), this toolbox can be installed with:
+After installing python (>=3.8) and COLMAP (>=3.6), this toolbox can be installed with:
 
 [source,bash]
 ----
