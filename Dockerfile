@@ -1,5 +1,4 @@
-#FROM ubuntu:18.04
-FROM nvidia/cudagl:10.0-devel-ubuntu18.04
+FROM nvcr.io/nvidia/cuda:11.7.0-devel-ubuntu20.04
 MAINTAINER naverlabs "kapture@naverlabs.com"
 
 # setup environment
@@ -12,16 +11,13 @@ ARG     SOURCE_PREFIX="/opt/src"
 
 RUN mkdir -p ${SOURCE_PREFIX}
 
-#Nvidia Public GPG Key
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
-
 # Get dependencies
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     git \
     wget curl \
     unzip openssh-client libssl-dev \
-    python3.6 python3-pip python3-dev \
+    python3 python3-pip python3-dev \
     pandoc asciidoctor \
     build-essential \
     libboost-all-dev \
@@ -37,7 +33,7 @@ RUN apt-get update \
     libsuitesparse-dev \
     libcgal-qt5-dev \
     libqt5opengl5-dev \
-    qt5-default \
+    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
     x11-apps \
     mesa-utils \
   && rm -rf /var/lib/apt/lists/*
@@ -130,7 +126,7 @@ RUN      python3 -m pip install kapture
 # install kapture-localization
 ADD      . ${SOURCE_PREFIX}/kapture-localization
 WORKDIR  ${SOURCE_PREFIX}/kapture-localization
-RUN      python3 -m pip install "torch==1.4.0" "torchvision==0.5.0" "scikit_learn==0.20.2"
+RUN      python3 -m pip install "torch==2.2.1" "torchvision==0.17.1" "scikit_learn==1.3.2"
 RUN      python3 -m pip install -r requirements.txt
 RUN      python3 setup.py install
 
