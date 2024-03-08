@@ -1,6 +1,5 @@
-kapture>=1.1.8,<1.2.0
-# numpy 1.20 requires python 3.7
-numpy>=1.16
+kapture>=1.1.9,<1.2.0
+numpy>=1.20
 numpy-quaternion
 numba
 cvxpy>=1.1.6

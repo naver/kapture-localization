@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/cuda:11.7.0-devel-ubuntu20.04
+FROM nvcr.io/nvidia/cuda:12.3.2-devel-ubuntu22.04
 MAINTAINER naverlabs "kapture@naverlabs.com"
 
 # setup environment
@@ -8,89 +8,57 @@ ENV     DEBIAN_FRONTEND noninteractive
 # arguments
 ARG     MAKE_OPTIONS="-j8"
 ARG     SOURCE_PREFIX="/opt/src"
+ARG     CUDA_ARCHITECTURES=75
 
 RUN mkdir -p ${SOURCE_PREFIX}
 
-# Get dependencies
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-    git \
-    wget curl \
-    unzip openssh-client libssl-dev \
-    python3 python3-pip python3-dev \
-    pandoc asciidoctor \
-    build-essential \
-    libboost-all-dev \
-    libsuitesparse-dev \
-    libfreeimage-dev \
-    libgoogle-glog-dev \
-    libgflags-dev \
-    libglew-dev \
-    freeglut3-dev \
-    libxmu-dev \
-    libxi-dev \
-    libatlas-base-dev \
-    libsuitesparse-dev \
-    libcgal-qt5-dev \
-    libqt5opengl5-dev \
-    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
-    x11-apps \
-    mesa-utils \
-  && rm -rf /var/lib/apt/lists/*
+# base tools
+RUN     apt-get update \
+     && apt-get install -y \
+        git \
+        wget cmake \
+        build-essential \
+     && rm -rf /var/lib/apt/lists/*
+
+# PYTHON & PIP ###########################################################################################################
+RUN     apt-get update \
+     && apt-get install -y python3 python3-pip \
+     && python3 -m pip install --upgrade pip \
+     && python3 -m pip install --upgrade setuptools wheel twine
 
 
-########################################################################################################################
-# PYTHON-PIP ###########################################################################################################
-# make sure pip 3 is >= 20.0 to enable use-feature=2020-resolver
-RUN     python3 -m pip install --upgrade pip
-RUN     python3 -m pip install --upgrade setuptools wheel twine
-
-# force upgrade of cmake (more than apt get)
-## CMAKE version 3.23.0-rc1
-WORKDIR ${SOURCE_PREFIX}
-RUN     wget https://github.com/Kitware/CMake/releases/download/v3.23.0-rc1/cmake-3.23.0-rc1.tar.gz && \
-        tar -xf cmake-3.23.0-rc1.tar.gz
-RUN     cd cmake-3.23.0-rc1 && ./bootstrap && make install
-
-########################################################################################################################
 # COLMAP ###############################################################################################################
-# ├── eigen
-# └── ceres
-
-# Eigen 3.3.9
+RUN     apt-get update \
+     && apt-get install -y --no-install-recommends --no-install-suggests \
+            git \
+            cmake \
+            ninja-build \
+            build-essential \
+            libboost-program-options-dev \
+            libboost-filesystem-dev \
+            libboost-graph-dev \
+            libboost-system-dev \
+            libeigen3-dev \
+            libflann-dev \
+            libfreeimage-dev \
+            libmetis-dev \
+            libgoogle-glog-dev \
+            libgtest-dev \
+            libsqlite3-dev \
+            libglew-dev \
+            qtbase5-dev \
+            libqt5opengl5-dev \
+            libcgal-dev \
+            libceres-dev
+## colmap
 WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git eigen
-RUN     mkdir -p eigen/build
-WORKDIR ${SOURCE_PREFIX}/eigen/build
-RUN     cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-         .. && \
-        make ${MAKE_OPTIONS} && make install && make clean
-
-# ceres 2.0.0
-WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 2.0.0 https://github.com/ceres-solver/ceres-solver.git
-RUN     mkdir -p ceres-solver/build
-WORKDIR ${SOURCE_PREFIX}/ceres-solver/build
-RUN     cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_EXAMPLES=OFF \
-        -DBUILD_BENCHMARKS=OFF \
-        ../ && \
-        make ${MAKE_OPTIONS} && make install && make clean
-
-# colmap
-WORKDIR ${SOURCE_PREFIX}
-RUN     git clone -b 3.7 https://github.com/colmap/colmap.git
-WORKDIR ${SOURCE_PREFIX}/colmap
-RUN     mkdir -p build
-WORKDIR ${SOURCE_PREFIX}/colmap/build
-RUN     cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DTESTS_ENABLED=OFF \
-        .. && \
-        make ${MAKE_OPTIONS} && make install && make clean
+RUN     git clone -b 3.9 https://github.com/colmap/colmap.git
+RUN     cd colmap \
+     && mkdir build \
+     && cd build \
+     && cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES} \
+          -DCMAKE_INSTALL_PREFIX=/colmap_installed \
+     && ninja install
 
 ######### POSELIB ##############################################################
 WORKDIR ${SOURCE_PREFIX}
@@ -99,36 +67,34 @@ WORKDIR ${SOURCE_PREFIX}/PoseLib
 RUN     git checkout 67dc757c619a320ae3cf4a4ffd4e4b7fc5daa692 && \
         git submodule update --recursive # version required by PYRANSACLIB
 RUN     mkdir -p ${SOURCE_PREFIX}/PoseLib/_build
-RUN     cd ${SOURCE_PREFIX}/PoseLib/_build && \
-        cmake -DCMAKE_INSTALL_PREFIX=../_install .. && \
-        cmake --build . --target install -j 8 && \
-        cmake --build . --target clean
+RUN     cd ${SOURCE_PREFIX}/PoseLib/_build \
+     && cmake -DCMAKE_INSTALL_PREFIX=../_install .. \
+     && cmake --build . --target install -j 8 \
+     && cmake --build . --target clean
 
 ######### PYCOLMAP #############################################################
-WORKDIR ${SOURCE_PREFIX}
-RUN     git clone --recursive -b v0.1.0 https://github.com/colmap/pycolmap.git
-WORKDIR ${SOURCE_PREFIX}/pycolmap
-RUN     python3 -m pip install ./
+RUN     python3 -m pip install pycolmap
 
 ######### PYRANSACLIB ##########################################################
 WORKDIR ${SOURCE_PREFIX}
 RUN     git clone --recursive -n https://github.com/tsattler/RansacLib.git
 WORKDIR ${SOURCE_PREFIX}/RansacLib
-RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113 && \
-        git submodule update --recursive
-RUN     sed -i '4i set(CMAKE_CXX_STANDARD 17)' CMakeLists.txt
+RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113 \
+     && git submodule update --recursive \
+     && sed -i '4i set(CMAKE_CXX_STANDARD 14)' CMakeLists.txt
 RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib  python3 -m pip install ./
+
 
 #########################################################################################################################
 # install kapture from pip.
-RUN      python3 -m pip install kapture
+RUN      python3 -m pip install kapture==1.1.9
 
-# install kapture-localization
+ # install kapture-localization
 ADD      . ${SOURCE_PREFIX}/kapture-localization
 WORKDIR  ${SOURCE_PREFIX}/kapture-localization
-RUN      python3 -m pip install "torch==2.2.1" "torchvision==0.17.1" "scikit_learn==1.3.2"
-RUN      python3 -m pip install -r requirements.txt
-RUN      python3 setup.py install
+RUN      python3 -m pip install "torch==2.2.1" "torchvision==0.17.1" "scikit_learn==1.3.2" \
+      && python3 -m pip install -r requirements.txt \
+      && python3 -m pip install .
 
 ### FINALIZE ###################################################################
 # save space: purge apt-get
