@@ -35,7 +35,10 @@ def absolute_pose_estimation(points2D, points3D, camera_dict, max_error, min_inl
             ret = {'success': False}
         else:
             ret['success'] = True
-            retmat = ret['cam_from_world'].matrix
+            try:
+                retmat = ret['cam_from_world'].matrix
+            except Exception as e:
+                retmat = ret['cam_from_world'].matrix()
             ret['qvec'] = quaternion.from_rotation_matrix(retmat[:3, :3])
             ret['tvec'] = retmat[:3, 3]
         return ret
@@ -71,7 +74,10 @@ def rig_absolute_pose_estimation(points2D, points3D, cameras_dict, qvec, tvec, m
             ret = {'success': False}
         else:
             ret['success'] = True
-            retmat = ret['rig_from_world'].matrix
+            try:
+                retmat = ret['cam_from_world'].matrix
+            except Exception as e:
+                retmat = ret['cam_from_world'].matrix()
             ret['qvec'] = quaternion.from_rotation_matrix(retmat[:3, :3])
             ret['tvec'] = retmat[:3, 3]
         return ret
@@ -95,7 +101,10 @@ def pose_refinement(tvec, qvec, points2D, points3D, inlier_mask, camera_dict):
             ret = {'success': False}
         else:
             ret['success'] = True
-            retmat = ret['cam_from_world'].matrix
+            try:
+                retmat = ret['cam_from_world'].matrix
+            except Exception as e:
+                retmat = ret['cam_from_world'].matrix()
             ret['qvec'] = quaternion.from_rotation_matrix(retmat[:3, :3])
             ret['tvec'] = retmat[:3, 3]
         return ret
