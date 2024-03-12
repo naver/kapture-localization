@@ -57,7 +57,6 @@ RUN     cd colmap \
      && mkdir build \
      && cd build \
      && cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES} \
-          -DCMAKE_INSTALL_PREFIX=/colmap_installed \
      && ninja install
 
 ######### POSELIB ##############################################################
@@ -89,7 +88,7 @@ RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib  p
 # install kapture from pip.
 RUN      python3 -m pip install kapture==1.1.10
 
- # install kapture-localization
+# install kapture-localization
 ADD      . ${SOURCE_PREFIX}/kapture-localization
 WORKDIR  ${SOURCE_PREFIX}/kapture-localization
 RUN      python3 -m pip install "torch==2.2.1" "torchvision==0.17.1" "scikit_learn==1.3.2" \

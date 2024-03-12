@@ -34,10 +34,10 @@ Requirements:
  - python (>=3.8) + python3-pip
  - COLMAP (>=3.6)
 
-=== linux (Ubuntu 20.04 LTS)
+=== linux (Ubuntu 22.04 LTS)
 
 kapture-localization requires a recent version of COLMAP (>=3.6).
-Unfortunately, `apt-get` in Ubuntu 18.04 will install COLMAP 3.4.
+Unfortunately, `apt-get` in Ubuntu 20.04 will install COLMAP 3.4.
 A solution is **to install COLMAP from source**. You will find instructions of how to do that in the link:../Dockerfile[Dockerfile] and on the https://colmap.github.io/install.html[COLMAP website].
 
 Then, in a terminal (e.g. __bash__), run:
@@ -104,7 +104,7 @@ and optionally (for documentation), __pandoc__ and __asciidoctor__.
 
 When you install __kapture-localization__ from source, you should also install __kapture__ from source, as the most recent changes in __kapture-localization__ might use code from __kapture__ which are not part of a release or pushed to pip yet.
 
-=== Linux (Ubuntu 18.04 LTS)
+=== Linux (Ubuntu 22.04 LTS)
 
 In a terminal, do:
 
