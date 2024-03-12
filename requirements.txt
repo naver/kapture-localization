@@ -1,4 +1,4 @@
-kapture>=1.1.9,<1.2.0
+kapture>=1.1.10,<1.2.0
 numpy>=1.20
 numpy-quaternion
 numba

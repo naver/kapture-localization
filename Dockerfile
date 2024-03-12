@@ -85,9 +85,9 @@ RUN     git checkout 8b5a8b062711ee9cc57bc73907fbe0ae769d5113 \
 RUN     CMAKE_PREFIX_PATH=${SOURCE_PREFIX}/PoseLib/_install/lib/cmake/PoseLib  python3 -m pip install ./
 
 
-#########################################################################################################################
+########################################################################################################################
 # install kapture from pip.
-RUN      python3 -m pip install kapture==1.1.9
+RUN      python3 -m pip install kapture==1.1.10
 
  # install kapture-localization
 ADD      . ${SOURCE_PREFIX}/kapture-localization
