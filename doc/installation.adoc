@@ -12,11 +12,29 @@ We provide a docker image that can be run like this:
 
 [source,bash]
 ----
-docker run --runtime=nvidia # benefit from the GPU acceleration \
-    -it --rm # automatically remove the container when it exits \
-    --volume <my_data>:<my_data> # give access to your data on your machine \
+docker run --runtime=nvidia `# benefit from the GPU acceleration` \
+    -it --rm `# automatically remove the container when it exits` \
+    --volume <my_data>:<my_data> `# give access to your data on your machine` \
     kapture/kapture-localization
 ----
+
+If you want to be able to open colmap gui, you need extra arguments:
+[source,bash]
+----
+xhost +local:root # allow access the running X server
+docker run --runtime=nvidia -it --rm \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    --env="QT_X11_NO_MITSHM=1" \
+    --env="DISPLAY"  \
+    --gpus all \
+    --privileged \
+ kapture/kapture-localization
+----
+
+See full details on colmap repo:
+
+ . https://github.com/colmap/colmap/discussions/2386[colmap xhost issue]
+ . https://github.com/colmap/colmap/blob/main/docker/run-gui.sh[colmap docker]
 
 You can also build your own docker image as follow:
 
@@ -37,8 +55,11 @@ Requirements:
 === linux (Ubuntu 22.04 LTS)
 
 kapture-localization requires a recent version of COLMAP (>=3.6).
-Unfortunately, `apt-get` in Ubuntu 20.04 will install COLMAP 3.4.
-A solution is **to install COLMAP from source**. You will find instructions of how to do that in the link:../Dockerfile[Dockerfile] and on the https://colmap.github.io/install.html[COLMAP website].
+Ubuntu 22.04 `apt` provides colmap 3.7, that should be ok.
+Unfortunately, Ubuntu 18.04 `apt-get` in will install COLMAP 3.4.
+A solution is **to install COLMAP from source**.
+You will find instructions of how to do that in the link:../Dockerfile[Dockerfile]
+and on the https://colmap.github.io/install.html[COLMAP website].
 
 Then, in a terminal (e.g. __bash__), run:
 
@@ -46,7 +67,7 @@ Then, in a terminal (e.g. __bash__), run:
 ----
 # install requirements
 # make sure you have COLMAP 3.6 (see above instructions)
-sudo apt-get install -y python3.6 python3-pip
+sudo apt-get install -y python3 python3-pip
 # install kapture-localization
 python3 -m pip install kapture-localization
 ----

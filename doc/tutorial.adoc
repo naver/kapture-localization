@@ -125,7 +125,13 @@ to allow symlink. They should also enable long paths. See link:installation.adoc
 .using docker
 [source,bash]
 ----
-docker run --runtime=nvidia -it --rm  kapture/kapture-localization
+docker run -it --rm   \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    --env="QT_X11_NO_MITSHM=1" \
+    --env="DISPLAY"  \
+    --gpus all \
+    --privileged \
+  kapture/kapture-localization
 cd kapture-localization
 ----
 
@@ -303,7 +309,14 @@ The example scripts can be found in link:https://github.com/naver/kapture-locali
 We will use the pre-built docker container for these examples.
 ```
 docker pull kapture/kapture-localization
-docker run --runtime=nvidia -it --rm --volume <my_data>:<my_data> kapture/kapture-localization
+docker run -it --rm
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    --env="QT_X11_NO_MITSHM=1" \
+    --env="DISPLAY"  \
+    --gpus all \
+    --privileged \
+    --volume <my_data>:<my_data> \
+    kapture/kapture-localization
 ```
 
 The path specified in WORKING_DIR (defined in the scripts) can be the same for all examples. There will be a subfolder that contains the downloaded datasets and a subfolder that contains the processed data for each example.
