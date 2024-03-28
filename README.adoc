@@ -60,6 +60,12 @@ See link:doc/installation.adoc[] for more details.
 
 See link:doc/tutorial.adoc[doc/tutorial] for a short introduction and examples of the provided processing pipelines.
 
+== Image Retrieval Benchmark
+
+link:doc/benchmark.adoc[Benchmark pipeline]
+
+link:doc/benchmark_results.adoc[Benchmark results]
+
 == Contributing
 
 There are many ways to contribute to the __kapture-localization__ project:
